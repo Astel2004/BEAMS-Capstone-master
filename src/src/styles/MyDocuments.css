@@ -1,0 +1,126 @@
+/* File Upload Section */
+.file-upload-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem 0;
+  }
+  
+  .file-drop-area {
+    flex: 1;
+    border: 2px dashed #ccc;
+    padding: 1rem;
+    text-align: center;
+    border-radius: 8px;
+    margin: 1rem;
+  }
+  
+  .browse-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .browse-button:hover {
+    background-color: #005fa3;
+  }
+  
+  .file-type-section {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .file-type-buttons button {
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .file-type-buttons button.active {
+    background-color: #1abc9c;
+    color: white;
+  }
+  
+  .upload-button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .upload-button:hover {
+    background-color: #16a085;
+  }
+  
+  /* Uploaded Documents Table */
+  .uploaded-documents{
+    margin: 1rem;
+  }
+  .uploaded-documents table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .uploaded-documents th,
+  .uploaded-documents td {
+    padding: 0.75rem;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+  
+  .uploaded-documents th {
+    background-color: #1abc9c;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .uploaded-documents tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .uploaded-documents tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .view-button {
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .view-button:hover {
+    background-color: #005fa3;
+  }
+  
+  .delete-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .delete-button:hover {
+    background-color: #c0392b;
+  }
+
+  .document-content{
+    width: 70rem;
+  }

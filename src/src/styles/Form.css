@@ -1,0 +1,124 @@
+/* Background Section */
+.form-left-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+  color: white;
+  padding: 2rem;
+  box-sizing: border-box;
+  overflow: hidden; /* Ensure the pseudo-element doesn't overflow */
+  background: linear-gradient(135deg, #0cc0df, #ffde59);
+}
+
+.form-left-background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../assets/background.jpg'); /* Replace with the correct path */
+  background-size: cover;
+  background-position: center;
+  opacity: 0.5; /* Adjust opacity for a subtle effect */
+  z-index: -1; /* Place it behind the content */
+}
+.form-left-background .bg-texts{
+  position: absolute;
+  top: 40%;
+  left: 15%;
+  transform: translateY(-50%);
+  max-width: 1000px;
+  text-align: left;
+  text-shadow: 5px 5px 5px rgba(0, 0, 0, 5); /* Optional: Add a shadow for better readability */
+}
+
+.form-left-background h1 {
+  font-size: 5rem;
+  margin-top: 8rem;
+  margin-bottom: 1rem;
+  line-height: 1.8em;
+}
+
+.form-left-background p {
+  font-size: 4rem;
+  font-weight: 800;
+}
+
+/* Form Wrapper */
+.form-wrapper {
+  position: absolute;
+  right: 10%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 80%;
+  width: 500px;
+  background-color: white;
+  border-radius: 2rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  padding: 2rem;
+  z-index: 1; /* Ensure it appears above the background */
+}
+
+/* Form headings */
+.form-wrapper h2 {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color, #0077cc);
+  text-align: center;
+}
+
+/* Form group blocks */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+
+/* Inputs & Select */
+.form-wrapper input,
+.form-wrapper select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.3rem;
+  font-size: 1rem;
+  background-color: #46587e66;
+  color: black;
+}
+
+.form-wrapper input::placeholder{
+  color: rgba(0, 0, 0, 0.418);
+}
+
+.form-wrapper label{
+  display: block;
+  text-align: left;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+/* Buttons */
+button.login-button, button.signin-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 500;
+  border: none;
+  border-radius: 0.3rem;
+  font-size: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+button.login-button:hover {
+  background-color: #009e2f;
+}
+button.signin-button:hover {
+  background-color: #009e2f;
+}
+

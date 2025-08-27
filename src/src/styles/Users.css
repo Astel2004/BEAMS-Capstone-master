@@ -1,0 +1,219 @@
+.user-list-table {
+  width: 100%;
+  max-width: 1025px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin: 1rem;
+  overflow: hidden;
+}
+
+.user-list-table th,
+.user-list-table td {
+  padding: 0.9rem 1.2rem;
+  text-align: center;
+  border: 1.5px solid #1abc9c;
+  font-size: 1rem;
+  background-clip: padding-box;
+}
+
+.user-list-table th {
+  background: #1abc9c;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border: 1.5px solid #16a085;
+}
+
+.user-list-table tr:last-child td {
+  border-bottom: 1.5px solid #1abc9c;
+}
+
+.user-list-table tr:first-child th:first-child {
+  border-top-left-radius: 8px;
+}
+.user-list-table tr:first-child th:last-child {
+  border-top-right-radius: 8px;
+}
+.user-list-table tr:last-child td:first-child {
+  border-bottom-left-radius: 8px;
+}
+.user-list-table tr:last-child td:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+.user-list-table button {
+  background: #0077cc;
+  color: #fff;
+  border: 2px solid #1abc9c;
+  border-radius: 6px;
+  padding: 0.4rem 1.1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+}
+
+.user-list-table button:hover {
+  background: #005fa3;
+  border-color: #16a085;
+}
+
+.user-management-nav {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  max-width: 1025px;
+  border: 2.5px solid #1abc9c;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  margin: 1rem;
+}
+
+.user-nav-btn {
+  flex: 1 1 0;
+  border: none;
+  background: #1abc9ca2;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 500;
+  
+  padding: 1rem 0;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  border-radius: 0;
+  border-right: 1.5px solid #fff;
+  border-bottom: 2.5px solid #1abc9c;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.user-nav-btn:last-child {
+  border-right: none;
+}
+
+.user-nav-btn:hover, .user-nav-btn.active {
+  background: #16a085;
+  border-bottom: 2.5px solid #16a085;
+  z-index: 1;
+}
+
+.add-user-window {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  padding: 2rem 2.5rem;
+  max-width: 600px;
+  width: 100%;
+  margin: 2rem auto 0 auto;
+  border: 1.5px solid #1abc9c;
+}
+.add-user-window h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.2rem;
+  color: #333;
+}
+.add-user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.add-user-form-row {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 1.1rem;
+}
+
+.add-user-form-row label {
+  min-width: 130px;
+  font-weight: 500;
+  color: #222;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+/* Employee dropdown for add user form */
+.employee-dropdown {
+  width: 100%;
+  max-width: 500px;
+  padding: 0.6rem 1rem;
+  border: 1.5px solid #1abc9c;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #000;
+  background: #f9f9f9;
+}
+
+.add-user-form-row input[type="text"],
+.add-user-form-row input[type="email"],
+.add-user-form-row input[type="password"] {
+  flex: 1 1 0;
+  padding: 0.6rem 1rem;
+  border: 1.5px solid #1abc9c;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #f9f9f9;
+  color: #000;
+  transition: border-color 0.2s;
+}
+
+.add-user-form-row input:focus {
+  border-color: #16a085;
+  outline: none;
+}
+
+.add-user-form-row input[readonly] {
+  background: #f4f4f4;
+  color: #888;
+}
+
+.add-user-form label {
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+  color: #222;
+}
+
+.add-user-form input[type="text"],
+.add-user-form input[type="email"],
+.add-user-form input[type="password"] {
+  width: 100%;
+  max-width: 500px;
+  padding: 0.6rem 1rem;
+  border: 1.5px solid #1abc9c;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #f9f9f9;
+  transition: border-color 0.2s;
+}
+
+.add-user-form input:focus {
+  border-color: #16a085;
+  outline: none;
+}
+
+.add-user-form input[readonly] {
+  background: #f4f4f4;
+  color: #888;
+}
+
+.add-user-button {
+  background: #1abc9c;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.7rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+
+.add-user-button:hover {
+  background: #16a085;
+}

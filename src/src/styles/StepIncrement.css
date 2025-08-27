@@ -1,0 +1,118 @@
+/* Sort Dropdown Styles */
+.step-increment-table-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.step-increment-sort-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 0.5px;
+}
+
+.step-increment-sort-label {
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
+
+.step-increment-sort-select {
+  padding: 0.4rem 0.7rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 1rem;
+  color: #333;
+  margin-right: 1rem;
+  transition: border-color 0.2s;
+}
+
+.step-increment-sort-select:focus {
+  border-color: #007bff;
+}
+/* Sticky header for step increment table */
+.step-increment-table-scroll th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #1abc9c;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  border-right: 1px solid #ddd;
+}
+.step-increment-table-scroll th:last-child {
+  border-right: none;
+}
+/* Scrollable wrapper for step increment table, matching employee records */
+.step-increment-table-scroll {
+  max-height: 630px;
+  overflow-y: auto;
+  width: 100%;
+  display: block;
+  padding-right: 0;
+  box-sizing: border-box;
+}
+/* Table container to match dashboard card/table look */
+.step-increment-table {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 1rem;
+  padding: 1rem;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.step-increment-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .step-increment-table th{
+    padding: 0.75rem;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+  .step{
+    padding: 0.75rem;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+  .lastName {
+    padding: 0.75rem;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  .step-increment-table th {
+    background-color: #1abc9c;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .step-increment-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .step-increment-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .notification-button {
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .notification-button:hover {
+    background-color: #005fa3;
+  }

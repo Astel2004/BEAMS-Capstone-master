@@ -1,0 +1,82 @@
+/* Increment Tracking Section */
+.increment-tracking {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    margin: 1rem;
+  }
+
+  .step-increment-table{
+    margin: 1rem;
+  }
+  
+  .increment-content{
+    width: 70rem;
+  }
+
+  .left-table,
+  .right-table {
+    flex: 1;
+    background-color: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .left-table table,
+  .right-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .left-table td,
+  .right-table td {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+  }
+  
+  .left-table td:first-child,
+  .right-table td:first-child {
+    font-weight: bold;
+    text-align: left;
+  }
+  
+  .left-table td:last-child,
+  .right-table td:last-child {
+    text-align: center;
+  }
+  
+  /* Action Buttons */
+  .action-buttons {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .request-review-button,
+  .view-service-record-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .request-review-button {
+    background-color: #1abc9c;
+    color: white;
+  }
+  
+  .request-review-button:hover {
+    background-color: #16a085;
+  }
+  
+  .view-service-record-button {
+    background-color: #0077cc;
+    color: white;
+  }
+  
+  .view-service-record-button:hover {
+    background-color: #005fa3;
+  }

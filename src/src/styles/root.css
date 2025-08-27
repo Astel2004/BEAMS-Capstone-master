@@ -1,0 +1,23 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Variables */
+  :root {
+    --primary-color: #4CAF50;
+    --secondary-color: #333;
+    --font-main: 'Poppins', sans-serif;
+  }
+  
+  /* Base Styles */
+  body {
+    font-family: var(--font-main);
+    background: #f9f9f9;
+    color: var(--secondary-color);
+    line-height: 1.6;
+    overflow: hidden;
+  }
+
