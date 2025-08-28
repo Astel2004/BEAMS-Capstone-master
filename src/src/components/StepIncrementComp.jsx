@@ -136,8 +136,7 @@ const StepIncrementComp = () => {
                     const currentStep = parseInt(employee.step.replace("Step ", ""));
                     const nextStep = `Step ${currentStep + 1}`;
                     const dueDate = new Date();
-                    dueDate.setDate(dueDate.getDate() + 30); // Example: Due date is 30 days from now
-
+                    dueDate.setDate(dueDate.getDate() + 90); // Step increment due date
                     return (
                       <tr key={employee.id}>
                         <td className="step">{employee.id}</td>
