@@ -63,6 +63,15 @@ const StepIncrementComp = () => {
     // Add logic to send notification
   };
 
+  // Function to calculate step based on dateJoined
+  const calculateStep = (dateJoined) => {
+    if (!dateJoined) return 1;
+    const joinDate = new Date(dateJoined);
+    const now = new Date();
+    const diffMonths = Math.floor((now - joinDate) / (1000 * 60 * 60 * 24 * 30.44)); // Approximate months
+    return Math.floor(diffMonths / 3) + 1; // Every 3 months is a new step
+  };
+
   return (
     <div className="dashboard-container">
       {/* Sidebar */}
@@ -125,7 +134,7 @@ const StepIncrementComp = () => {
                   <th>Salary Grade</th>
                   <th>Current Step</th>
                   <th>Next Step</th>
-                  <th>Due Date</th>
+                  <th>Due Date Next Step</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -133,16 +142,17 @@ const StepIncrementComp = () => {
               <tbody>
                 {eligibleEmployees.length > 0 ? (
                   eligibleEmployees.map((employee) => {
-                    const currentStep = parseInt(employee.step.replace("Step ", ""));
+                    const currentStep = calculateStep(employee.dateJoined);
                     const nextStep = `Step ${currentStep + 1}`;
-                    const dueDate = new Date();
-                    dueDate.setDate(dueDate.getDate() + 90); // Step increment due date
+                    // Calculate due date for next step (3 months after last step increment)
+                    const joinDate = new Date(employee.dateJoined);
+                    const dueDate = new Date(joinDate.getTime() + currentStep * 3 * 30.44 * 24 * 60 * 60 * 1000);
                     return (
                       <tr key={employee.id}>
                         <td className="step">{employee.id}</td>
                         <td className="lastName">{employee.surname ? `${employee.surname} ${employee.firstname || ''} ${employee.middlename || ''} ${employee.extension || ''}` : employee.name}</td>
                         <td className="step">{employee.salaryGrade || "N/A"}</td>
-                        <td className="step">{employee.step}</td>
+                        <td className="step">{`Step ${currentStep}`}</td>
                         <td className="step">{nextStep}</td>
                         <td className="step">{dueDate.toLocaleDateString()}</td>
                         <td className="step">Pending</td>
