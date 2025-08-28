@@ -31,6 +31,8 @@ const EmployeeRecordsComp = () => {
   });
   const [viewEmployee, setViewEmployee] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const navigate = useNavigate();
 
   const handleViewClick = async (employeeId) => {
@@ -182,6 +184,26 @@ const EmployeeRecordsComp = () => {
     } catch (error) {
       alert("Error deleting employee. Please try again.");
     }
+  };
+
+  const handleDeleteClick = (employeeId) => {
+    setEmployeeToDelete(employeeId);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteEmployeeConfirmed = async () => {
+    if (!employeeToDelete) return;
+    try {
+      const response = await fetch(`http://localhost:5000/api/employees/${employeeToDelete}`, {
+        method: "DELETE"
+      });
+      if (!response.ok) throw new Error("Failed to delete employee");
+      setActiveEmployees((prev) => prev.filter(emp => emp._id !== employeeToDelete));
+    } catch (error) {
+      alert("Error deleting employee. Please try again.");
+    }
+    setShowDeleteModal(false);
+    setEmployeeToDelete(null);
   };
 
   // Sorting handler
@@ -521,12 +543,11 @@ const EmployeeRecordsComp = () => {
                           View
                         </button>
                         <button
-                          className="delete-employee-icon"
+                          className="delete-employee-button"
                           title="Delete Employee"
-                          style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer', color: '#e74c3c', fontSize: '1.2rem' }}
-                          onClick={() => handleDeleteEmployee(employee._id)}
+                          onClick={() => handleDeleteClick(employee._id)}
                         >
-                          🗑️
+                          Delete
                         </button>
                       </td>
                     </tr>
@@ -540,6 +561,19 @@ const EmployeeRecordsComp = () => {
             </table>
           </div>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <p>Are you sure you want to delete this employee?</p>
+              <div className="modal-actions">
+                <button className="modal-btn yes" onClick={handleDeleteEmployeeConfirmed}>Yes</button>
+                <button className="modal-btn no" onClick={() => { setShowDeleteModal(false); setEmployeeToDelete(null); }}>No</button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
