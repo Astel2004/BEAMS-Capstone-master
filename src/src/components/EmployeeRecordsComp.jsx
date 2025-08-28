@@ -33,6 +33,7 @@ const EmployeeRecordsComp = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const navigate = useNavigate();
 
   const handleViewClick = async (employeeId) => {
@@ -199,6 +200,8 @@ const EmployeeRecordsComp = () => {
       });
       if (!response.ok) throw new Error("Failed to delete employee");
       setActiveEmployees((prev) => prev.filter(emp => emp._id !== employeeToDelete));
+      setShowDeleteSuccess(true); // Show success message
+      setTimeout(() => setShowDeleteSuccess(false), 2000); // Hide after 2 seconds
     } catch (error) {
       alert("Error deleting employee. Please try again.");
     }
@@ -271,6 +274,11 @@ const EmployeeRecordsComp = () => {
       </div>
       {showSuccess && (
         <div className="employee-success-popup">Employee successfully added!</div>
+      )}
+      {showDeleteSuccess && (
+        <div className="employee-success-popup" style={{background: "#4caf50", color: "#fff"}}>
+          Employee Successfully Deleted!
+        </div>
       )}
 
         {/* Add Employee Modal */}
