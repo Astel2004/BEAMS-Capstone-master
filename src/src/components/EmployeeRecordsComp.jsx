@@ -220,6 +220,15 @@ const EmployeeRecordsComp = () => {
     }
   };
 
+  function calculateStep(dateJoined) {
+    if (!dateJoined) return "Step 1";
+    const joinDate = new Date(dateJoined);
+    const now = new Date();
+    const diffMonths = Math.floor((now - joinDate) / (1000 * 60 * 60 * 24 * 30.44)); // Approximate months
+    const step = Math.floor(diffMonths / 3) + 1; // Every 3 months is a new step
+    return `Step ${step}`;
+  }
+
   return (
     <div className="dashboard-container">
       {/* Sidebar */}
@@ -563,7 +572,7 @@ const EmployeeRecordsComp = () => {
                       <td className="lastName">{employee.surname} {employee.firstname} {employee.middlename} {employee.extension ? employee.extension : ''}</td>
                       <td className="employee-data">{employee.email || '-'}</td>
                       <td className="employee-data">{employee.position || '-'}</td>
-                      <td className="employee-data">{employee.step || '-'}</td>
+                      <td className="employee-data">{calculateStep(employee.dateJoined)}</td>
                       <td className="employee-data">{employee.status || '-'}</td>
                       <td className="employee-data">
                         <button
