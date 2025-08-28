@@ -21,6 +21,7 @@ const EmployeeRecordsComp = () => {
     password: "",
     contact: "",
     birthdate: "",
+    dateJoined: "",
     gender: "",
     address: {
       province: "",
@@ -128,7 +129,7 @@ const EmployeeRecordsComp = () => {
     // Validate required fields
     const requiredFields = [
       'surname', 'firstname', 'middlename', 'civilStatus', 'citizenship', 'mobileNo', 'email', 'birthdate', 'gender',
-      'province', 'city', 'zipCode', 'barangay'
+      'province', 'city', 'zipCode', 'barangay', 'dateJoined'
     ];
     const missingFields = [];
     requiredFields.forEach(field => {
@@ -286,7 +287,7 @@ const EmployeeRecordsComp = () => {
           <div className="modal-overlay">
             <div className="modal-content">
               <div className="Form-title">
-                <h3>Add New Employee</h3>
+                <h3>Add Employee</h3>
               <p className="note">
                 (Note: Field with <span style={{color: 'red'}}>*</span> is required)
               </p>
@@ -393,6 +394,16 @@ const EmployeeRecordsComp = () => {
                     value={newEmployee.birthdate}
                     onChange={handleInputChange}
                     required
+                  />
+                </label>
+                <label>
+                  Date Joined: <span style={{color: 'red'}}>*</span>
+                  <input
+                  type="date"
+                  name="dateJoined"
+                  value={newEmployee.dateJoined}
+                  onChange={handleInputChange}
+                  required
                   />
                 </label>
                 <label>
