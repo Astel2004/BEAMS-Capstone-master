@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 const StepIncrementComp = () => {
   const [eligibleEmployees, setEligibleEmployees] = useState([]); // State for employees eligible for step increment
   const [sortBy, setSortBy] = useState('lastname');
+  const [userAccounts, setUserAccounts] = useState([]);
+  const [showNoAccountModal, setShowNoAccountModal] = useState(false);
   const navigate = useNavigate(); // Initialize useNavigate
 
   // Fetch eligible employees from the backend
@@ -39,6 +41,21 @@ const StepIncrementComp = () => {
     fetchEligibleEmployees();
   }, []);
 
+  // Fetch user accounts
+  useEffect(() => {
+    const fetchUserAccounts = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/user/list");
+        const data = await response.json();
+        setUserAccounts(data);
+      } catch (error) {
+        console.error("Error fetching user accounts:", error);
+      }
+    };
+
+    fetchUserAccounts();
+  }, []);
+
   // Sorting handler
   const handleSortChange = (e) => {
     const value = e.target.value;
@@ -59,8 +76,13 @@ const StepIncrementComp = () => {
   };
 
   const handleSendNotification = (employeeId) => {
-    console.log(`Notification sent to employee with ID: ${employeeId}`);
+    const hasAccount = userAccounts.some(user => user.employeeId === employeeId);
+    if (!hasAccount) {
+      setShowNoAccountModal(true);
+      return;
+    }
     // Add logic to send notification
+    alert("Notification sent!");
   };
 
   // Function to calculate step based on dateJoined
@@ -176,6 +198,18 @@ const StepIncrementComp = () => {
             </table>
           </div>
         </div>
+
+        {showNoAccountModal && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <p>This employee has no BEAMS account yet.</p>
+      <div className="modal-actions">
+        <button className="modal-btn" onClick={() => setShowNoAccountModal(false)}>OK</button>
+      </div>
+    </div>
+  </div>
+)}
+
       </main>
     </div>
   );
