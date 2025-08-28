@@ -87,5 +87,17 @@ router.get('/list', async (req, res) => {
   }
 });
 
+router.delete('/:id', async (req, res) => {
+  try {
+    const deletedUser = await UserAccounts.findByIdAndDelete(req.params.id);
+    if (!deletedUser) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+    res.json({ message: 'User deleted successfully!' });
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred. Please try again.' });
+  }
+});
+
 
 module.exports = router;

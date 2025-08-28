@@ -89,23 +89,25 @@ const UsersComp = () => {
   };
 
   // Handle delete user
-  const handleDeleteUser = async (userId) => {
-  if (!window.confirm('Are you sure you want to delete this user account?')) return;
-  try {
-    const response = await fetch(`http://localhost:5000/api/user/${userId}`, {
-      method: 'DELETE',
-    });
-    const data = await response.json();
-    if (response.ok) {
-      alert('User deleted successfully!');
-      setUsers(users.filter(user => user._id !== userId));
-    } else {
-      alert(data.error || 'Failed to delete user.');
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    try {
+      const response = await fetch(`http://localhost:5000/api/user/${userToDelete}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert('User deleted successfully!');
+        setUsers(users.filter(user => user._id !== userToDelete));
+      } else {
+        alert(data.error || 'Failed to delete user.');
+      }
+    } catch (error) {
+      alert('An error occurred. Please try again.');
     }
-  } catch (error) {
-    alert('An error occurred. Please try again.');
-  }
-};
+    setShowDeleteModal(false);
+    setUserToDelete(null);
+  };
 
   // Fetch employees for dropdown
   useEffect(() => {
@@ -131,6 +133,14 @@ const UsersComp = () => {
     // Perform logout logic here (e.g., clearing tokens)
     alert("You have been logged out.");
     navigate("/login"); // Redirect to the login page
+  };
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+
+  const handleDeleteClick = (userId) => {
+    setUserToDelete(userId);
+    setShowDeleteModal(true);
   };
 
   return (
@@ -220,7 +230,7 @@ const UsersComp = () => {
                       <td>{user.role}</td>
                       <td>{user.status}</td>
                       <td><button>View</button>
-                      <button className="user-delete-btn"onClick={() => handleDeleteUser(user._id)}>Delete</button></td>
+                      <button className="user-delete-btn"onClick={() => handleDeleteClick(user._id)}>Delete</button></td>
                     </tr>
                   ))
                 ) : (
@@ -300,6 +310,19 @@ const UsersComp = () => {
             </div>
           )}
         </section>
+
+        {showDeleteModal && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <p>Are you sure you want to delete this user account?</p>
+      <div className="modal-actions">
+        <button className="modal-btn yes" onClick={handleDeleteUser}>Yes</button>
+        <button className="modal-btn no" onClick={() => { setShowDeleteModal(false); setUserToDelete(null); }}>No</button>
+      </div>
+    </div>
+  </div>
+)}
+
       </main>
     </div>
   );
