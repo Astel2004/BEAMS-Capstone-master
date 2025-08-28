@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { data } = require('react-router-dom');
 
 const AddressSchema = new mongoose.Schema({
   province: { type: String, required: true },
@@ -18,6 +19,7 @@ const EmployeeSchema = new mongoose.Schema({
   mobileNo: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   birthdate: { type: Date, required: true },
+  dateJoined: { type: Date, required: false, default: Date.now },
   gender: { type: String, required: true, enum: ['Male', 'Female'] },
   address: { type: AddressSchema, required: true },
   status: { type: String, required: false },

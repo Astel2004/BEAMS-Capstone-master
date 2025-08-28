@@ -98,6 +98,7 @@ const EmployeeRecordsComp = () => {
       password: "",
       contact: "",
       birthdate: "",
+      dateJoined: "",
       gender: "",
       address: {
         province: "",
@@ -511,6 +512,16 @@ const EmployeeRecordsComp = () => {
                     <p><b>Mobile No.:</b> <u>{viewEmployee.mobileNo}</u> </p>
                     <p><b>Email:</b> <u>{viewEmployee.email}</u> </p>
                     <p><b>Birthdate:</b> <u>{viewEmployee.birthdate ? new Date(viewEmployee.birthdate).toLocaleDateString() : '-'}</u> </p>
+                    <p><b>Date Joined:</b>
+                      <u>
+                        {viewEmployee.dateJoined
+                          ? (() => {
+                              const d = new Date(viewEmployee.dateJoined);
+                              return isNaN(d.getTime()) ? viewEmployee.dateJoined : d.toLocaleDateString();
+                            })()
+                          : '-'}
+                      </u>
+                    </p> 
                     <p><b>Gender:</b> <u>{viewEmployee.gender}</u> </p>
                   </div>
                 </div>
