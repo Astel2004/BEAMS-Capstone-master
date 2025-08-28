@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const Employee = require('../models/Employees'); // Import the Employee model
+const UserAccounts = require('../models/UserAccounts'); // Import your user model
 const jwt = require('jsonwebtoken');
 
 // Create a new employee
@@ -116,15 +117,15 @@ const deleteEmployee = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const deletedEmployee = await Employee.findByIdAndDelete(id);
-    if (!deletedEmployee) {
-      return res.status(404).json({ message: 'Employee not found' });
+    const employee = await Employee.findByIdAndDelete(id);
+    if (!employee) {
+      return res.status(404).json({ error: 'Employee not found.' });
     }
-
-    res.status(200).json({ message: 'Employee deleted successfully' });
+    // Delete the user account linked to this employee
+    await UserAccounts.findOneAndDelete({ employeeId: employee._id });
+    res.json({ message: 'Employee and user account deleted successfully!' });
   } catch (error) {
-    console.error('Error deleting employee:', error);
-    res.status(500).json({ message: 'Error deleting employee', error });
+    res.status(500).json({ error: 'An error occurred. Please try again.' });
   }
 };
 

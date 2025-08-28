@@ -566,7 +566,7 @@ const EmployeeRecordsComp = () => {
         {showDeleteModal && (
           <div className="modal-overlay">
             <div className="modal-content">
-              <p>Are you sure you want to delete this employee?</p>
+              <p>When deleting employee, It's User Account will be lost too. <br/> <b>ARE YOU SURE YOU WANT TO DELETE THIS EMPLOYEE?</b> </p>
               <div className="modal-actions">
                 <button className="modal-btn yes" onClick={handleDeleteEmployeeConfirmed}>Yes</button>
                 <button className="modal-btn no" onClick={() => { setShowDeleteModal(false); setEmployeeToDelete(null); }}>No</button>
