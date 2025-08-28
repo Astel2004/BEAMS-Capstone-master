@@ -88,6 +88,25 @@ const UsersComp = () => {
     }
   };
 
+  // Handle delete user
+  const handleDeleteUser = async (userId) => {
+  if (!window.confirm('Are you sure you want to delete this user account?')) return;
+  try {
+    const response = await fetch(`http://localhost:5000/api/user/${userId}`, {
+      method: 'DELETE',
+    });
+    const data = await response.json();
+    if (response.ok) {
+      alert('User deleted successfully!');
+      setUsers(users.filter(user => user._id !== userId));
+    } else {
+      alert(data.error || 'Failed to delete user.');
+    }
+  } catch (error) {
+    alert('An error occurred. Please try again.');
+  }
+};
+
   // Fetch employees for dropdown
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -200,7 +219,8 @@ const UsersComp = () => {
                       <td>{user.email}</td>
                       <td>{user.role}</td>
                       <td>{user.status}</td>
-                      <td><button>View</button></td>
+                      <td><button>View</button>
+                      <button className="user-delete-btn"onClick={() => handleDeleteUser(user._id)}>Delete</button></td>
                     </tr>
                   ))
                 ) : (
