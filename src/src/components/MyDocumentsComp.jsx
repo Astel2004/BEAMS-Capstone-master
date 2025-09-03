@@ -19,7 +19,6 @@ const MyDocumentsComp = () => {
       status: "Verified",
     },
   ]); // Example uploaded documents
-  const [fileType, setFileType] = useState("PDF"); // State for selected file type
   const [file, setFile] = useState(null); // State for the selected file
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -29,9 +28,12 @@ const MyDocumentsComp = () => {
 
   const handleUpload = () => {
     if (file) {
+      let type = "Other";
+      if (file.type === "application/pdf") type = "PDF";
+      else if (file.type.startsWith("image/")) type = "Image";
       const newDocument = {
         fileName: file.name,
-        type: fileType,
+        type,
         dateUploaded: new Date().toLocaleDateString(),
         status: "Pending",
       };
@@ -103,37 +105,50 @@ const MyDocumentsComp = () => {
         {/* File Upload Section */}
         <div className="file-upload-section">
           <div className="file-drop-area">
-            <p>Drag and Drop Files Here</p>
-            <p>or</p>
+            {file ? (
+              <div className="selected-file-info">
+                <p>
+                  <b>Selected file:</b> {file.name}
+                </p>
+                <p>
+                  <b>Type:</b> {file.type}
+                </p>
+                <p>
+                  <b>Size:</b> {(file.size / 1024).toFixed(2)} KB
+                </p>
+              </div>
+            ) : (
+              <>
+                <p>Drag and Drop Files Here</p>
+                <p>or</p>
+              </>
+            )}
             <input
               type="file"
               id="fileInput"
+              accept=".pdf,image/*"
               onChange={handleFileChange}
               style={{ display: "none" }}
             />
             <label htmlFor="fileInput" className="browse-button">
               Browse
             </label>
-          </div>
-          <div className="file-type-section">
-            <p>Choose File Type</p>
-            <div className="file-type-buttons">
-              <button
-                className={fileType === "PDF" ? "active" : ""}
-                onClick={() => setFileType("PDF")}
-              >
-                PDF
-              </button>
-              <button
-                className={fileType === "DOCX" ? "active" : ""}
-                onClick={() => setFileType("DOCX")}
-              >
-                DOCX
-              </button>
-            </div>
-            <button className="upload-button" onClick={handleUpload}>
+            <button
+              className="upload-button"
+              onClick={handleUpload}
+              disabled={!file}
+              style={{ marginLeft: "10px" }}
+            >
               Upload
             </button>
+          </div>
+          <div className="file-type-section">
+            <div className="file-type-buttons">
+              <button className="type-btn">PDS File</button>
+              <button className="type-btn">SALN File</button>
+              <button className="type-btn">Employee Records</button>
+              <button className="type-btn">Uploaded Documents</button>
+            </div>
           </div>
         </div>
 

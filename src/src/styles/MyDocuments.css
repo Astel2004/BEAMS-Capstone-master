@@ -34,9 +34,14 @@
     text-align: center;
   }
   
+.file-type-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .file-type-buttons button {
     padding: 0.5rem 1rem;
-    margin: 0 0.5rem;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -123,4 +128,25 @@
 
   .document-content{
     width: 70rem;
+  }
+
+  .selected-file-info {
+    margin-top: 10px;
+    color: #1976d2;
+    font-weight: bold;
+  }
+
+  .type-btn {
+    margin: 1px;
+    padding: 6px 16px;
+    border: none;
+    border-radius: 4px;
+    background: #1976d2;
+    color: #fff;
+    cursor: pointer;
+    max-width: 100%;
+    width: 25rem;
+  }
+  .type-btn:last-child {
+    margin-right: 0;
   }
