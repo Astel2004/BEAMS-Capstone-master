@@ -2,7 +2,14 @@ const EmployeeRecords = require('../models/EmployeeRecords');
 
 exports.createEmployeeRecords = async (req, res) => {
   try {
-    const employeeRecords = new EmployeeRecords(req.body);
+    // req.file contains file info, req.body contains other metadata
+    const employeeRecords = new EmployeeRecords({
+      employeeId: req.body.employeeId,
+      fileName: req.file.originalname,
+      fileUrl: req.file.path, // Save file path
+      dateUploaded: new Date(),
+      status: req.body.status || 'Pending'
+    });
     await employeeRecords.save();
     res.status(201).json(employeeRecords);
   } catch (error) {

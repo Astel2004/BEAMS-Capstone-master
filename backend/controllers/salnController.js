@@ -2,7 +2,14 @@ const SALN = require('../models/SALN');
 
 exports.createSALN = async (req, res) => {
   try {
-    const saln = new SALN(req.body);
+    // req.file contains file info, req.body contains other metadata
+    const saln = new SALN({
+      employeeId: req.body.employeeId,
+      fileName: req.file.originalname,
+      fileUrl: req.file.path, // Save file path
+      dateUploaded: new Date(),
+      status: req.body.status || 'Pending'
+    });
     await saln.save();
     res.status(201).json(saln);
   } catch (error) {

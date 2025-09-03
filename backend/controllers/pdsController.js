@@ -2,7 +2,14 @@ const PDS = require('../models/PDS');
 
 exports.createPDS = async (req, res) => {
   try {
-    const pds = new PDS(req.body);
+    // req.file contains file info, req.body contains other metadata
+    const pds = new PDS({
+      employeeId: req.body.employeeId,
+      fileName: req.file.originalname,
+      fileUrl: req.file.path, // Save file path
+      dateUploaded: new Date(),
+      status: req.body.status || 'Pending'
+    });
     await pds.save();
     res.status(201).json(pds);
   } catch (error) {

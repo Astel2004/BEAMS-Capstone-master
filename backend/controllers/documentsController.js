@@ -2,7 +2,14 @@ const Documents = require('../models/Documents');
 
 exports.createDocuments = async (req, res) => {
   try {
-    const documents = new Documents(req.body);
+    // req.file contains file info, req.body contains other metadata
+    const documents = new Documents({
+      employeeId: req.body.employeeId,
+      fileName: req.file.originalname,
+      fileUrl: req.file.path, // Save file path
+      dateUploaded: new Date(),
+      status: req.body.status || 'Pending'
+    });
     await documents.save();
     res.status(201).json(documents);
   } catch (error) {
