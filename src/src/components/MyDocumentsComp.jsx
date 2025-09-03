@@ -20,6 +20,7 @@ const MyDocumentsComp = () => {
     },
   ]); // Example uploaded documents
   const [file, setFile] = useState(null); // State for the selected file
+  const [activeTab, setActiveTab] = useState("PDS"); // State for the active tab
   const navigate = useNavigate(); // Initialize useNavigate
 
   const handleFileChange = (e) => {
@@ -144,56 +145,166 @@ const MyDocumentsComp = () => {
           </div>
           <div className="file-type-section">
             <div className="file-type-buttons">
-              <button className="type-btn">PDS File</button>
-              <button className="type-btn">SALN File</button>
-              <button className="type-btn">Employee Records</button>
-              <button className="type-btn">Uploaded Documents</button>
+              <button
+                className="type-btn"
+                onClick={() => setActiveTab("PDS")}
+              >
+                PDS File
+              </button>
+              <button
+                className="type-btn"
+                onClick={() => setActiveTab("SALN")}
+              >
+                SALN File
+              </button>
+              <button
+                className="type-btn"
+                onClick={() => setActiveTab("EmployeeRecords")}
+              >
+                Employee Records
+              </button>
+              <button
+                className="type-btn"
+                onClick={() => setActiveTab("Uploaded")}
+              >
+                Uploaded Documents
+              </button>
             </div>
           </div>
         </div>
 
         {/* Uploaded Documents Table */}
-        <div className="uploaded-documents">
-          <h3>Uploaded Documents</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>File Name</th>
-                <th>Type</th>
-                <th>Date Uploaded</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {uploadedDocuments.length > 0 ? (
-                uploadedDocuments.map((doc) => (
-                  <tr key={doc.fileName}>
-                    <td>{doc.fileName}</td>
-                    <td>{doc.type}</td>
-                    <td>{doc.dateUploaded}</td>
-                    <td>{doc.status}</td>
-                    <td>
-                      <button className="view-button">View</button>
-                      {doc.status === "Pending" && (
-                        <button
-                          className="delete-button"
-                          onClick={() => handleDelete(doc.fileName)}
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
+        {activeTab === "PDS" && (
+          <div className="uploaded-documents">
+            <h3>PDS Documents</h3>
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan="5">No documents uploaded yet.</td>
+                  <th>File Name</th>
+                  <th>Date Uploaded</th>
+                  <th>Status</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {uploadedDocuments.filter((doc) => doc.type === "PDS")
+                  .length > 0 ? (
+                  uploadedDocuments
+                    .filter((doc) => doc.type === "PDS")
+                    .map((doc) => (
+                      <tr key={doc.fileName}>
+                        <td>{doc.fileName}</td>
+                        <td>{doc.dateUploaded}</td>
+                        <td>{doc.status}</td>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan="3">No PDS documents uploaded yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {activeTab === "SALN" && (
+          <div className="uploaded-documents">
+            <h3>SALN Documents</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>File Name</th>
+                  <th>Date Uploaded</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {uploadedDocuments.filter((doc) => doc.type === "SALN")
+                  .length > 0 ? (
+                  uploadedDocuments
+                    .filter((doc) => doc.type === "SALN")
+                    .map((doc) => (
+                      <tr key={doc.fileName}>
+                        <td>{doc.fileName}</td>
+                        <td>{doc.dateUploaded}</td>
+                        <td>{doc.status}</td>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan="3">No SALN documents uploaded yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {activeTab === "EmployeeRecords" && (
+          <div className="uploaded-documents">
+            <h3>Employee Records</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>File Name</th>
+                  <th>Date Uploaded</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {uploadedDocuments.filter(
+                  (doc) => doc.type === "EmployeeRecords"
+                ).length > 0 ? (
+                  uploadedDocuments
+                    .filter((doc) => doc.type === "EmployeeRecords")
+                    .map((doc) => (
+                      <tr key={doc.fileName}>
+                        <td>{doc.fileName}</td>
+                        <td>{doc.dateUploaded}</td>
+                        <td>{doc.status}</td>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan="3">No Employee Records uploaded yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {activeTab === "Uploaded" && (
+          <div className="uploaded-documents">
+            <h3>All Uploaded Documents</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>File Name</th>
+                  <th>Type</th>
+                  <th>Date Uploaded</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {uploadedDocuments.length > 0 ? (
+                  uploadedDocuments.map((doc) => (
+                    <tr key={doc.fileName}>
+                      <td>{doc.fileName}</td>
+                      <td>{doc.type}</td>
+                      <td>{doc.dateUploaded}</td>
+                      <td>{doc.status}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4">No documents uploaded yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </main>
     </div>
   );
