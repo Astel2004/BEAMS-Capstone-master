@@ -60,6 +60,14 @@ const MyDocumentsComp = () => {
     alert("File deleted successfully!");
   };
 
+  const getAcceptTypes = () => {
+    if (activeTab === "SALN" || activeTab === "PDS") {
+      return ".pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    }
+    // EmployeeRecords and Uploaded can accept any file type
+    return "";
+  };
+
   return (
     <div className="dashboard-container">
       {/* Sidebar */}
@@ -127,7 +135,7 @@ const MyDocumentsComp = () => {
             <input
               type="file"
               id="fileInput"
-              accept=".pdf,image/*"
+              accept={getAcceptTypes()}
               onChange={handleFileChange}
               style={{ display: "none" }}
             />
@@ -183,11 +191,11 @@ const MyDocumentsComp = () => {
                   <th>File Name</th>
                   <th>Date Uploaded</th>
                   <th>Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {uploadedDocuments.filter((doc) => doc.type === "PDS")
-                  .length > 0 ? (
+                {uploadedDocuments.filter((doc) => doc.type === "PDS").length > 0 ? (
                   uploadedDocuments
                     .filter((doc) => doc.type === "PDS")
                     .map((doc) => (
@@ -195,11 +203,16 @@ const MyDocumentsComp = () => {
                         <td>{doc.fileName}</td>
                         <td>{doc.dateUploaded}</td>
                         <td>{doc.status}</td>
+                        <td>
+                          <button className="view-btn" onClick={() => alert(`Viewing ${doc.fileName}`)}>View</button>
+                          <button className="delete-btn" onClick={() => handleDelete(doc.fileName)}>Request Delete</button>
+                          <button className="validate-btn" onClick={() => alert(`Submitted ${doc.fileName} for validation`)}>Submit for Validation</button>
+                        </td>
                       </tr>
                     ))
                 ) : (
                   <tr>
-                    <td colSpan="3">No PDS documents uploaded yet.</td>
+                    <td colSpan="4">No PDS documents uploaded yet.</td>
                   </tr>
                 )}
               </tbody>
@@ -216,11 +229,11 @@ const MyDocumentsComp = () => {
                   <th>File Name</th>
                   <th>Date Uploaded</th>
                   <th>Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {uploadedDocuments.filter((doc) => doc.type === "SALN")
-                  .length > 0 ? (
+                {uploadedDocuments.filter((doc) => doc.type === "SALN").length > 0 ? (
                   uploadedDocuments
                     .filter((doc) => doc.type === "SALN")
                     .map((doc) => (
@@ -228,11 +241,16 @@ const MyDocumentsComp = () => {
                         <td>{doc.fileName}</td>
                         <td>{doc.dateUploaded}</td>
                         <td>{doc.status}</td>
+                        <td>
+                          <button className="view-btn" onClick={() => alert(`Viewing ${doc.fileName}`)}>View</button>
+                          <button className="delete-btn" onClick={() => handleDelete(doc.fileName)}>Request Delete</button>
+                          <button className="validate-btn" onClick={() => alert(`Submitted ${doc.fileName} for validation`)}>Submit for Validation</button>
+                        </td>
                       </tr>
                     ))
                 ) : (
                   <tr>
-                    <td colSpan="3">No SALN documents uploaded yet.</td>
+                    <td colSpan="4">No SALN documents uploaded yet.</td>
                   </tr>
                 )}
               </tbody>
@@ -247,8 +265,10 @@ const MyDocumentsComp = () => {
               <thead>
                 <tr>
                   <th>File Name</th>
+                  <th>File Type</th>
                   <th>Date Uploaded</th>
                   <th>Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -260,13 +280,38 @@ const MyDocumentsComp = () => {
                     .map((doc) => (
                       <tr key={doc.fileName}>
                         <td>{doc.fileName}</td>
+                        <td>{doc.type}</td>
                         <td>{doc.dateUploaded}</td>
                         <td>{doc.status}</td>
+                        <td>
+                          <button
+                            className="view-btn"
+                            onClick={() =>
+                              alert(`Viewing ${doc.fileName}`)
+                            }
+                          >
+                            View
+                          </button>
+                          <button
+                            className="edit-btn"
+                            onClick={() =>
+                              alert(`Editing ${doc.fileName}`)
+                            }
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDelete(doc.fileName)}
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))
                 ) : (
                   <tr>
-                    <td colSpan="3">No Employee Records uploaded yet.</td>
+                    <td colSpan="5">No Employee Records uploaded yet.</td>
                   </tr>
                 )}
               </tbody>
@@ -276,7 +321,7 @@ const MyDocumentsComp = () => {
 
         {activeTab === "Uploaded" && (
           <div className="uploaded-documents">
-            <h3>All Uploaded Documents</h3>
+            <h3>Uploaded Documents</h3>
             <table>
               <thead>
                 <tr>
@@ -287,15 +332,17 @@ const MyDocumentsComp = () => {
                 </tr>
               </thead>
               <tbody>
-                {uploadedDocuments.length > 0 ? (
-                  uploadedDocuments.map((doc) => (
-                    <tr key={doc.fileName}>
-                      <td>{doc.fileName}</td>
-                      <td>{doc.type}</td>
-                      <td>{doc.dateUploaded}</td>
-                      <td>{doc.status}</td>
-                    </tr>
-                  ))
+                {uploadedDocuments.filter(doc => doc.type === "Uploaded").length > 0 ? (
+                  uploadedDocuments
+                    .filter(doc => doc.type === "Uploaded")
+                    .map(doc => (
+                      <tr key={doc.fileName}>
+                        <td>{doc.fileName}</td>
+                        <td>{doc.type}</td>
+                        <td>{doc.dateUploaded}</td>
+                        <td>{doc.status}</td>
+                      </tr>
+                    ))
                 ) : (
                   <tr>
                     <td colSpan="4">No documents uploaded yet.</td>

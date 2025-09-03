@@ -150,3 +150,14 @@
   .type-btn:last-child {
     margin-right: 0;
   }
+
+  .view-btn, .delete-btn, .validate-btn {
+  margin-right: 6px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.view-btn { background: #1976d2; color: #fff; }
+.delete-btn { background: #d32f2f; color: #fff; }
+.validate-btn { background: #43a047; color: #fff; }
