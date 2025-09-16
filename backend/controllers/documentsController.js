@@ -21,6 +21,8 @@ exports.getAllDocuments = async (req, res) => {
   try {
     const filter = {};
     if (req.query.type) filter.type = req.query.type;
+    if (req.query.status) filter.status = req.query.status;
+    if (req.query.employeeId) filter.employeeId = req.query.employeeId;
     const docs = await Documents.find(filter);
     res.json(docs);
   } catch (error) {
