@@ -1,35 +1,35 @@
 import React, { useState, useEffect } from "react";
-import "../styles/Dashboard.css"; // Reuse the same CSS for sidebar and navbar
-import "../styles/StepIncrement.css"; // Add specific styles for step increment
-import profileImage from "../assets/profile-user.png"; // Import the profile image
-import Image from "../assets/user.png"; // Import the admin image
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
+import "../styles/Dashboard.css";
+import "../styles/StepIncrement.css";
+import profileImage from "../assets/profile-user.png";
+import Image from "../assets/user.png";
+import { useNavigate } from "react-router-dom";
+import NotificationPopup from "./NotificationPopUp";
 
 const StepIncrementComp = () => {
-  const [eligibleEmployees, setEligibleEmployees] = useState([]); // State for employees eligible for step increment
+  const [eligibleEmployees, setEligibleEmployees] = useState([]);
   const [sortBy, setSortBy] = useState('lastname');
   const [userAccounts, setUserAccounts] = useState([]);
   const [showNoAccountModal, setShowNoAccountModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const navigate = useNavigate(); // Initialize useNavigate
 
-  // Fetch eligible employees from the backend
+  // New state for Generate List feature
+  const [showEligibleListModal, setShowEligibleListModal] = useState(false);
+  const [loadingEligibleList, setLoadingEligibleList] = useState(false);
+  const [eligibleListData, setEligibleListData] = useState([]);
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchEligibleEmployees = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/employees"); // Replace with your API endpoint
+        const response = await fetch("http://localhost:5000/api/employees");
         const data = await response.json();
-
-        // Filter employees eligible for step increment
         const eligible = data.filter((employee) => {
           const currentStep = parseInt(employee.step.replace("Step ", ""));
-          return currentStep < 5; // Example logic: Eligible if current step is less than 5
+          return currentStep < 5;
         });
-
-        // Sort by last name by default
         const sorted = eligible.sort((a, b) => {
-          // Use surname if available, else fallback to name
           const aName = a.surname || a.name || '';
           const bName = b.surname || b.name || '';
           return aName.localeCompare(bName);
@@ -39,11 +39,9 @@ const StepIncrementComp = () => {
         console.error("Error fetching eligible employees:", error);
       }
     };
-
     fetchEligibleEmployees();
   }, []);
 
-  // Fetch user accounts
   useEffect(() => {
     const fetchUserAccounts = async () => {
       try {
@@ -54,11 +52,9 @@ const StepIncrementComp = () => {
         console.error("Error fetching user accounts:", error);
       }
     };
-
     fetchUserAccounts();
   }, []);
 
-  // Sorting handler
   const handleSortChange = (e) => {
     const value = e.target.value;
     setSortBy(value);
@@ -72,9 +68,8 @@ const StepIncrementComp = () => {
   };
 
   const handleLogout = () => {
-    // Perform logout logic here (e.g., clearing tokens)
     alert("You have been logged out.");
-    navigate("/login"); // Redirect to the login page
+    navigate("/login");
   };
 
   const handleSendNotification = (employeeId) => {
@@ -83,17 +78,52 @@ const StepIncrementComp = () => {
       setShowNoAccountModal(true);
       return;
     }
-    // Add logic to send notification
     alert("Notification sent!");
   };
 
-  // Function to calculate step based on dateJoined
   const calculateStep = (dateJoined) => {
     if (!dateJoined) return 1;
     const joinDate = new Date(dateJoined);
     const now = new Date();
-    const diffMonths = Math.floor((now - joinDate) / (1000 * 60 * 60 * 24 * 30.44)); // Approximate months
-    return Math.floor(diffMonths / 3) + 1; // Every 3 months is a new step
+    const diffMonths = Math.floor((now - joinDate) / (1000 * 60 * 60 * 24 * 30.44));
+    return Math.floor(diffMonths / 3) + 1;
+  };
+
+  // Generate List Button Handler
+  const handleGenerateEligibleList = () => {
+    setLoadingEligibleList(true);
+    setShowEligibleListModal(true);
+    // Simulate loading for 3 seconds
+    setTimeout(() => {
+      // Sample data for eligible employees
+      setEligibleListData([
+        {
+          id: "EMP001",
+          name: "John Doe",
+          salaryGrade: "SG 11",
+          currentStep: "Step 2",
+          nextStep: "Step 3",
+          dueDate: "2025-12-01"
+        },
+        {
+          id: "EMP002",
+          name: "Jane Smith",
+          salaryGrade: "SG 12",
+          currentStep: "Step 3",
+          nextStep: "Step 4",
+          dueDate: "2025-11-15"
+        },
+        {
+          id: "EMP003",
+          name: "Mark Lee",
+          salaryGrade: "SG 10",
+          currentStep: "Step 1",
+          nextStep: "Step 2",
+          dueDate: "2025-10-20"
+        }
+      ]);
+      setLoadingEligibleList(false);
+    }, 3000);
   };
 
   return (
@@ -144,6 +174,25 @@ const StepIncrementComp = () => {
           <h2>Step Increment Tracker</h2>
         </div>
 
+        {/* Generate List Button */}
+        <div style={{ marginBottom: "1rem" }}>
+          <button
+            className="generate-list-btn"
+            style={{
+              padding: "10px 22px",
+              background: "#1976d2",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              fontWeight: "bold",
+              cursor: "pointer"
+            }}
+            onClick={handleGenerateEligibleList}
+          >
+            Generate List of Eligible Employees
+          </button>
+        </div>
+
         {/* Sort Dropdown above the Step Increment Table */}
         <div className="step-increment-table-controls">
           <div className="step-increment-sort-dropdown">
@@ -174,7 +223,6 @@ const StepIncrementComp = () => {
                   eligibleEmployees.map((employee) => {
                     const currentStep = calculateStep(employee.dateJoined);
                     const nextStep = `Step ${currentStep + 1}`;
-                    // Calculate due date for next step (3 months after last step increment)
                     const joinDate = new Date(employee.dateJoined);
                     const dueDate = new Date(joinDate.getTime() + currentStep * 3 * 30.44 * 24 * 60 * 60 * 1000);
                     return (
@@ -207,23 +255,71 @@ const StepIncrementComp = () => {
           </div>
         </div>
 
+        {/* Modal for No Account */}
         {showNoAccountModal && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <p>This employee has no BEAMS account yet.</p>
-      <div className="modal-actions">
-        <button className="modal-btn" onClick={() => setShowNoAccountModal(false)}>OK</button>
-      </div>
-    </div>
-  </div>
-)}
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <p>This employee has no BEAMS account yet.</p>
+              <div className="modal-actions">
+                <button className="modal-btn" onClick={() => setShowNoAccountModal(false)}>OK</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal for Eligible Employees List */}
+        {showEligibleListModal && (
+          <div className="modal-overlay">
+            <div className="modal-content" style={{ minWidth: "420px", maxWidth: "90vw" }}>
+              <h3>Eligible Employees</h3>
+              {loadingEligibleList ? (
+                <div style={{ textAlign: "center", padding: "32px 0" }}>
+                  <span style={{ fontSize: "1.2em", color: "#1976d2" }}>Loading...</span>
+                </div>
+              ) : (
+                <table style={{ width: "100%", marginTop: "12px", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th>Employee Id</th>
+                      <th>Full Name</th>
+                      <th>Salary Grade</th>
+                      <th>Current Step</th>
+                      <th>Next Step</th>
+                      <th>Due Date Next Step</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {eligibleListData.length > 0 ? (
+                      eligibleListData.map(emp => (
+                        <tr key={emp.id}>
+                          <td>{emp.id}</td>
+                          <td>{emp.name}</td>
+                          <td>{emp.salaryGrade}</td>
+                          <td>{emp.currentStep}</td>
+                          <td>{emp.nextStep}</td>
+                          <td>{emp.dueDate}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="6" style={{ textAlign: "center" }}>No eligible employees found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
+              <div className="modal-actions" style={{ marginTop: "18px" }}>
+                <button className="modal-btn" onClick={() => setShowEligibleListModal(false)}>Close</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <NotificationPopup
-  visible={showNotifications}
-  onClose={() => setShowNotifications(false)}
-  userType="hr"
-/>
-
+          visible={showNotifications}
+          onClose={() => setShowNotifications(false)}
+          userType="hr"
+        />
       </main>
     </div>
   );
