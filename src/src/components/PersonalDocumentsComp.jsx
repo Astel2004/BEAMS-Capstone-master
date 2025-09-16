@@ -108,7 +108,7 @@ const PersonalDocuments = () => {
         </header>
 
         <div className="dashboard-title">
-          <h2>Personal Records</h2>
+          <h2>Personal Documents</h2>
         </div>
 
         {/* File Upload Section */}
