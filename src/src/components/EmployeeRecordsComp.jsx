@@ -35,6 +35,7 @@ const EmployeeRecordsComp = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState("employees");
   const navigate = useNavigate();
 
   const handleViewClick = async (employeeId) => {
@@ -271,346 +272,387 @@ const EmployeeRecordsComp = () => {
           <h2>Employee Records</h2>
         </div>
 
-      {/* Add Employee and Sort Dropdown above the Active Employees table */}
-      <div className="employee-table-controls">
-        <button className="add-employee-button" onClick={handleAddEmployeeClick}>
-          Add Employee
-        </button>
-        <div className="employee-sort-dropdown">
-          <label htmlFor="sortBy" className="employee-sort-label">Sort by:</label>
-          <select id="sortBy" value={sortBy} onChange={handleSortChange} className="employee-sort-select">
-            <option value="lastname">By Last Name</option>
-          </select>
-        </div>
-      </div>
-      {showSuccess && (
-        <div className="employee-success-popup">Employee successfully added!</div>
-      )}
-      {showDeleteSuccess && (
-        <div className="employee-success-popup" style={{background: "#4caf50", color: "#fff"}}>
-          Employee Successfully Deleted!
-        </div>
-      )}
+        {/* Tab Navigation */}
+        <nav className="employee-records-nav">
+          <button
+            className={`employee-nav-btn${activeTab === "employees" ? " active" : ""}`}
+            onClick={() => setActiveTab("employees")}
+          >
+            Employees
+          </button>
+          <button
+            className={`employee-nav-btn${activeTab === "personal" ? " active" : ""}`}
+            onClick={() => setActiveTab("personal")}
+          >
+            Personal Records
+          </button>
+          <button
+            className={`employee-nav-btn${activeTab === "service" ? " active" : ""}`}
+            onClick={() => setActiveTab("service")}
+          >
+            Service Records
+          </button>
+        </nav>
 
-        {/* Add Employee Modal */}
-        {showAddModal && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <div className="Form-title">
-                <h3>Add Employee</h3>
-              <p className="note">
-                (Note: Field with <span style={{color: 'red'}}>*</span> is required)
-              </p>
+        {/* Tab Content */}
+        {activeTab === "employees" && (
+          <>
+            {/* Employee Table Controls */}
+            <div className="employee-table-controls">
+              <button className="add-employee-button" onClick={handleAddEmployeeClick}>
+                Add Employee
+              </button>
+              <div className="employee-sort-dropdown">
+                <label htmlFor="sortBy" className="employee-sort-label">Sort by:</label>
+                <select id="sortBy" value={sortBy} onChange={handleSortChange} className="employee-sort-select">
+                  <option value="lastname">By Last Name</option>
+                </select>
               </div>
-              <form onSubmit={handleAddEmployeeSubmit} className="add-employee-form">
-                <section className="info-section">
-                <div className="employee-info1">
-                <h4 className="section-title">Employee Information</h4>
-                <label>
-                  Surname: <span style={{color: 'red'}}>*</span>
-                  <input
-                    type="text"
-                    name="surname"
-                    value={newEmployee.surname}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </label>
-                <label>
-                  First Name: <span style={{color: 'red'}}>*</span>
-                  <input
-                    type="text"
-                    name="firstname"
-                    value={newEmployee.firstname}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </label>
-                <label>
-                  Middle Name: <span style={{color: 'red'}}>*</span>
-                  <input
-                    type="text"
-                    name="middlename"
-                    value={newEmployee.middlename}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </label>
-                <label>
-                  Extension:
-                  <input
-                    type="text"
-                    name="extension"
-                    value={newEmployee.extension}
-                    onChange={handleInputChange}
-                  />
-                </label>
-                <label>
-                  Civil Status: <span style={{color: 'red'}}>*</span>
-                  <select
-                    name="civilStatus"
-                    value={newEmployee.civilStatus}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Select</option>
-                    <option value="Single">Single</option>
-                    <option value="Married">Married</option>
-                    <option value="Widowed">Widowed</option>
-                    <option value="Separated">Separated</option>
-                    <option value="Other/s">Other/s</option>
-                  </select>
-                </label>
-                </div>
-                <div className="employee-info2">
-                <label>
-                  Citizenship: <span style={{color: 'red'}}>*</span>
-                  <select
-                    name="citizenship"
-                    value={newEmployee.citizenship}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Select</option>
-                    <option value="Filipino">Filipino</option>
-                    <option value="Dual Citizenship">Dual Citizenship</option>
-                  </select>
-                </label>
-                <label>
-                  Mobile No.: <span style={{color: 'red'}}>*</span>
-                  <input
-                    type="text"
-                    name="mobileNo"
-                    value={newEmployee.mobileNo}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </label>
-                <label>
-                  Email Address: <span style={{color: 'red'}}>*</span>
-                  <input
-                    type="email"
-                    name="email"
-                    value={newEmployee.email}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </label>
-                <label>
-                  Birthdate: <span style={{color: 'red'}}>*</span>
-                  <input
-                    type="date"
-                    name="birthdate"
-                    value={newEmployee.birthdate}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </label>
-                <label>
-                  Date Joined: <span style={{color: 'red'}}>*</span>
-                  <input
-                  type="date"
-                  name="dateJoined"
-                  value={newEmployee.dateJoined}
-                  onChange={handleInputChange}
-                  required
-                  />
-                </label>
-                <label>
-                  Gender: <span style={{color: 'red'}}>*</span>
-                  <select
-                    name="gender"
-                    value={newEmployee.gender}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Select</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                  </select>
-                </label>                  
-                </div>
-                </section>
-
-                <section className="address-section">
-                  <div className="address"> 
-                    <h4 className="section-title">Address</h4>
-                  <label>
-                    Province: <span style={{color: 'red'}}>*</span>
-                    <input
-                      type="text"
-                      name="province"
-                      value={newEmployee.address.province}
-                      onChange={e => setNewEmployee({
-                        ...newEmployee,
-                        address: { ...newEmployee.address, province: e.target.value }
-                      })}
-                      required
-                    />
-                  </label>
-                  <label>
-                    City/Municipality: <span style={{color: 'red'}}>*</span>
-                    <input
-                      type="text"
-                      name="city"
-                      value={newEmployee.address.city}
-                      onChange={e => setNewEmployee({
-                        ...newEmployee,
-                        address: { ...newEmployee.address, city: e.target.value }
-                      })}
-                      required
-                    />
-                  </label>
-                    <label>
-                    Zip Code: <span style={{color: 'red'}}>*</span>
-                    <input
-                      type="text"
-                      name="zipCode"
-                      value={newEmployee.address.zipCode}
-                      onChange={e => setNewEmployee({
-                        ...newEmployee,
-                        address: { ...newEmployee.address, zipCode: e.target.value }
-                      })}
-                      required
-                    />
-                  </label>
-                  <label>
-                    Barangay: <span style={{color: 'red'}}>*</span>
-                    <input
-                      type="text"
-                      name="barangay"
-                      value={newEmployee.address.barangay}
-                      onChange={e => setNewEmployee({
-                        ...newEmployee,
-                        address: { ...newEmployee.address, barangay: e.target.value }
-                      })}
-                      required
-                    />
-                  </label>
-                  </div>
-
-                  <div className="modal-actions">
-                  <button type="submit" className="add-employee-button">
-                    Add
-                  </button>
-                  <button type="button" className="delete-employee-button" onClick={handleCloseModal}>
-                    Cancel
-                  </button>
-                </div>
-                </section>
-              </form>
             </div>
-          </div>
-        )}
+            {showSuccess && (
+              <div className="employee-success-popup">Employee successfully added!</div>
+            )}
+            {showDeleteSuccess && (
+              <div className="employee-success-popup" style={{background: "#4caf50", color: "#fff"}}>
+                Employee Successfully Deleted!
+              </div>
+            )}
 
-        {/* View Employee Modal */}
-        {viewEmployee && (
-          <div className="modal-overlay">
-            <div className="view-employee-modal">
-              <div className="view-employee-header">Employee Details</div>
-              <div className="view-employee-details-grid">
-                <div>
-                  <div className="view-employee-section-title">Personal Information</div>
-                  <div className="view-employee-info-list">
-                    <p><b>Surname:</b> <u>{viewEmployee.surname}</u> </p>
-                    <p><b>First Name:</b> <u>{viewEmployee.firstname}</u> </p>
-                    <p><b>Middle Name:</b> <u>{viewEmployee.middlename}</u> </p>
-                    <p><b>Extension:</b> <u>{viewEmployee.extension || '-'}</u> </p>
-                    <p><b>Civil Status:</b> <u>{viewEmployee.civilStatus}</u> </p>
-                    <p><b>Citizenship:</b> <u>{viewEmployee.citizenship}</u> </p>
-                    <p><b>Mobile No.:</b> <u>{viewEmployee.mobileNo}</u> </p>
-                    <p><b>Email:</b> <u>{viewEmployee.email}</u> </p>
-                    <p><b>Birthdate:</b> <u>{viewEmployee.birthdate ? new Date(viewEmployee.birthdate).toLocaleDateString() : '-'}</u> </p>
-                    <p><b>Date Joined:</b>
-                      <u>
-                        {viewEmployee.dateJoined
-                          ? (() => {
-                              const d = new Date(viewEmployee.dateJoined);
-                              return isNaN(d.getTime()) ? viewEmployee.dateJoined : d.toLocaleDateString();
+            {/* Add Employee Modal */}
+            {showAddModal && (
+              <div className="modal-overlay">
+                <div className="modal-content">
+                  <div className="Form-title">
+                    <h3>Add Employee</h3>
+                  <p className="note">
+                    (Note: Field with <span style={{color: 'red'}}>*</span> is required)
+                  </p>
+                  </div>
+                  <form onSubmit={handleAddEmployeeSubmit} className="add-employee-form">
+                    <section className="info-section">
+                    <div className="employee-info1">
+                    <h4 className="section-title">Employee Information</h4>
+                    <label>
+                      Surname: <span style={{color: 'red'}}>*</span>
+                      <input
+                        type="text"
+                        name="surname"
+                        value={newEmployee.surname}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </label>
+                    <label>
+                      First Name: <span style={{color: 'red'}}>*</span>
+                      <input
+                        type="text"
+                        name="firstname"
+                        value={newEmployee.firstname}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </label>
+                    <label>
+                      Middle Name: <span style={{color: 'red'}}>*</span>
+                      <input
+                        type="text"
+                        name="middlename"
+                        value={newEmployee.middlename}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </label>
+                    <label>
+                      Extension:
+                      <input
+                        type="text"
+                        name="extension"
+                        value={newEmployee.extension}
+                        onChange={handleInputChange}
+                      />
+                    </label>
+                    <label>
+                      Civil Status: <span style={{color: 'red'}}>*</span>
+                      <select
+                        name="civilStatus"
+                        value={newEmployee.civilStatus}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="">Select</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Widowed">Widowed</option>
+                        <option value="Separated">Separated</option>
+                        <option value="Other/s">Other/s</option>
+                      </select>
+                    </label>
+                    </div>
+                    <div className="employee-info2">
+                    <label>
+                      Citizenship: <span style={{color: 'red'}}>*</span>
+                      <select
+                        name="citizenship"
+                        value={newEmployee.citizenship}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="">Select</option>
+                        <option value="Filipino">Filipino</option>
+                        <option value="Dual Citizenship">Dual Citizenship</option>
+                      </select>
+                    </label>
+                    <label>
+                      Mobile No.: <span style={{color: 'red'}}>*</span>
+                      <input
+                        type="text"
+                        name="mobileNo"
+                        value={newEmployee.mobileNo}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </label>
+                    <label>
+                      Email Address: <span style={{color: 'red'}}>*</span>
+                      <input
+                        type="email"
+                        name="email"
+                        value={newEmployee.email}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </label>
+                    <label>
+                      Birthdate: <span style={{color: 'red'}}>*</span>
+                      <input
+                        type="date"
+                        name="birthdate"
+                        value={newEmployee.birthdate}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </label>
+                    <label>
+                      Date Joined: <span style={{color: 'red'}}>*</span>
+                      <input
+                      type="date"
+                      name="dateJoined"
+                      value={newEmployee.dateJoined}
+                      onChange={handleInputChange}
+                      required
+                      />
+                    </label>
+                    <label>
+                      Gender: <span style={{color: 'red'}}>*</span>
+                      <select
+                        name="gender"
+                        value={newEmployee.gender}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="">Select</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                      </select>
+                    </label>                  
+                    </div>
+                    </section>
+
+                    <section className="address-section">
+                      <div className="address"> 
+                        <h4 className="section-title">Address</h4>
+                      <label>
+                        Province: <span style={{color: 'red'}}>*</span>
+                        <input
+                          type="text"
+                          name="province"
+                          value={newEmployee.address.province}
+                          onChange={e => setNewEmployee({
+                            ...newEmployee,
+                            address: { ...newEmployee.address, province: e.target.value }
+                          })}
+                          required
+                        />
+                      </label>
+                      <label>
+                        City/Municipality: <span style={{color: 'red'}}>*</span>
+                        <input
+                          type="text"
+                          name="city"
+                          value={newEmployee.address.city}
+                          onChange={e => setNewEmployee({
+                            ...newEmployee,
+                            address: { ...newEmployee.address, city: e.target.value }
+                          })}
+                          required
+                        />
+                      </label>
+                        <label>
+                        Zip Code: <span style={{color: 'red'}}>*</span>
+                        <input
+                          type="text"
+                          name="zipCode"
+                          value={newEmployee.address.zipCode}
+                          onChange={e => setNewEmployee({
+                            ...newEmployee,
+                            address: { ...newEmployee.address, zipCode: e.target.value }
+                          })}
+                          required
+                        />
+                      </label>
+                      <label>
+                        Barangay: <span style={{color: 'red'}}>*</span>
+                        <input
+                          type="text"
+                          name="barangay"
+                          value={newEmployee.address.barangay}
+                          onChange={e => setNewEmployee({
+                            ...newEmployee,
+                            address: { ...newEmployee.address, barangay: e.target.value }
+                          })}
+                          required
+                        />
+                      </label>
+                      </div>
+
+                      <div className="modal-actions">
+                      <button type="submit" className="add-employee-button">
+                        Add
+                      </button>
+                      <button type="button" className="delete-employee-button" onClick={handleCloseModal}>
+                        Cancel
+                      </button>
+                    </div>
+                    </section>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* View Employee Modal */}
+            {viewEmployee && (
+              <div className="modal-overlay">
+                <div className="view-employee-modal">
+                  <div className="view-employee-header">Employee Details</div>
+                  <div className="view-employee-details-grid">
+                    <div>
+                      <div className="view-employee-section-title">Personal Information</div>
+                      <div className="view-employee-info-list">
+                        <p><b>Surname:</b> <u>{viewEmployee.surname}</u> </p>
+                        <p><b>First Name:</b> <u>{viewEmployee.firstname}</u> </p>
+                        <p><b>Middle Name:</b> <u>{viewEmployee.middlename}</u> </p>
+                        <p><b>Extension:</b> <u>{viewEmployee.extension || '-'}</u> </p>
+                        <p><b>Civil Status:</b> <u>{viewEmployee.civilStatus}</u> </p>
+                        <p><b>Citizenship:</b> <u>{viewEmployee.citizenship}</u> </p>
+                        <p><b>Mobile No.:</b> <u>{viewEmployee.mobileNo}</u> </p>
+                        <p><b>Email:</b> <u>{viewEmployee.email}</u> </p>
+                        <p><b>Birthdate:</b> <u>{viewEmployee.birthdate ? new Date(viewEmployee.birthdate).toLocaleDateString() : '-'}</u> </p>
+                        <p><b>Date Joined:</b>
+                          <u>
+                            {viewEmployee.dateJoined
+                              ? (() => {
+                                  const d = new Date(viewEmployee.dateJoined);
+                                  return isNaN(d.getTime()) ? viewEmployee.dateJoined : d.toLocaleDateString();
                             })()
                           : '-'}
-                      </u>
-                    </p> 
-                    <p><b>Gender:</b> <u>{viewEmployee.gender}</u> </p>
+                        </u>
+                        </p> 
+                        <p><b>Gender:</b> <u>{viewEmployee.gender}</u> </p>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="view-employee-section-title">Address</div>
+                      <div className="view-employee-address-list">
+                        <p><b>Province:</b> <u>{viewEmployee.address?.province || '-'}</u></p>
+                        <p><b>City/Municipality:</b> <u>{viewEmployee.address?.city || '-'}</u></p>
+                        <p><b>Zip Code:</b> <u>{viewEmployee.address?.zipCode || '-'}</u></p>
+                        <p><b>Barangay:</b> <u>{viewEmployee.address?.barangay || '-'}</u></p>
+                      </div>
+                    </div>
                   </div>
+                  <button className="view-employee-close-btn" onClick={handleCloseViewModal}>Close</button>
                 </div>
-                <div>
-                  <div className="view-employee-section-title">Address</div>
-                  <div className="view-employee-address-list">
-                    <p><b>Province:</b> <u>{viewEmployee.address?.province || '-'}</u></p>
-                    <p><b>City/Municipality:</b> <u>{viewEmployee.address?.city || '-'}</u></p>
-                    <p><b>Zip Code:</b> <u>{viewEmployee.address?.zipCode || '-'}</u></p>
-                    <p><b>Barangay:</b> <u>{viewEmployee.address?.barangay || '-'}</u></p>
+              </div>
+            )}
+
+            {/* Employees Table */}
+            <div className="employee-table">
+              <div className="employee-table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Employee Id</th>
+                      <th>Full Name</th>
+                      <th>Email Address</th>
+                      <th>Position</th>
+                      <th>Current Step</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activeEmployees.length > 0 ? (
+                      activeEmployees.map((employee) => (
+                        <tr key={employee._id || employee.id}>
+                          <td className="employee-data">{employee.id || '-'}</td>
+                          <td className="lastName">{employee.surname} {employee.firstname} {employee.middlename} {employee.extension ? employee.extension : ''}</td>
+                          <td className="employee-data">{employee.email || '-'}</td>
+                          <td className="employee-data">{employee.position || '-'}</td>
+                          <td className="employee-data">{calculateStep(employee.dateJoined)}</td>
+                          <td className="employee-data">{employee.status || '-'}</td>
+                          <td className="employee-data">
+                            <button
+                              className="view-button"
+                              onClick={() => handleViewClick(employee._id)}
+                            >
+                              View
+                            </button>
+                            <button
+                              className="delete-employee-button"
+                              title="Delete Employee"
+                              onClick={() => handleDeleteClick(employee._id)}
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="7">No active employees found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && (
+              <div className="modal-overlay">
+                <div className="modal-content">
+                  <p>When deleting employee, It's User Account will be lost too. <br/> <b>ARE YOU SURE YOU WANT TO DELETE THIS EMPLOYEE?</b> </p>
+                  <div className="modal-actions">
+                    <button className="modal-btn yes" onClick={handleDeleteEmployeeConfirmed}>Yes</button>
+                    <button className="modal-btn no" onClick={() => { setShowDeleteModal(false); setEmployeeToDelete(null); }}>No</button>
                   </div>
                 </div>
               </div>
-              <button className="view-employee-close-btn" onClick={handleCloseViewModal}>Close</button>
-            </div>
+            )}
+          </>
+        )}
+
+        {activeTab === "personal" && (
+          <div>
+            {/* Personal Records content goes here */}
+            <h3>Personal Records</h3>
           </div>
         )}
 
-        {/* Employees Table */}
-        <div className="employee-table">
-          <div className="employee-table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Employee Id</th>
-                  <th>Full Name</th>
-                  <th>Email Address</th>
-                  <th>Position</th>
-                  <th>Current Step</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activeEmployees.length > 0 ? (
-                  activeEmployees.map((employee) => (
-                    <tr key={employee._id || employee.id}>
-                      <td className="employee-data">{employee.id || '-'}</td>
-                      <td className="lastName">{employee.surname} {employee.firstname} {employee.middlename} {employee.extension ? employee.extension : ''}</td>
-                      <td className="employee-data">{employee.email || '-'}</td>
-                      <td className="employee-data">{employee.position || '-'}</td>
-                      <td className="employee-data">{calculateStep(employee.dateJoined)}</td>
-                      <td className="employee-data">{employee.status || '-'}</td>
-                      <td className="employee-data">
-                        <button
-                          className="view-button"
-                          onClick={() => handleViewClick(employee._id)}
-                        >
-                          View
-                        </button>
-                        <button
-                          className="delete-employee-button"
-                          title="Delete Employee"
-                          onClick={() => handleDeleteClick(employee._id)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="7">No active employees found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Delete Confirmation Modal */}
-        {showDeleteModal && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <p>When deleting employee, It's User Account will be lost too. <br/> <b>ARE YOU SURE YOU WANT TO DELETE THIS EMPLOYEE?</b> </p>
-              <div className="modal-actions">
-                <button className="modal-btn yes" onClick={handleDeleteEmployeeConfirmed}>Yes</button>
-                <button className="modal-btn no" onClick={() => { setShowDeleteModal(false); setEmployeeToDelete(null); }}>No</button>
-              </div>
-            </div>
+        {activeTab === "service" && (
+          <div>
+            {/* Service Records content goes here */}
+            <h3>Service Records</h3>
           </div>
         )}
       </main>

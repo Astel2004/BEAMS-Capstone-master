@@ -431,3 +431,22 @@
   background: #eee;
   color: #333;
 }
+.employee-records-nav {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.employee-nav-btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 4px 4px 0 0;
+  background: #eee;
+  color: #333;
+  font-weight: bold;
+  cursor: pointer;
+}
+.employee-nav-btn.active {
+  background: #27ae60;
+  color: #fff;
+}
