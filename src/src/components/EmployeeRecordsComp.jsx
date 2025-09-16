@@ -37,6 +37,7 @@ const EmployeeRecordsComp = () => {
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState("employees");
   const [personalRecords, setPersonalRecords] = useState([]); // State for personal records
+  const [personalEmployees, setPersonalEmployees] = useState([]);
   const navigate = useNavigate();
 
   const handleViewClick = async (employeeId) => {
@@ -80,6 +81,37 @@ const EmployeeRecordsComp = () => {
     };
     fetchEmployees();
   }, []);
+
+  // Fetch personal records from the backend
+  useEffect(() => {
+    const fetchPersonalRecords = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/documents?type=Personal");
+        const data = await response.json();
+        setPersonalRecords(data);
+      } catch (error) {
+        setPersonalRecords([]);
+        console.error("Error fetching personal records:", error);
+      }
+    };
+    fetchPersonalRecords();
+  }, []);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/employees");
+        const data = await response.json();
+        setPersonalEmployees(data);
+      } catch (error) {
+        setPersonalEmployees([]);
+        console.error("Error fetching employees:", error);
+      }
+    };
+    if (activeTab === "personal") {
+      fetchEmployees();
+    }
+  }, [activeTab]);
 
   // Handle Add Employee Modal
   const handleAddEmployeeClick = () => {
@@ -650,29 +682,32 @@ const EmployeeRecordsComp = () => {
       <table>
         <thead>
           <tr>
-            <th>File Name</th>
-            <th>Date Uploaded</th>
-            <th>Status</th>
+            <th>Employee ID</th>
+            <th>Full Name</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {personalRecords.length > 0 ? (
-            personalRecords.map((doc) => (
-              <tr key={doc.fileName}>
-                <td>{doc.fileName}</td>
-                <td>{doc.dateUploaded}</td>
-                <td>{doc.status}</td>
+          {personalEmployees.length > 0 ? (
+            personalEmployees.map((emp) => (
+              <tr key={emp._id}>
+                <td>{emp.id || emp._id}</td>
                 <td>
-                  <button className="view-btn" onClick={() => alert(`Viewing ${doc.fileName}`)}>View</button>
-                  <button className="delete-btn" onClick={() => alert(`Requesting delete for ${doc.fileName}`)}>Request Delete</button>
-                  <button className="validate-btn" onClick={() => alert(`Submitted ${doc.fileName} for validation`)}>Submit for Validation</button>
+                  {emp.surname} {emp.firstname} {emp.middlename} {emp.extension ? emp.extension : ""}
+                </td>
+                <td>
+                  <button
+                    className="manage-records-btn"
+                    onClick={() => navigate(`/employee-records/${emp._id}/documents`)}
+                  >
+                    Manage Records
+                  </button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="4">No personal records uploaded yet.</td>
+              <td colSpan="3">No employees found.</td>
             </tr>
           )}
         </tbody>

@@ -8,6 +8,7 @@ import Login from './pages/Login.jsx'; // Import Login.jsx
 import HRDashboard from "./pages/HRDashboard.jsx"; // Import HR Dashboard
 import EmployeeDashboardComp from "./components/EmployeeDashboardComp.jsx"; // Import Employee Dashboard
 import EmployeeRecords from "./pages/EmployeeRecords.jsx"; // Import Employee Records
+import HRPersonalRecordsDocuments from './components/HRPersonalRecordsDocuments.jsx';
 import EmployeeProfileRecordComp from "./components/EmployeeProfileRecordComp.jsx"; // Import Employee Profile Record
 import StepIncrementComp from "./components/StepIncrementComp.jsx"; // Import Step Increment Tracker
 import Reports from "./pages/Reports.jsx"; // Import Reports and Analytics
@@ -33,6 +34,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/employee-dashboard" element={<EmployeeDashboardComp />} />
         {/* Route for Employee Records */}
         <Route path="/employee-records" element={<EmployeeRecords />} />
+        {/* Route for HR Personal Records Documents */}
+        <Route path="/employee-records/:employeeId/documents" element={<HRPersonalRecordsDocuments />} />
         {/* Route for Employee Profile Record */}
         <Route path="/employee-profile/:id" element={<EmployeeProfileRecordComp />} />
         {/* Route for Step Increment Tracker */}

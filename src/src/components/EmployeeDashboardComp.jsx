@@ -26,7 +26,7 @@ const EmployeeDashboardComp = () => {
           <ul>
             <li onClick={() => navigate("/employee-dashboard")}>Dashboard</li>
             <li onClick={() => navigate("/my-profile")}>My Profile</li>
-            <li onClick={() => navigate("/my-documents")}>My Documents</li>
+            <li onClick={() => navigate("/personal-documents")}>Personal Documents</li>
             <li onClick={() => navigate("/employee-increment")}>
               Step Increment Status
             </li>
