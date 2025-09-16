@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../styles/Dashboard.css";
 import "../styles/EmployeeRecords.css";
+import "../styles/HRPersonalRecordsDocuments.css";
 import { useParams, useNavigate } from "react-router-dom";
 
 const HRPersonalRecordsDocuments = () => {
@@ -42,33 +43,12 @@ const HRPersonalRecordsDocuments = () => {
         </div>
 
         <button
-          className="back-btn"
-          style={{
-            marginBottom: "1.5rem",
-            marginLeft: "0.5rem",
-            padding: "8px 18px",
-            background: "#1976d2",
-            color: "#fff",
-            border: "none",
-            borderRadius: "4px",
-            fontWeight: "bold",
-            cursor: "pointer"
-          }}
-          onClick={() => navigate("/employee-records", { state: { tab: "personal" } })}
+          className="back-btn" onClick={() => navigate("/employee-records", { state: { tab: "personal" } })}
         >
           ← Back to Personal Records
         </button>
 
-        <div
-          className="employee-table"
-          style={{
-            background: "#fff",
-            borderRadius: "8px",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
-            padding: "24px",
-            margin: "0 0.5rem 2rem 0.5rem"
-          }}
-        >
+        <div className="employee-table">
           <div className="employee-table-scroll" style={{ maxHeight: "60vh", overflowY: "auto" }}>
             <table>
               <thead>
