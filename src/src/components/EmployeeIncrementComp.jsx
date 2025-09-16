@@ -3,9 +3,11 @@ import "../styles/Dashboard.css"; // Reuse the same CSS for sidebar and navbar
 import "../styles/EmployeeIncrement.css"; // Add specific styles for Step Increment Tracking
 import profileImage from "../assets/profile-user.png"; // Import the profile image
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
 
 const EmployeeIncrementComp = () => {
   const [employee, setEmployee] = useState(null); // State to store employee details
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate(); // Initialize useNavigate
 
   const handleLogout = () => {
@@ -67,7 +69,13 @@ const EmployeeIncrementComp = () => {
           </div>
           <div className="header-icons">
             <span className="icon">📧</span>
-            <span className="icon">🔔</span>
+            <span
+              className="icon"
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowNotifications(true)}
+            >
+              🔔
+            </span>
             <div className="profile">
               <img src={profileImage} alt="Profile" />
               <span>USER</span>
@@ -152,6 +160,12 @@ const EmployeeIncrementComp = () => {
           </button>
         </div>
       </main>
+
+      <NotificationPopup
+        visible={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        userType="employee"
+      />
     </div>
   );
 };

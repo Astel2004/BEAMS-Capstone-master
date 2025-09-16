@@ -4,12 +4,14 @@ import "../styles/StepIncrement.css"; // Add specific styles for step increment
 import profileImage from "../assets/profile-user.png"; // Import the profile image
 import Image from "../assets/user.png"; // Import the admin image
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
 
 const StepIncrementComp = () => {
   const [eligibleEmployees, setEligibleEmployees] = useState([]); // State for employees eligible for step increment
   const [sortBy, setSortBy] = useState('lastname');
   const [userAccounts, setUserAccounts] = useState([]);
   const [showNoAccountModal, setShowNoAccountModal] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate(); // Initialize useNavigate
 
   // Fetch eligible employees from the backend
@@ -124,7 +126,13 @@ const StepIncrementComp = () => {
           </div>
           <div className="header-icons">
             <span className="icon">📧</span>
-            <span className="icon">🔔</span>
+            <span
+              className="icon"
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowNotifications(true)}
+            >
+              🔔
+            </span>
             <div className="profile">
               <img src={Image} alt="Profile" />
               <span>ADMIN</span>
@@ -209,6 +217,12 @@ const StepIncrementComp = () => {
     </div>
   </div>
 )}
+
+        <NotificationPopup
+  visible={showNotifications}
+  onClose={() => setShowNotifications(false)}
+  userType="hr"
+/>
 
       </main>
     </div>

@@ -4,6 +4,7 @@ import "../styles/Dashboard.css"; // Assuming you have a CSS file for styling
 import "../styles/Users.css"; // Import the CSS file for user management styles
 import profileImage from "../assets/profile-user.png"; // Import the image
 import Image from "../assets/user.png"; // Import the image
+import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
 
 const UsersComp = () => {
   const navigate = useNavigate(); // Initialize useNavigate
@@ -137,6 +138,7 @@ const UsersComp = () => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const handleDeleteClick = (userId) => {
     setUserToDelete(userId);
@@ -172,7 +174,13 @@ const UsersComp = () => {
           </div>
           <div className="header-icons">
             <span className="icon">📧</span>
-            <span className="icon">🔔</span>
+            <span
+  className="icon"
+  style={{ cursor: "pointer" }}
+  onClick={() => setShowNotifications(true)}
+>
+  🔔
+</span>
             <div className="profile">
               <span className="user">
                 <img src={Image} alt="Image" />
@@ -323,6 +331,11 @@ const UsersComp = () => {
   </div>
 )}
 
+        <NotificationPopup
+  visible={showNotifications}
+  onClose={() => setShowNotifications(false)}
+  userType="hr"
+/>
       </main>
     </div>
   );

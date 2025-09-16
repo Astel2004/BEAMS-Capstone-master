@@ -4,6 +4,7 @@ import "../styles/EmployeeRecords.css";
 import profileImage from "../assets/profile-user.png";
 import Image from "../assets/user.png";
 import { useNavigate } from "react-router-dom";
+import NotificationPopup from "./NotificationPopUp";
 
 const EmployeeRecordsComp = () => {
   const [activeEmployees, setActiveEmployees] = useState([]);
@@ -38,6 +39,7 @@ const EmployeeRecordsComp = () => {
   const [activeTab, setActiveTab] = useState("employees");
   const [personalRecords, setPersonalRecords] = useState([]); // State for personal records
   const [personalEmployees, setPersonalEmployees] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
 
   const handleViewClick = async (employeeId) => {
@@ -293,7 +295,13 @@ const EmployeeRecordsComp = () => {
           </div>
           <div className="header-icons">
             <span className="icon">📧</span>
-            <span className="icon">🔔</span>
+            <span
+  className="icon"
+  style={{ cursor: "pointer" }}
+  onClick={() => setShowNotifications(true)}
+>
+  🔔
+</span>
             <div className="profile">
               <img src={Image} alt="Image" />
               <span>ADMIN</span>
@@ -722,6 +730,12 @@ const EmployeeRecordsComp = () => {
             <h3>Service Records</h3>
           </div>
         )}
+
+        <NotificationPopup
+          visible={showNotifications}
+          onClose={() => setShowNotifications(false)}
+          userType="hr"
+        />
       </main>
     </div>
   );

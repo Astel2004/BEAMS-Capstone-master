@@ -3,11 +3,13 @@ import "../styles/Dashboard.css";
 import "../styles/MyProfile.css"; // Add specific styles for My Profile
 import profileImage from "../assets/profile-user.png";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
 
 const MyProfileComp = () => {
   const [profile, setProfile] = useState(null); // State to store the profile details
   const [isEditing, setIsEditing] = useState(false); // State to toggle edit mode
   const [formData, setFormData] = useState({}); // State to store form data
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
@@ -94,7 +96,13 @@ const MyProfileComp = () => {
           </div>
           <div className="header-icons">
             <span className="icon">📧</span>
-            <span className="icon">🔔</span>
+            <span
+              className="icon"
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowNotifications(true)}
+            >
+              🔔
+            </span>
             <div className="profile">
               <img src={profileImage} alt="Profile" />
               <span>ADMIN</span>
@@ -180,6 +188,11 @@ const MyProfileComp = () => {
           </div>
         </div>
       </main>
+      <NotificationPopup
+        visible={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        userType="employee"
+      />
     </div>
   );
 };

@@ -3,10 +3,13 @@ import "../styles/Dashboard.css";
 import "../styles/EmployeeRecords.css";
 import "../styles/HRPersonalRecordsDocuments.css";
 import { useParams, useNavigate } from "react-router-dom";
+import NotificationPopup from "./NotificationPopUp";
 
 const HRPersonalRecordsDocuments = () => {
   const { employeeId } = useParams();
   const [documents, setDocuments] = useState([]);
+  const [notification, setNotification] = useState({ visible: false, message: "" });
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,6 +25,23 @@ const HRPersonalRecordsDocuments = () => {
     fetchDocs();
   }, [employeeId]);
 
+  const handleApprove = async (docId) => {
+    try {
+      await fetch(`http://localhost:5000/api/documents/${docId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "Validated" }),
+      });
+      setNotification({ visible: true, message: "Document approved and validated!" });
+      // Refresh documents after approval
+      setDocuments((prevDocs) =>
+        prevDocs.map((doc) => (doc._id === docId ? { ...doc, status: "Validated" } : doc))
+      );
+    } catch (error) {
+      setNotification({ visible: true, message: "Error approving document." });
+    }
+  };
+
   return (
     <div className="dashboard-container" style={{ background: "#f5f7fa", minHeight: "100vh" }}>
       <main className="main-content">
@@ -31,7 +51,13 @@ const HRPersonalRecordsDocuments = () => {
           </div>
           <div className="header-icons">
             <span className="icon">📧</span>
-            <span className="icon">🔔</span>
+            <span
+              className="icon"
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowNotifications(true)}
+            >
+              🔔
+            </span>
             <div className="profile">
               <span>ADMIN</span>
             </div>
@@ -72,16 +98,7 @@ const HRPersonalRecordsDocuments = () => {
                         <button className="view-btn" onClick={() => window.open(doc.fileUrl, "_blank")}>View</button>
                         <button
                           className="approve-btn"
-                          onClick={async () => {
-                            // Example: Update status to "Validated"
-                            await fetch(`http://localhost:5000/api/documents/${doc._id}`, {
-                              method: "PUT",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ status: "Validated" }),
-                            });
-                            // Optionally, refresh the table
-                            alert("Document approved and validated!");
-                          }}
+                          onClick={() => handleApprove(doc._id)}
                         >
                           Approve
                         </button>
@@ -97,6 +114,15 @@ const HRPersonalRecordsDocuments = () => {
             </table>
           </div>
         </div>
+
+        {notification.visible && (
+          <NotificationPopup message={notification.message} onClose={() => setNotification({ visible: false, message: "" })} />
+        )}
+        <NotificationPopup
+          visible={showNotifications}
+          onClose={() => setShowNotifications(false)}
+          userType="hr"
+        />
       </main>
     </div>
   );

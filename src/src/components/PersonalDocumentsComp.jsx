@@ -3,6 +3,7 @@ import "../styles/Dashboard.css"; // Reuse the same CSS for sidebar and navbar
 import "../styles/PersonalDocuments.css"; // Add specific styles for Personal Documents
 import profileImage from "../assets/profile-user.png"; // Import the profile image
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import NotificationPopup from "./NotificationPopUp";
 
 const PersonalDocuments = () => {
   const [uploadedDocuments, setUploadedDocuments] = useState([
@@ -21,6 +22,20 @@ const PersonalDocuments = () => {
   ]); // Example uploaded documents
   const [file, setFile] = useState(null); // State for the selected file
   const [activeTab, setActiveTab] = useState("PDS"); // State for the active tab
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([
+    // Example notifications
+    {
+      title: "Welcome!",
+      message: "Your profile was updated.",
+      date: "2025-09-16",
+    },
+    {
+      title: "Step Increment",
+      message: "You are eligible for a step increment.",
+      date: "2025-09-15",
+    },
+  ]);
   const navigate = useNavigate(); // Initialize useNavigate
 
   const handleFileChange = (e) => {
@@ -99,7 +114,13 @@ const PersonalDocuments = () => {
           </div>
           <div className="header-icons">
             <span className="icon">📧</span>
-            <span className="icon">🔔</span>
+            <span
+              className="icon"
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowNotifications(true)}
+            >
+              🔔
+            </span>
             <div className="profile">
               <img src={profileImage} alt="Profile" />
               <span>USER</span>
@@ -352,6 +373,12 @@ const PersonalDocuments = () => {
             </table>
           </div>
         )}
+
+        <NotificationPopup
+          visible={showNotifications}
+          onClose={() => setShowNotifications(false)}
+          userType="employee"
+        />
       </main>
     </div>
   );

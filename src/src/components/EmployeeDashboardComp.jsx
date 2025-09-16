@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import "../styles/Dashboard.css"; // Import the CSS file for styling
 import profileImage from "../assets/profile-user.png"; // Import the profile image
+import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
 
 const EmployeeDashboardComp = () => {
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate(); // Initialize useNavigate
 
   const handleLogout = () => {
@@ -43,7 +45,13 @@ const EmployeeDashboardComp = () => {
           </div>
           <div className="header-icons">
             <span className="icon">📧</span>
-            <span className="icon">🔔</span>
+            <span
+              className="icon"
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowNotifications(true)}
+            >
+              🔔
+            </span>
             <div className="profile">
               <img src={profileImage} alt="Profile" className="profile-image" />
               <span>EMPLOYEE</span>
@@ -84,6 +92,12 @@ const EmployeeDashboardComp = () => {
           <div className="chart-placeholder">Chart Placeholder</div>
         </section>
       </main>
+
+      <NotificationPopup
+        visible={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        userType="employee"
+      />
     </div>
   );
 };

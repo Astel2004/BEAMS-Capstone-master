@@ -1,16 +1,18 @@
-import React from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import "../styles/Dashboard.css"; // Assuming you have a CSS file for styling
-import profileImage from "../assets/profile-user.png"; // Import the image
-import Image from "../assets/user.png"; // Import the image
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles/Dashboard.css";
+import profileImage from "../assets/profile-user.png";
+import Image from "../assets/user.png";
+import NotificationPopup from "./NotificationPopUp";
 
 const HRDashboardComp = () => {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const handleLogout = () => {
-    // Perform logout logic here (e.g., clearing tokens)
     alert("You have been logged out.");
-    navigate("/login"); // Redirect to the login page
+    navigate("/login");
   };
+
+  const [showNotifications, setShowNotifications] = useState(false);
 
   return (
     <div className="dashboard-container">
@@ -29,7 +31,8 @@ const HRDashboardComp = () => {
             <li onClick={() => navigate("/step-increment")}>Step Increment Tracker</li>
             <li onClick={() => navigate("/reports")}>Reports & Analytics</li>
             <li onClick={() => navigate("/users")}>User Management</li>
-<li onClick={handleLogout}>Log out</li>          </ul>
+            <li onClick={handleLogout}>Log out</li>
+          </ul>
         </nav>
       </aside>
 
@@ -41,7 +44,13 @@ const HRDashboardComp = () => {
           </div>
           <div className="header-icons">
             <span className="icon">📧</span>
-            <span className="icon">🔔</span>
+            <span
+              className="icon"
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowNotifications(true)}
+            >
+              🔔
+            </span>
             <div className="profile">
               <span className="user">
                 <img src={Image} alt="Image" />
@@ -87,6 +96,12 @@ const HRDashboardComp = () => {
           {/* Placeholder for charts */}
           <div className="chart-placeholder">Chart Placeholder</div>
         </section>
+
+        <NotificationPopup
+          visible={showNotifications}
+          onClose={() => setShowNotifications(false)}
+          userType="hr"
+        />
       </main>
     </div>
   );

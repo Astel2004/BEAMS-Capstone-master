@@ -4,12 +4,14 @@ import "../styles/Reports.css"; // Add specific styles for reports
 import profileImage from "../assets/profile-user.png"; // Import the profile image
 import Image from "../assets/user.png"; // Import the admin image
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
 
 const ReportsComp = () => {
   const [employees, setEmployees] = useState([]); // State to store employee data
   const [displayedEmployees, setDisplayedEmployees] = useState([]); // State for sorted/filtered employees
   const [selectedReport, setSelectedReport] = useState(""); // State for selected report type
   const [sortBy, setSortBy] = useState('lastname');
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate(); // Initialize useNavigate
 
   // Sorting handler
@@ -88,7 +90,13 @@ const ReportsComp = () => {
           </div>
           <div className="header-icons">
             <span className="icon">📧</span>
-            <span className="icon">🔔</span>
+            <span
+              className="icon"
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowNotifications(true)}
+            >
+              🔔
+            </span>
             <div className="profile">
               <img src={Image} alt="Profile" />
               <span>ADMIN</span>
@@ -163,6 +171,11 @@ const ReportsComp = () => {
           </div>
         </div>
       </main>
+      <NotificationPopup
+  visible={showNotifications}
+  onClose={() => setShowNotifications(false)}
+  userType="hr"
+/>
     </div>
   );
 };

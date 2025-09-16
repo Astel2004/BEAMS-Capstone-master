@@ -1,0 +1,101 @@
+/* Add to NotificationPopup.css or your main CSS file */
+.notification-popup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.notification-popup-window {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(25, 118, 210, 0.18), 0 2px 8px rgba(0,0,0,0.10);
+  width: 380px;
+  max-width: 95vw;
+  padding: 0;
+  overflow: hidden;
+  animation: popup-fade-in 0.3s;
+}
+
+@keyframes popup-fade-in {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.notification-popup-header {
+  background: linear-gradient(90deg, #27ae60 80%, #35eb81 100%);
+  color: #fff;
+  padding: 16px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.15rem;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.notification-popup-body {
+  padding: 18px 22px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: #f7faff;
+}
+
+.notification-item {
+  border-bottom: 1px solid #e3eafc;
+  padding: 10px 0;
+  margin-bottom: 2px;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-date {
+  font-size: 0.85em;
+  color: #888;
+  float: right;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5em;
+  cursor: pointer;
+  margin-left: 12px;
+}
+
+.notification-empty {
+  color: #888;
+  text-align: center;
+  padding: 32px 0;
+  font-size: 1.1em;
+}
+
+/* Add to NotificationPopup.css */
+.notification-tabs {
+  background: #f7faff;
+  padding: 0 22px;
+}
+
+.notif-tab-btn {
+  flex: 1;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  color: #1976d2;
+  font-weight: bold;
+  font-size: 1em;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.notif-tab-btn.active {
+  border-bottom: 2px solid #1976d2;
+  background: #e3eafc;
+}

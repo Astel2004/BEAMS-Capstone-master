@@ -4,10 +4,12 @@ import "../styles/Dashboard.css";
 import "../styles/EmployeeProfile.css";
 import profileImage from "../assets/profile-user.png";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
 
 const EmployeeProfileRecordComp = () => {
   const { id } = useParams(); // Get the custom employee ID from the URL
   const [employee, setEmployee] = useState(null); // State to store the employee details
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
@@ -58,7 +60,13 @@ const EmployeeProfileRecordComp = () => {
           </div>
           <div className="header-icons">
             <span className="icon">📧</span>
-            <span className="icon">🔔</span>
+            <span
+              className="icon"
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowNotifications(true)}
+            >
+              🔔
+            </span>
             <div className="profile">
               <img src={profileImage} alt="Profile" />
               <span>ADMIN</span>
@@ -86,6 +94,11 @@ const EmployeeProfileRecordComp = () => {
           </div>
         </div>
       </main>
+      <NotificationPopup
+        visible={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        userType="hr"
+      />
     </div>
   );
 };
