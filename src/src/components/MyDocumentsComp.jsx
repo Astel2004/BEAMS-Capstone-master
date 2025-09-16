@@ -82,7 +82,7 @@ const MyDocumentsComp = () => {
           <ul>
             <li onClick={() => navigate("/employee-dashboard")}>Dashboard</li>
             <li onClick={() => navigate("/my-profile")}>My Profile</li>
-            <li onClick={() => navigate("/my-documents")}>My Documents</li>
+            <li onClick={() => navigate("/my-documents")}>Personal Records</li>
             <li onClick={() => navigate("/employee-increment")}>
               Step Increment Status
             </li>
@@ -108,7 +108,7 @@ const MyDocumentsComp = () => {
         </header>
 
         <div className="dashboard-title">
-          <h2>My Documents</h2>
+          <h2>Personal Records</h2>
         </div>
 
         {/* File Upload Section */}

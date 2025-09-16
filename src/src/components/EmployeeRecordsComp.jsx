@@ -36,6 +36,7 @@ const EmployeeRecordsComp = () => {
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState("employees");
+  const [personalRecords, setPersonalRecords] = useState([]); // State for personal records
   const navigate = useNavigate();
 
   const handleViewClick = async (employeeId) => {
@@ -644,8 +645,39 @@ const EmployeeRecordsComp = () => {
 
         {activeTab === "personal" && (
           <div>
-            {/* Personal Records content goes here */}
             <h3>Personal Records</h3>
+            <div className="uploaded-documents">
+      <table>
+        <thead>
+          <tr>
+            <th>File Name</th>
+            <th>Date Uploaded</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {personalRecords.length > 0 ? (
+            personalRecords.map((doc) => (
+              <tr key={doc.fileName}>
+                <td>{doc.fileName}</td>
+                <td>{doc.dateUploaded}</td>
+                <td>{doc.status}</td>
+                <td>
+                  <button className="view-btn" onClick={() => alert(`Viewing ${doc.fileName}`)}>View</button>
+                  <button className="delete-btn" onClick={() => alert(`Requesting delete for ${doc.fileName}`)}>Request Delete</button>
+                  <button className="validate-btn" onClick={() => alert(`Submitted ${doc.fileName} for validation`)}>Submit for Validation</button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4">No personal records uploaded yet.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
           </div>
         )}
 
