@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import "../styles/Dashboard.css"; // Reuse the same CSS for sidebar and navbar
-import "../styles/MyDocuments.css"; // Add specific styles for My Documents
+import "../styles/PersonalDocuments.css"; // Add specific styles for My Documents
 import profileImage from "../assets/profile-user.png"; // Import the profile image
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
-const MyDocumentsComp = () => {
+const PersonalDocuments = () => {
   const [uploadedDocuments, setUploadedDocuments] = useState([
     {
       fileName: "PDS_2025.pdf",
@@ -357,4 +357,4 @@ const MyDocumentsComp = () => {
   );
 };
 
-export default MyDocumentsComp;
+export default PersonalDocuments;

@@ -13,7 +13,7 @@ import StepIncrementComp from "./components/StepIncrementComp.jsx"; // Import St
 import Reports from "./pages/Reports.jsx"; // Import Reports and Analytics
 import UsersComp from "./components/UsersComp.jsx"; // Import Users Component
 import MyProfileComp from "./components/MyProfileComp.jsx"; // Import My Profile
-import MyDocumentsComp from "./components/MyDocumentsComp.jsx"; // Import My Documents
+import PersonalDocumentsComp from "./components/PersonalDocumentsComp.jsx"; // Import My Documents
 import EmployeeIncrementComp from "./components/EmployeeIncrementComp.jsx"; // Import Employee Increment Tracker
 import EmployeeFillUpComp from "./components/EmployeeFillUpComp.jsx"; // Import Employee Fill-Up Form
 
@@ -44,7 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         {/* Route for My Profile */}
         <Route path="/my-profile" element={<MyProfileComp />} />
         {/* Route for My Documents */}
-        <Route path="/my-documents" element={<MyDocumentsComp />} />
+        <Route path="/personal-documents" element={<PersonalDocumentsComp />} />
         {/* Route for Employee Increment Tracker */}
         <Route path="/employee-increment" element={<EmployeeIncrementComp />} />
       </Routes>

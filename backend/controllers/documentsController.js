@@ -2,27 +2,29 @@ const Documents = require('../models/Documents');
 
 exports.createDocuments = async (req, res) => {
   try {
-    // req.file contains file info, req.body contains other metadata
     const documents = new Documents({
       employeeId: req.body.employeeId,
       fileName: req.file.originalname,
-      fileUrl: req.file.path, // Save file path
+      fileUrl: req.file.path,
+      type: req.body.type, // <-- Save type
       dateUploaded: new Date(),
       status: req.body.status || 'Pending'
     });
     await documents.save();
     res.status(201).json(documents);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to upload Documents document.' });
+    res.status(500).json({ error: 'Failed to upload document.' });
   }
 };
 
 exports.getAllDocuments = async (req, res) => {
   try {
-    const docs = await Documents.find();
+    const filter = {};
+    if (req.query.type) filter.type = req.query.type;
+    const docs = await Documents.find(filter);
     res.json(docs);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch Documents documents.' });
+    res.status(500).json({ error: 'Failed to fetch documents.' });
   }
 };
 
