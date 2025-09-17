@@ -48,26 +48,35 @@ router.post('/login', async (req, res) => {
 
 // Add User route (for user management)
 router.post('/add-user', async (req, res) => {
-  const { employeeId, name, email, password, role } = req.body;
+  const { firstName, lastName, middleName, email, password, role, status } = req.body;
+
   try {
-    if (!employeeId || !name || !email || !password || !role) {
+    // Validate required fields
+    if (!firstName || !lastName || !email || !password || !role) {
       return res.status(400).json({ error: 'All fields are required.' });
     }
-    // Check if user already exists for this employee or email
-    const existingUser = await UserAccounts.findOne({ $or: [ { email }, { employeeId } ] });
+
+    // Build full name
+    const name = `${firstName} ${middleName || ""} ${lastName}`.trim();
+
+    // Check if user already exists by email
+    const existingUser = await UserAccounts.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ error: 'User already exists for this employee or email.' });
+      return res.status(409).json({ error: 'User already exists with this email.' });
     }
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+
     // Create new user
     const newUser = new UserAccounts({
-      employeeId,
       name,
       email,
       password: hashedPassword,
-      role
+      role,
+      status: status || "Active" // default to Active if not provided
     });
+
     await newUser.save();
     res.status(201).json({ message: 'User added successfully!' });
   } catch (error) {
@@ -75,6 +84,7 @@ router.post('/add-user', async (req, res) => {
     res.status(500).json({ error: 'An error occurred. Please try again.' });
   }
 });
+
 
 // Get all users (for user management)
 router.get('/list', async (req, res) => {

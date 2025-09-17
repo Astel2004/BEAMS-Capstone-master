@@ -101,6 +101,8 @@
 }
 
 .add-user-window {
+  max-height: 480px;
+  overflow-y: auto;
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.10);

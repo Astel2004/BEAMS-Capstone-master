@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import "../styles/Dashboard.css"; // Assuming you have a CSS file for styling
-import "../styles/Users.css"; // Import the CSS file for user management styles
-import profileImage from "../assets/profile-user.png"; // Import the image
-import Image from "../assets/user.png"; // Import the image
-import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
+import { useNavigate } from "react-router-dom";
+import "../styles/Dashboard.css";
+import "../styles/Users.css";
+import profileImage from "../assets/profile-user.png";
+import Image from "../assets/user.png";
+import NotificationPopup from "./NotificationPopUp";
 
 const UsersComp = () => {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("list");
-  // Example: Replace with real data fetching
   const [users, setUsers] = useState([]);
-  // Employees for dropdown
-  const [employees, setEmployees] = useState([]);
+  const [addUserForm, setAddUserForm] = useState({
+    firstName: '',
+    lastName: '',
+    middleName: '',
+    email: '',
+    password: '',
+    role: 'Employee',
+    status: 'Active'
+  });
 
   // Fetch users for user list
   useEffect(() => {
@@ -34,62 +40,93 @@ const UsersComp = () => {
     fetchUsers();
   }, []);
 
-  // Add user form state
-  const [addUserForm, setAddUserForm] = useState({
-    employeeId: '',
-    email: '',
-    password: '',
-    role: 'Employee',
-  });
+  // Automatically fill email when last name changes (removes spaces)
+  useEffect(() => {
+    if (addUserForm.lastName) {
+      const cleanedLastName = addUserForm.lastName.replace(/\s+/g, "").toLowerCase();
+      setAddUserForm(f => ({
+        ...f,
+        email: `${cleanedLastName}@beams.com`
+      }));
+    } else {
+      setAddUserForm(f => ({
+        ...f,
+        email: ''
+      }));
+    }
+  }, [addUserForm.lastName]);
 
-  // Handle add user form submit
+  // Handle create user form submit
   const handleAddUserSubmit = async (e) => {
-    e.preventDefault();
-    // Find selected employee for name
-    const selectedEmployee = employees.find(emp => emp._id === addUserForm.employeeId);
-    if (!selectedEmployee) {
-      alert('Please select a valid employee.');
-      return;
-    }
-    const payload = {
-      employeeId: addUserForm.employeeId,
-      name: selectedEmployee.surname
-        ? `${selectedEmployee.surname} ${selectedEmployee.firstname || ''} ${selectedEmployee.middlename || ''} ${selectedEmployee.extension || ''}`.trim()
-        : selectedEmployee.name,
-      email: addUserForm.email,
-      password: addUserForm.password,
-      role: addUserForm.role,
-    };
-    try {
-      const response = await fetch('http://localhost:5000/api/user/add-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        alert('User added successfully!');
-        setAddUserForm({ employeeId: '', email: '', password: '', role: 'Employee' });
-        setActiveTab('list');
-        // Refresh user list so dropdown updates
-        const usersRes = await fetch("http://localhost:5000/api/user/list");
-        const usersData = await usersRes.json();
-        console.log('Fetched users after add:', usersData);
-        if (Array.isArray(usersData)) {
-          setUsers(usersData);
-        } else {
-          setUsers([]);
-          console.error('User list API did not return an array:', usersData);
-        }
-      } else {
-        alert(data.error || 'Failed to add user.');
-      }
-    } catch (error) {
-      alert('An error occurred. Please try again.');
-    }
+  e.preventDefault();
+
+  // Always regenerate email
+  const cleanedLastName = addUserForm.lastName.replace(/\s+/g, "").toLowerCase();
+  const finalEmail = `${cleanedLastName}@beams.com`;
+
+  const payload = {
+    firstName: addUserForm.firstName?.trim(),
+    lastName: addUserForm.lastName?.trim(),
+    middleName: addUserForm.middleName?.trim() || "", // allow blank if needed
+    email: finalEmail,
+    password: addUserForm.password,
+    role: addUserForm.role,
+    status: addUserForm.status
   };
 
+  console.log("🚀 Payload being sent:", payload); // 👈 check values here
+
+  try {
+    const response = await fetch('http://localhost:5000/api/user/add-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    console.log("✅ Server response:", data);
+
+    if (response.ok) {
+      alert('User created successfully!');
+      setAddUserForm({
+        firstName: '',
+        lastName: '',
+        middleName: '',
+        email: '',
+        password: '',
+        role: 'Employee',
+        status: 'Active'
+      });
+      setActiveTab('list');
+
+      // Refresh user list
+      const usersRes = await fetch("http://localhost:5000/api/user/list");
+      const usersData = await usersRes.json();
+      if (Array.isArray(usersData)) {
+        setUsers(usersData);
+      } else {
+        setUsers([]);
+        console.error('User list API did not return an array:', usersData);
+      }
+    } else {
+      alert(data.error || 'Failed to create user.');
+    }
+  } catch (error) {
+    console.error("❌ Submission error:", error);
+    alert('An error occurred. Please try again.');
+  }
+};
+
+
   // Handle delete user
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+
+  const handleDeleteClick = (userId) => {
+    setUserToDelete(userId);
+    setShowDeleteModal(true);
+  };
+
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
     try {
@@ -110,40 +147,12 @@ const UsersComp = () => {
     setUserToDelete(null);
   };
 
-  // Fetch employees for dropdown
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/employees");
-        const data = await response.json();
-        // Sort by surname (or name if no surname)
-        const sorted = data.slice().sort((a, b) => {
-          const aName = a.surname ? a.surname.toLowerCase() : (a.name || '').toLowerCase();
-          const bName = b.surname ? b.surname.toLowerCase() : (b.name || '').toLowerCase();
-          return aName.localeCompare(bName);
-        });
-        setEmployees(sorted);
-      } catch (error) {
-        console.error("Error fetching employees for dropdown:", error);
-      }
-    };
-    fetchEmployees();
-  }, []);
-  
   const handleLogout = () => {
-    // Perform logout logic here (e.g., clearing tokens)
     alert("You have been logged out.");
-    navigate("/login"); // Redirect to the login page
+    navigate("/login");
   };
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [userToDelete, setUserToDelete] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
-
-  const handleDeleteClick = (userId) => {
-    setUserToDelete(userId);
-    setShowDeleteModal(true);
-  };
 
   return (
     <div className="dashboard-container">
@@ -162,7 +171,8 @@ const UsersComp = () => {
             <li onClick={() => navigate("/step-increment")}>Step Increment Tracker</li>
             <li onClick={() => navigate("/reports")}>Reports & Analytics</li>
             <li onClick={() => navigate("/users")}>User Management</li>
-            <li onClick={handleLogout}>Log out</li>          </ul>
+            <li onClick={handleLogout}>Log out</li>
+          </ul>
         </nav>
       </aside>
 
@@ -175,12 +185,12 @@ const UsersComp = () => {
           <div className="header-icons">
             <span className="icon">📧</span>
             <span
-  className="icon"
-  style={{ cursor: "pointer" }}
-  onClick={() => setShowNotifications(true)}
->
-  🔔
-</span>
+              className="icon"
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowNotifications(true)}
+            >
+              🔔
+            </span>
             <div className="profile">
               <span className="user">
                 <img src={Image} alt="Image" />
@@ -206,7 +216,7 @@ const UsersComp = () => {
             className={`user-nav-btn${activeTab === "add" ? " active" : ""}`}
             onClick={() => setActiveTab("add")}
           >
-            ADD USER
+            CREATE USER
           </button>
         </nav>
 
@@ -218,7 +228,9 @@ const UsersComp = () => {
               <table className="user-list-table">
                 <thead>
                   <tr>
-                    <th>Name</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Middle Name</th>
                     <th>Email</th>
                     <th>Role</th>
                     <th>Status</th>
@@ -226,70 +238,88 @@ const UsersComp = () => {
                   </tr>
                 </thead>
                 <tbody>
-                {Array.isArray(users) && users.length === 0 ? (
-                  <tr>
-                    <td colSpan="5" style={{ textAlign: 'center', color: '#888' }}>No users found.</td>
-                  </tr>
-                ) : Array.isArray(users) ? (
-                  users.map((user, idx) => (
-                    <tr key={user._id || idx}>
-                      <td>{user.name}</td>
-                      <td>{user.email}</td>
-                      <td>{user.role}</td>
-                      <td>{user.status}</td>
-                      <td><button>View</button>
-                      <button className="user-delete-btn"onClick={() => handleDeleteClick(user._id)}>Delete</button></td>
+                  {Array.isArray(users) && users.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" style={{ textAlign: 'center', color: '#888' }}>No users found.</td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" style={{ textAlign: 'center', color: 'red' }}>User list error</td>
-                  </tr>
-                )}
+                  ) : Array.isArray(users) ? (
+                    users.map((user, idx) => (
+                      <tr key={user._id || idx}>
+                        <td>{user.firstName || ""}</td>
+                        <td>{user.lastName || ""}</td>
+                        <td>{user.middleName || ""}</td>
+                        <td>{user.email}</td>
+                        <td>{user.role}</td>
+                        <td>{user.status}</td>
+                        <td>
+                          <button>View</button>
+                          <button className="user-delete-btn" onClick={() => handleDeleteClick(user._id)}>Delete</button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="7" style={{ textAlign: 'center', color: 'red' }}>User list error</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
           )}
           {activeTab === "add" && (
             <div className="add-user-window">
-              <h3>ADD NEW USER</h3>
+              <h3>CREATE NEW USER</h3>
               <form className="add-user-form" onSubmit={handleAddUserSubmit}>
                 <div className="add-user-form-row">
-                  <label htmlFor="employee">Employee:</label>
-                  <select
-                    id="employee"
-                    name="employee"
+                  <label htmlFor="firstName">First Name:</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    placeholder="Enter first name"
                     required
-                    className="employee-dropdown"
-                    value={addUserForm.employeeId}
-                    onChange={e => setAddUserForm(f => ({ ...f, employeeId: e.target.value }))}
-                  >
-                    <option value="">Select Employee</option>
-                    {employees
-                      .filter(emp => !users.some(user => user.employeeId === emp._id))
-                      .map(emp => (
-                        <option key={emp._id} value={emp._id}>
-                          {emp.surname ? `${emp.surname} ${emp.firstname || ''} ${emp.middlename || ''} ${emp.extension || ''}`.trim() : emp.name}
-                        </option>
-                      ))}
-                  </select>
+                    value={addUserForm.firstName}
+                    onChange={e => setAddUserForm(f => ({ ...f, firstName: e.target.value }))}
+                  />
                 </div>
-
                 <div className="add-user-form-row">
-                  <label htmlFor="email">Create Email:</label>
+                  <label htmlFor="lastName">Last Name:</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Enter last name"
+                    required
+                    value={addUserForm.lastName}
+                    onChange={e => setAddUserForm(f => ({ ...f, lastName: e.target.value }))}
+                  />
+                </div>
+                <div className="add-user-form-row">
+                  <label htmlFor="middleName">Middle Name:</label>
+                  <input
+                    type="text"
+                    id="middleName"
+                    name="middleName"
+                    placeholder="Enter middle name"
+                    value={addUserForm.middleName}
+                    required
+                    onChange={e => setAddUserForm(f => ({ ...f, middleName: e.target.value }))}
+                  />
+                </div>
+                <div className="add-user-form-row">
+                  <label htmlFor="email">Email:</label>
                   <input
                     type="email"
                     id="email"
                     name="email"
-                    placeholder="Enter user email"
+                    placeholder="Email auto-generated"
                     required
                     value={addUserForm.email}
-                    onChange={e => setAddUserForm(f => ({ ...f, email: e.target.value }))}
+                    readOnly
                   />
                 </div>
-
                 <div className="add-user-form-row">
-                  <label htmlFor="password">Create Password:</label>
+                  <label htmlFor="password">Password:</label>
                   <input
                     type="password"
                     id="password"
@@ -300,42 +330,54 @@ const UsersComp = () => {
                     onChange={e => setAddUserForm(f => ({ ...f, password: e.target.value }))}
                   />
                 </div>
-
                 <div className="add-user-form-row">
                   <label htmlFor="role">Role:</label>
-                  <input
-                    type="text"
+                  <select
                     id="role"
                     name="role"
                     value={addUserForm.role}
-                    readOnly
-                    style={{ background: '#f4f4f4', color: '#888' }}
-                  />
+                    onChange={e => setAddUserForm(f => ({ ...f, role: e.target.value }))}
+                  >
+                    <option value="Employee">Employee</option>
+                    <option value="HR">HR</option>
+                    <option value="Admin">Admin</option>
+                  </select>
                 </div>
-
-                <button type="submit" className="add-user-button">Add User</button>
+                <div className="add-user-form-row">
+                  <label htmlFor="status">Status:</label>
+                  <select
+                    id="status"
+                    name="status"
+                    value={addUserForm.status}
+                    onChange={e => setAddUserForm(f => ({ ...f, status: e.target.value }))}
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+                <button type="submit" className="add-user-button">Create User</button>
               </form>
             </div>
           )}
         </section>
 
         {showDeleteModal && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <p>Are you sure you want to delete this user account?</p>
-      <div className="modal-actions">
-        <button className="modal-btn yes" onClick={handleDeleteUser}>Yes</button>
-        <button className="modal-btn no" onClick={() => { setShowDeleteModal(false); setUserToDelete(null); }}>No</button>
-      </div>
-    </div>
-  </div>
-)}
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <p>Are you sure you want to delete this user account?</p>
+              <div className="modal-actions">
+                <button className="modal-btn yes" onClick={handleDeleteUser}>Yes</button>
+                <button className="modal-btn no" onClick={() => { setShowDeleteModal(false); setUserToDelete(null); }}>No</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <NotificationPopup
-  visible={showNotifications}
-  onClose={() => setShowNotifications(false)}
-  userType="hr"
-/>
+          visible={showNotifications}
+          onClose={() => setShowNotifications(false)}
+          userType="hr"
+        />
       </main>
     </div>
   );
