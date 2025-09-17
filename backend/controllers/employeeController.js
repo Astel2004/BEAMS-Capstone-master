@@ -91,6 +91,21 @@ const getEmployeeById = async (req, res) => {
   }
 };
 
+// Get a single employee by custom ID
+const getEmployeeByCustomId = async (req, res) => {
+  const { customId } = req.params;
+  try {
+    const employee = await Employee.findOne({ id: customId }); // 'id' is your custom employee ID
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+    res.status(200).json(employee);
+  } catch (error) {
+    console.error('Error fetching employee:', error);
+    res.status(500).json({ message: 'Error fetching employee', error });
+  }
+};
+
 // Update an employee
 const updateEmployee = async (req, res) => {
   const { id } = req.params;
@@ -135,6 +150,7 @@ module.exports = {
   createEmployee,
   getAllEmployees,
   getEmployeeById,
+  getEmployeeByCustomId,
   updateEmployee,
   deleteEmployee,
 };

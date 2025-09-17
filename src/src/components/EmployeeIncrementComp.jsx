@@ -1,27 +1,29 @@
 import React, { useState, useEffect } from "react";
-import "../styles/Dashboard.css"; // Reuse the same CSS for sidebar and navbar
-import "../styles/EmployeeIncrement.css"; // Add specific styles for Step Increment Tracking
-import profileImage from "../assets/profile-user.png"; // Import the profile image
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
-
+import "../styles/Dashboard.css";
+import "../styles/EmployeeIncrement.css";
+import profileImage from "../assets/profile-user.png";
+import { useNavigate } from "react-router-dom";
+import NotificationPopup from "./NotificationPopUp";
+  
 const EmployeeIncrementComp = () => {
-  const [employee, setEmployee] = useState(null); // State to store employee details
+  const [employee, setEmployee] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Perform logout logic here (e.g., clearing tokens)
     alert("You have been logged out.");
-    navigate("/login"); // Redirect to the login page
+    navigate("/login");
   };
 
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/user/profile"); // Replace with your API endpoint
+        const employeeId = localStorage.getItem("employeeId");
+        const response = await fetch(
+          `http://localhost:5000/api/employees/${employeeId}`
+        );
         const data = await response.json();
-        setEmployee(data); // Update state with fetched data
+        setEmployee(data);
       } catch (error) {
         console.error("Error fetching employee details:", error);
       }
@@ -31,12 +33,12 @@ const EmployeeIncrementComp = () => {
   }, []);
 
   if (!employee) {
-    return <div>Loading...</div>; // Show a loading message while fetching data
+    return <div>Loading...</div>;
   }
 
   // Calculate next step increment date (example logic)
   const nextStepIncrementDate = new Date(employee.dateJoined);
-  nextStepIncrementDate.setFullYear(nextStepIncrementDate.getFullYear() + 5); // Example: Increment every 5 years
+  nextStepIncrementDate.setFullYear(nextStepIncrementDate.getFullYear() + 5);
 
   return (
     <div className="dashboard-container">
@@ -94,20 +96,30 @@ const EmployeeIncrementComp = () => {
             <table>
               <tbody>
                 <tr>
-                  <td>Name:</td>
-                  <td>{employee.name}</td>
+                  <td>Employee ID:</td>
+                  <td>{employee.id || employee._id}</td>
+                </tr>
+                <tr>
+                  <td>Full Name:</td>
+                  <td>
+                    {employee.surname} {employee.firstname} {employee.middlename} {employee.extension ? employee.extension : ""}
+                  </td>
                 </tr>
                 <tr>
                   <td>Position:</td>
                   <td>{employee.position}</td>
                 </tr>
                 <tr>
+                  <td>Salary Grade:</td>
+                  <td>{employee.salaryGrade || "N/A"}</td>
+                </tr>
+                <tr>
                   <td>Date Hired:</td>
-                  <td>{new Date(employee.dateJoined).toLocaleDateString()}</td>
+                  <td>{employee.dateJoined ? new Date(employee.dateJoined).toLocaleDateString() : "-"}</td>
                 </tr>
                 <tr>
                   <td>Current Step:</td>
-                  <td>{employee.step}</td>
+                  <td>{employee.step || "Step 1"}</td>
                 </tr>
                 <tr>
                   <td>Next Step Increment:</td>
