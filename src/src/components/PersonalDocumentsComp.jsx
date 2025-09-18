@@ -26,7 +26,6 @@ const PersonalDocuments = () => {
       status: "Pending",
     },
   ]);
-
   const [file, setFile] = useState(null);
   const [activeTab, setActiveTab] = useState("EmployeeRecords");
   const [showNotifications, setShowNotifications] = useState(false);
@@ -199,7 +198,7 @@ const PersonalDocuments = () => {
               </button>
               <button
                 className="create-button"
-                onClick={() => alert("Create PDS coming soon...")}
+                onClick={() => navigate("/pds-form")} // Redirect to PDS form page
               >
                 Create PDS
               </button>
@@ -228,7 +227,6 @@ const PersonalDocuments = () => {
                 Supporting Documents
               </button>
             </div>
-            {/* Drag and Drop Area moved here */}
             <div
               className={`file-drop-area${dragActive ? " drag-active" : ""}`}
               onDragOver={handleDragOver}

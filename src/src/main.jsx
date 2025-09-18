@@ -15,6 +15,7 @@ import Reports from "./pages/Reports.jsx"; // Import Reports and Analytics
 import UsersComp from "./components/UsersComp.jsx"; // Import Users Component
 import MyProfileComp from "./components/MyProfileComp.jsx"; // Import My Profile
 import PersonalDocumentsComp from "./components/PersonalDocumentsComp.jsx"; // Import My Documents
+import PDSFormComp from './components/PDSFormComp.jsx'; // Import PDS Form Component
 import EmployeeIncrementComp from "./components/EmployeeIncrementComp.jsx"; // Import Employee Increment Tracker
 import EmployeeFillUpComp from "./components/EmployeeFillUpComp.jsx"; // Import Employee Fill-Up Form
 
@@ -48,6 +49,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/my-profile" element={<MyProfileComp />} />
         {/* Route for My Documents */}
         <Route path="/personal-documents" element={<PersonalDocumentsComp />} />
+        {/* Route for PDS Form */}
+        <Route path="/pds-form" element={<PDSFormComp />} />
         {/* Route for Employee Increment Tracker */}
         <Route path="/employee-increment" element={<EmployeeIncrementComp />} />
       </Routes>
