@@ -1,92 +1,386 @@
-/* Each page styled like paper */
-.page {
-  width: 100%;
-  min-height: 297mm; /* keeps A4 height for PDF layout */
-  background: white;
-  padding: 12px 16px; /* tighter padding */
-  margin-bottom: 16px;
-  box-sizing: border-box;
-  box-shadow: 0 0 3px rgba(0,0,0,0.1);
-  font-family: Arial, sans-serif;
-  font-size: 11px; /* compact font */
-  color: #000;
-}
-
-/* Container that holds the whole PDS form */
-.pds-form {
-  max-height: 90vh;   /* fills most of the screen */
-  padding: 8px;
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  overflow-y: auto;
-  overflow-x: auto;
-}
-
-/* wrapper for scroll handling */
+/* ------------------------------------ */
+/*         PDS FORM BASE STYLES         */
+/* ------------------------------------ */
+/* Main container for the entire form, handles scrolling and background */
 .pds-form-wrapper {
-  max-height: 85vh;
+  max-height: 85vh; /* Fills most of the screen viewport */
   overflow-y: auto;
-  overflow-x: auto;
-  padding: 8px;
+  overflow-x: hidden; /* Prevent horizontal scroll unless necessary */
+  padding: 12px;
   background: #f4f6f8;
-  border: 1px solid #ddd;
 }
 
-/* Headings */
-.page h2,
-.page h3,
-.page h4 {
+/* The form element itself, can have its own basic styles if needed */
+.pds-form {
+  padding: 0;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center pages horizontally if they don't fill width */
+}
+
+/* Styling for each A4-like page */
+.page {
+  width: 320mm;         /* was 210mm, now wider */
+  min-width: 240mm;     /* ensure min width matches */
+  min-height: 300mm; /* A4 height */
+  background: white;
+  padding: 16px 20px; /* Slightly more balanced padding */
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 0 6px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+  color: #333; /* Darker text for better readability */
+}
+
+/* Headings and subheadings */
+h4 {
   font-size: 12px;
-  margin: 6px 0;
   font-weight: bold;
+  margin: 18px 0 8px;
+  border-bottom: 1px solid #999;
+  padding-bottom: 4px;
+}
+.page .header-text {
+  text-align: center;
+  margin-bottom: 12px;
+}
+.page .cs-id-no {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.page .cs-id-no label {
+  font-size: 10px;
+  font-weight: normal;
+  display: inline;
+}
+.page .cs-id-no input {
+  width: 120px;
+  margin-left: 8px;
+}
+.page .warning {
+  font-size: 10px;
+  padding: 6px;
+  border: 1px dashed #ccc;
+  margin-bottom: 12px;
+}
+.page .warning strong {
+  color: #d32f2f;
 }
 
-/* Labels */
-.page label {
-  font-size: 10.5px;
+/* ------------------------------------ */
+/*             FORM FIELDS             */
+/* ------------------------------------ */
+.pds-field {
+  margin-bottom: 10px;
+}
+
+.pds-field label {
+  font-size: 9px;
   font-weight: bold;
-  margin-bottom: 2px;
   display: block;
+  text-transform: uppercase;
+  margin-bottom: 2px;
 }
 
-/* Inputs, Textareas, Selects */
-.page input,
-.page textarea,
-.page select {
+.pds-field input,
+.pds-field textarea,
+.pds-field select {
   width: 100%;
+  padding: 4px 6px;
   font-size: 11px;
-  padding: 3px 4px;
   border: 1px solid #999;
-  border-radius: 0;
+  border-radius: 2px;
   box-sizing: border-box;
 }
 
-.page textarea {
-  resize: vertical;
+/* Specific input styles for radio/checkbox */
+.pds-field input[type="radio"],
+.pds-field input[type="checkbox"] {
+  width: auto;
+  margin-right: 4px;
 }
 
-/* Tables */
+/* Grid containers */
+.pds-grid {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pds-grid.four-col {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.pds-grid.three-col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.pds-grid.two-col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* Special case for address section */
+.address-box {
+  border: 1px solid #ccc;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ------------------------------------ */
+/*               TABLES               */
+/* ------------------------------------ */
 .page table {
-  border-collapse: collapse;
   width: 100%;
-  table-layout: fixed; /* keeps cells from expanding too wide */
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-bottom: 12px;
 }
 
 .page table th,
 .page table td {
   border: 1px solid #888;
-  padding: 3px;
-  font-size: 10.5px;
-  vertical-align: middle;
+  padding: 4px;
+  font-size: 10px;
+  vertical-align: top; /* Align content to the top of cells */
 }
 
-.page table input {
+.page table th {
+  background-color: #f0f0f0;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+}
+
+.page table td input {
   border: none;
-  padding: 2px 3px;
-  font-size: 10.5px;
+  padding: 2px;
+  font-size: 10px;
   width: 100%;
+  box-sizing: border-box;
+  background: transparent;
 }
 
-.page-break {
-  page-break-after: always;
+/* ------------------------------------ */
+/*               BUTTONS              */
+/* ------------------------------------ */
+.button-container {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.button-container button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+.button-container button:hover {
+  opacity: 0.9;
+}
+.button-container button.save {
+  background-color: #1a73e8;
+}
+.button-container button.download {
+  background-color: #34a853;
+}
+
+/* Additions for PDSEditorComp.jsx structure */
+
+/* Header */
+.header-text {
+  text-align: center;
+  margin-bottom: 12px;
+}
+.header-bold {
+  font-weight: 700;
+}
+
+/* Warning box */
+.warning {
+  font-size: 12px;
+  margin-bottom: 12px;
+  padding: 6px;
+  border: 1px dashed #ccc;
+  background: #fffbe7;
+}
+.warning strong {
+  color: #d32f2f;
+}
+
+/* CS ID No */
+.cs-id-no {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.cs-id-no label {
+  font-size: 12px;
+  font-weight: normal;
+  display: inline;
+}
+.cs-id-no input {
+  width: 220px;
+  margin-left: 8px;
+}
+
+/* Address section */
+.address-title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.address-row {
+  display: flex;
+  gap: 8px;
+}
+.address-row input {
+  flex: 1;
+}
+
+/* Children list */
+.children-list {
+  margin-top: 6px;
+}
+.children-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.children-row input[type="date"] {
+  width: 160px;
+}
+
+/* Radio group */
+.radio-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.citizenship-field .dual-details {
+  margin-left: 6px;
+}
+
+/* Questions section */
+.pds-questions {
+  font-size: 12px;
+}
+.pds-question {
+  margin-bottom: 12px;
+}
+.pds-question-indent {
+  margin-left: 16px;
+  margin-top: 4px;
+}
+.pds-question label {
+  margin-right: 8px;
+}
+
+/* Questions Table */
+.questions-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.questions-table th,
+.questions-table td {
+  border: 1px solid #888;
+  padding: 6px;
+  vertical-align: top;
+}
+
+.questions-table th {
+  background-color: #f0f0f0;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+}
+
+.questions-table td input[type="text"],
+.questions-table td input[type="date"],
+.questions-table td input[type="number"] {
+  width: 100%;
+  border: none;
+  padding: 4px;
+  font-size: 11px;
+  box-sizing: border-box;
+  margin-bottom: 4px;
+}
+
+.questions-table td input[type="radio"] {
+  margin-right: 4px;
+}
+
+
+/* Declaration */
+.declaration-text {
+  font-size: 12px;
+}
+.declaration-grid {
+  grid-template-columns: 1fr 200px;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.back-btn{
+  background-color: #005fa3;
+  color: white;
+  border: none;
+  margin: 10px 0px;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.back-btn:hover {
+  background-color: #003f73;
+}
+
+/* Save button with spinner */
+.save-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #ffffff;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
