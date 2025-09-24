@@ -6,16 +6,39 @@ import Docxtemplater from "docxtemplater";
 import { saveAs } from "file-saver";
 import "../styles/PDSForm.css";
 
+// Helper function for citizenship placeholders
+function getCitizenshipPlaceholders(citizenship, dualType, country) {
+  return {
+    filipinoBox: citizenship === "Filipino" ? "✔" : "☐",
+    dualBox: citizenship === "Dual" ? "✔" : "☐",
+    byBirthBox: citizenship === "Dual" && dualType === "Birth" ? "✔" : "☐",
+    byNaturalBox: citizenship === "Dual" && dualType === "Naturalization" ? "✔" : "☐",
+    citizenshipCountry: citizenship === "Dual" ? country : ""
+  };
+}
+
 const PDSForm = () => {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, watch } = useForm();
   const wrapperRef = useRef();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   // ---- Save data in console (debug) ----
   const onSubmit = (data) => {
-    console.log("PDS form data:", data);
-    alert("PDS data captured (check console).");
+    const citizenshipPlaceholders = {
+      filipinoBox: data.citizenship === "Filipino" ? "✔" : "☐",
+      dualBox: data.citizenship === "Dual" ? "✔" : "☐",
+      byBirthBox: data.citizenship === "Dual" && data.dualType === "Birth" ? "✔" : "☐",
+      byNaturalBox: data.citizenship === "Dual" && data.dualType === "Naturalization" ? "✔" : "☐",
+      citizenshipCountry:
+        data.citizenship === "Dual" ? (data.citizenshipCountry || "") : ""
+    };
+
+    const placeholders = { ...data, ...citizenshipPlaceholders };
+
+    console.log("Final placeholders:", placeholders);
+
+    generateDocx(placeholders); // your existing docxtemplater call
   };
 
   // ---- Generate DOCX from template ----
@@ -29,11 +52,26 @@ const PDSForm = () => {
       const zip = new PizZip(templateArrayBuffer);
       const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
 
+      // Citizenship placeholders
+      const citizenshipPlaceholders = getCitizenshipPlaceholders(
+        formData.citizenship,
+        formData.dualType,
+        formData.citizenshipCountry
+      );
+
       // Checkbox logic
       const filledData = {
         ...formData,
         maleBox: formData.sex === "Male" ? "✔" : "☐",
         femaleBox: formData.sex === "Female" ? "✔" : "☐",
+
+        singleBox: formData.civilStatus === "Single" ? "✔" : "☐",
+        marriedBox: formData.civilStatus === "Married" ? "✔" : "☐",
+        widowedBox: formData.civilStatus === "Widowed" ? "✔" : "☐",
+        separatedBox: formData.civilStatus === "Separated" ? "✔" : "☐",
+        otherBox: formData.civilStatus === "Other" ? "✔" : "☐",
+
+        ...citizenshipPlaceholders
       };
 
       // Inject form data into template
@@ -193,11 +231,29 @@ const PDSForm = () => {
               <div className="pds-field citizenship-field">
                 <label>16. CITIZENSHIP</label>
                 <div className="radio-group">
-                  <label><input type="radio" value="Filipino" {...register("citizenship")} /> Filipino</label>
-                  <label><input type="radio" value="Dual" {...register("citizenship")} /> Dual Citizenship</label>
-                  <span className="dual-details">
-                    <small>If dual: <input {...register("dual_details")} placeholder="country / how" /></small>
-                  </span>
+                  <label>
+                    <input type="radio" value="Filipino" {...register("citizenship")} /> Filipino
+                  </label>
+                  <label>
+                    <input type="radio" value="Dual" {...register("citizenship")} /> Dual Citizenship
+                  </label>
+                  {/* Only show these if Dual is selected */}
+                  {watch("citizenship") === "Dual" && (
+                    <div className="dual-options">
+                      <label>
+                        <input type="radio" value="Birth" {...register("dualType")} /> by birth
+                      </label>
+                      <label>
+                        <input type="radio" value="Naturalization" {...register("dualType")} /> by naturalization
+                      </label>
+                      <div className="dual-country">
+                        <label>
+                          Pls. indicate country:
+                          <input type="text" {...register("citizenshipCountry")} placeholder="Country" />
+                        </label>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
