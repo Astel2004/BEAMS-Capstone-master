@@ -59,7 +59,7 @@ const PDSForm = () => {
         formData.citizenshipCountry
       );
 
-      // Checkbox logic
+      // Checkbox logic for sex and civil status
       const filledData = {
         ...formData,
         maleBox: formData.sex === "Male" ? "✔" : "☐",
@@ -71,8 +71,91 @@ const PDSForm = () => {
         separatedBox: formData.civilStatus === "Separated" ? "✔" : "☐",
         otherBox: formData.civilStatus === "Other" ? "✔" : "☐",
 
-        ...citizenshipPlaceholders
+        ...citizenshipPlaceholders,
+
+        // Q34a
+        q34aYes: formData.q34a === "Yes" ? "✔" : "☐",
+        q34aNo:  formData.q34a === "No" ? "✔" : "☐",
+        q34a_details: formData.q34a_details || "",
+
+        // Q34b
+        q34bYes: formData.q34b === "Yes" ? "✔" : "☐",
+        q34bNo:  formData.q34b === "No" ? "✔" : "☐",
+        q34b_details: formData.q34b_details || "",
+
+        // Q35a
+        q35aYes: formData.q35a === "Yes" ? "✔" : "☐",
+        q35aNo:  formData.q35a === "No" ? "✔" : "☐",
+        q35a_details: formData.q35a_details || "",
+
+        // Q35b
+        q35bYes: formData.q35b === "Yes" ? "✔" : "☐",
+        q35bNo:  formData.q35b === "No" ? "✔" : "☐",
+        q35b_details: formData.q35b_details || "",
+        q35b_dateFiled: formData.q35b_dateFiled || "",
+        q35b_status: formData.q35b_status || "",
+
+        // Q36
+        q36Yes: formData.q36 === "Yes" ? "✔" : "☐",
+        q36No:  formData.q36 === "No" ? "✔" : "☐",
+        q36_details: formData.q36_details || "",
+
+        // Q37
+        q37Yes: formData.q37 === "Yes" ? "✔" : "☐",
+        q37No:  formData.q37 === "No" ? "✔" : "☐",
+        q37_details: formData.q37_details || "",
+
+        // Q38a
+        q38aYes: formData.q38a === "Yes" ? "✔" : "☐",
+        q38aNo:  formData.q38a === "No" ? "✔" : "☐",
+        q38a_details: formData.q38a_details || "",
+
+        // Q38b
+        q38bYes: formData.q38b === "Yes" ? "✔" : "☐",
+        q38bNo:  formData.q38b === "No" ? "✔" : "☐",
+        q38b_details: formData.q38b_details || "",
+
+        // Q39
+        q39Yes: formData.q39 === "Yes" ? "✔" : "☐",
+        q39No:  formData.q39 === "No" ? "✔" : "☐",
+        q39_details: formData.q39_details || "",
+
+        // Q40a
+        q40aYes: formData.q40a === "Yes" ? "✔" : "☐",
+        q40aNo:  formData.q40a === "No" ? "✔" : "☐",
+        q40a_details: formData.q40a_details || "",
+
+        // Q40b
+        q40bYes: formData.q40b === "Yes" ? "✔" : "☐",
+        q40bNo:  formData.q40b === "No" ? "✔" : "☐",
+        q40b_details: formData.q40b_details || "",
+
+        // Q40c
+        q40cYes: formData.q40c === "Yes" ? "✔" : "☐",
+        q40cNo:  formData.q40c === "No" ? "✔" : "☐",
+        q40c_details: formData.q40c_details || "",
+
+
+        // Residential Address placeholders
+        res_houseNo: formData.res_houseNo || "",
+        res_street: formData.res_street || "",
+        res_subdivision: formData.res_subdivision || "",
+        res_barangay: formData.res_barangay || "",
+        res_city: formData.res_city || "",
+        res_province: formData.res_province || "",
+        res_zip: formData.res_zip || "",
+
+        // Permanent Address placeholders
+        perm_houseNo: formData.perm_houseNo || "",
+        perm_street: formData.perm_street || "",
+        perm_subdivision: formData.perm_subdivision || "",
+        perm_barangay: formData.perm_barangay || "",
+        perm_city: formData.perm_city || "",
+        perm_province: formData.perm_province || "",
+        perm_zip: formData.perm_zip || "",
       };
+
+      
 
       // Inject form data into template
       doc.render(filledData);
@@ -526,24 +609,39 @@ const PDSForm = () => {
     </tr>
   </thead>
   <tbody>
-    {/* Q34a */}
-    <tr>
-      <td>
-        34a. Are you related by consanguinity or affinity within the third degree to the appointing/recommending authority, 
-        or to the chief of bureau/office, or the person who has immediate supervision over you in the office, bureau or department where you will be appointed?
-      </td>
-      <td><input type="radio" {...register("q34a")} value="Yes" /></td>
-      <td><input type="radio" {...register("q34a")} value="No" /></td>
-      <td><input {...register("q34a_details")} /></td>
-    </tr>
+   {/* Q34a */}
+<tr>
+  <td>
+    34a. Are you related by consanguinity or affinity within the third degree to the appointing/recommending authority, 
+    or to the chief of bureau/office, or the person who has immediate supervision over you in the office, bureau or department where you will be appointed? 
+    <b>a. within the third degree?</b>
+  </td>
+  <td>
+    <input type="radio" {...register("q34a")} value="Yes" /> Yes
+  </td>
+  <td>
+    <input type="radio" {...register("q34a")} value="No" /> No
+  </td>
+  <td>
+    <input {...register("q34a_details")} placeholder="If YES, give details" />
+  </td>
+</tr>
 
-    {/* Q34b */}
-    <tr>
-      <td>34b. Within the fourth degree (for Local Government Unit - Career Employees)?</td>
-      <td><input type="radio" {...register("q34b")} value="Yes" /></td>
-      <td><input type="radio" {...register("q34b")} value="No" /></td>
-      <td><input {...register("q34b_details")} /></td>
-    </tr>
+{/* Q34b */}
+<tr>
+  <td>
+    34b. <b>b. Within the fourth degree (for Local Government Unit - Career Employees)?</b>
+  </td>
+  <td>
+    <input type="radio" {...register("q34b")} value="Yes" /> Yes
+  </td>
+  <td>
+    <input type="radio" {...register("q34b")} value="No" /> No
+  </td>
+  <td>
+    <input {...register("q34b_details")} placeholder="If YES, give details" />
+  </td>
+</tr>
 
     {/* Q35a */}
     <tr>
