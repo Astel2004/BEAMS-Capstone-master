@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
@@ -17,8 +17,47 @@ function getCitizenshipPlaceholders(citizenship, dualType, country) {
   };
 }
 
+function ChildrenSection({ control, register }) {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "children",
+  });
+
+  return (
+    <div className="pds-field">
+      <label>
+        23. NAME OF CHILDREN (Write full name and list all) — DATE OF BIRTH (mm/dd/yyyy)
+      </label>
+      <div className="children-list">
+        {fields.map((field, i) => (
+          <div key={field.id} className="children-row">
+            <input
+              {...register(`children.${i}.name`)}
+              placeholder={`Child ${i + 1} Full Name`}
+            />
+            <input
+              type="date"
+              {...register(`children.${i}.dob`)}
+              placeholder="mm/dd/yyyy"
+            />
+            <button type="button" onClick={() => remove(i)}>
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() => append({ name: "", dob: "" })}
+      >
+        Add Child
+      </button>
+    </div>
+  );
+}
+
 const PDSForm = () => {
-  const { register, handleSubmit, watch } = useForm();
+  const { register, handleSubmit, watch, control } = useForm();
   const wrapperRef = useRef();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -387,45 +426,67 @@ const PDSForm = () => {
 
             {/* II. FAMILY BACKGROUND */}
             <h4>II. FAMILY BACKGROUND</h4>
-
             {/* Spouse */}
-            <div className="pds-grid three-col">
-              <div className="pds-field">
-                <label>22. SPOUSE'S SURNAME</label>
+            <div className="pds-grid four-col">
+             <div className="pds-field">
+               <label>22. SPOUSE'S SURNAME</label>
                 <input {...register("spouse_surname")} />
+             </div>
+             <div className="pds-field">
+               <label>FIRST NAME</label>
+               <input {...register("spouse_first")} />
+             </div>
+             <div className="pds-field">
+               <label>NAME EXTENSION (JR, SR, II, etc.)</label>
+               <input {...register("spouse_extension")} />
+             </div>
+             <div className="pds-field">
+               <label>MIDDLE NAME</label>
+               <input {...register("spouse_middle")} />
+             </div>
+            </div>
+            <div className="pds-grid four-col">
+              <div className="pds-field">
+                <label>OCCUPATION</label>
+                <input {...register("spouse_occupation")} />
               </div>
               <div className="pds-field">
-                <label>FIRST NAME</label>
-                <input {...register("spouse_first")} />
+                <label>EMPLOYER/BUSINESS NAME</label>
+                <input {...register("spouse_employer")} />
               </div>
               <div className="pds-field">
-                <label>MIDDLE NAME</label>
-                <input {...register("spouse_middle")} />
+                <label>BUSINESS ADDRESS</label>
+                <input {...register("spouse_businessAddress")} />
+              </div>
+              <div className="pds-field">
+                <label>TELEPHONE NO.</label>
+                <input {...register("spouse_tel")} />
               </div>
             </div>
 
-            {/* Children (multiple rows) */}
-            <div className="pds-field">
-              <label>23. NAME OF CHILDREN (Write full name and list all) — DATE OF BIRTH (mm/dd/yyyy)</label>
-              <div className="children-list">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="children-row">
-                    <input {...register(`child_${i}_name`)} placeholder={`Child ${i + 1} full name`} />
-                    <input type="date" {...register(`child_${i}_dob`)} />
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Children (dynamic section) */}
+            <ChildrenSection control={control} register={register} />
 
             {/* Father & Mother */}
             <div className="pds-grid two-col">
               <div className="pds-field">
-                <label>24. FATHER'S SURNAME / FIRST NAME / MIDDLE NAME / NAME EXTENSION (JR., SR.)</label>
-                <input {...register("father_full")} />
+                <label>24. FATHER'S SURNAME</label>
+                <input {...register("father_surname")} />
+                <label>FIRST NAME</label>
+                <input {...register("father_first")} />
+                <label>MIDDLE NAME</label>
+                <input {...register("father_middle")} />
+                <label>NAME EXTENSION (JR., SR.)</label>
+                <input {...register("father_ext")} />
               </div>
               <div className="pds-field">
-                <label>25. MOTHER'S MAIDEN NAME (SURNAME / FIRST NAME / MIDDLE NAME)</label>
-                <input {...register("mother_full")} />
+                <label>25. MOTHER'S MAIDEN NAME</label>
+                <label>SURNAME</label>
+                <input {...register("mother_surname")} />
+                <label>FIRST NAME</label>
+                <input {...register("mother_first")} />
+                <label>MIDDLE NAME</label>
+                <input {...register("mother_middle")} />
               </div>
             </div>
           </div>
@@ -446,7 +507,7 @@ const PDSForm = () => {
                 </tr>
               </thead>
               <tbody>
-                {["ELEMENTARY", "SECONDARY", "VOCATIONAL", "COLLEGE", "GRADUATE STUDIES"].map((lvl) => (
+                {["ELEMENTARY", "SECONDARY", "VOCATIONAL", "COLLEGE", "GRADUATE"].map((lvl) => (
                   <tr key={lvl}>
                     <td>{lvl}</td>
                     <td><input {...register(`${lvl}_school`)} /></td>
