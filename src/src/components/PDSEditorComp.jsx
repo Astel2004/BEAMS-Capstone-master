@@ -17,40 +17,144 @@ function getCitizenshipPlaceholders(citizenship, dualType, country) {
   };
 }
 
-function ChildrenSection({ control, register }) {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "children",
-  });
-
+function ChildrenSection({ register }) {
   return (
     <div className="pds-field">
       <label>
         23. NAME OF CHILDREN (Write full name and list all) — DATE OF BIRTH (mm/dd/yyyy)
       </label>
       <div className="children-list">
-        {fields.map((field, i) => (
-          <div key={field.id} className="children-row">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div key={i} className="children-row">
             <input
-              {...register(`children.${i}.name`)}
+              {...register(`child${i + 1}_name`)}
               placeholder={`Child ${i + 1} Full Name`}
             />
             <input
               type="date"
-              {...register(`children.${i}.dob`)}
+              {...register(`child${i + 1}_dob`)}
               placeholder="mm/dd/yyyy"
             />
-            <button type="button" onClick={() => remove(i)}>
-              Remove
-            </button>
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function EligibilitySection({ control, register }) {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "eligibility",
+  });
+
+  return (
+    <div>
+      <h4>IV. CIVIL SERVICE ELIGIBILITY</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>CAREER SERVICE / RA 1080 (BOARD/ BAR)</th>
+            <th>RATING</th>
+            <th>DATE OF EXAM / CONFERMENT</th>
+            <th>PLACE OF EXAM</th>
+            <th>LICENSE (No.)</th>
+            <th>VALIDITY</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {fields.map((field, i) => (
+            <tr key={field.id}>
+              <td>
+                <input {...register(`eligibility.${i}.service`)} />
+              </td>
+              <td>
+                <input {...register(`eligibility.${i}.title`)} />
+              </td>
+              <td>
+                <input type="date" {...register(`eligibility.${i}.date`)} />
+              </td>
+              <td>
+                <input {...register(`eligibility.${i}.place`)} />
+              </td>
+              <td>
+                <input {...register(`eligibility.${i}.license`)} />
+              </td>
+              <td>
+                <input type="date" {...register(`eligibility.${i}.valid`)} />
+              </td>
+              <td>
+                <button type="button" onClick={() => remove(i)}>Remove</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <button
         type="button"
-        onClick={() => append({ name: "", dob: "" })}
+        onClick={() => {
+          if (fields.length < 7) append({ service: "", title: "", date: "", place: "", license: "", valid: "" });
+        }}
+        disabled={fields.length >= 7}
       >
-        Add Child
+        Add Row
+      </button>
+    </div>
+  );
+}
+
+function WorkExperienceSection({ control, register }) {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "workExperience",
+  });
+
+  return (
+    <div>
+      <h4>V. WORK EXPERIENCE (Start from recent)</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>INCLUSIVE DATES (From)</th>
+            <th>INCLUSIVE DATES (To)</th>
+            <th>POSITION TITLE</th>
+            <th>DEPARTMENT / AGENCY / COMPANY</th>
+            <th>MONTHLY SALARY</th>
+            <th>SALARY GRADE & STEP</th>
+            <th>STATUS OF APPOINTMENT</th>
+            <th>GOV'T SERVICE?</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {fields.map((field, i) => (
+            <tr key={field.id}>
+              <td><input type="date" {...register(`workExperience.${i}.from`)} /></td>
+              <td><input type="date" {...register(`workExperience.${i}.to`)} /></td>
+              <td><input {...register(`workExperience.${i}.title`)} /></td>
+              <td><input {...register(`workExperience.${i}.agency`)} /></td>
+              <td><input {...register(`workExperience.${i}.salary`)} /></td>
+              <td><input {...register(`workExperience.${i}.grade`)} /></td>
+              <td><input {...register(`workExperience.${i}.status`)} /></td>
+              <td><input {...register(`workExperience.${i}.govt`)} /></td>
+              <td>
+                <button type="button" onClick={() => remove(i)}>Remove</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button
+        type="button"
+        onClick={() => {
+          if (fields.length < 28) append({
+            from: "", to: "", title: "", agency: "", salary: "", grade: "", status: "", govt: ""
+          });
+        }}
+        disabled={fields.length >= 28}
+      >
+        Add Row
       </button>
     </div>
   );
@@ -194,7 +298,13 @@ const PDSForm = () => {
         perm_zip: formData.perm_zip || "",
       };
 
-      
+      // Pad children array to 11 items
+      if (!Array.isArray(filledData.children)) {
+        filledData.children = [];
+      }
+      while (filledData.children.length < 12) {
+        filledData.children.push({ name: "", dob: "" });
+      }
 
       // Inject form data into template
       doc.render(filledData);
@@ -465,7 +575,7 @@ const PDSForm = () => {
             </div>
 
             {/* Children (dynamic section) */}
-            <ChildrenSection control={control} register={register} />
+            <ChildrenSection register={register} />
 
             {/* Father & Mother */}
             <div className="pds-grid two-col">
@@ -522,60 +632,11 @@ const PDSForm = () => {
                 ))}
               </tbody>
             </table>
-
-            <h4>IV. CIVIL SERVICE ELIGIBILITY</h4>
-            <table>
-              <thead>
-                <tr>
-                  <th>27. CAREER SERVICE / RATING</th>
-                  <th>DATE OF EXAM / CONFERMENT</th>
-                  <th>PLACE OF EXAM</th>
-                  <th>LICENSE (No.)</th>
-                  <th>VALIDITY</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i}>
-                    <td><input {...register(`elig_${i}_title`)} /></td>
-                    <td><input type="date" {...register(`elig_${i}_date`)} /></td>
-                    <td><input {...register(`elig_${i}_place`)} /></td>
-                    <td><input {...register(`elig_${i}_license`)} /></td>
-                    <td><input type="date" {...register(`elig_${i}_valid`)} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* IV. Civil Service Eligibility*/}
+            <EligibilitySection control={control} register={register} />
 
             <h4>V. WORK EXPERIENCE (Start from recent)</h4>
-            <table>
-              <thead>
-                <tr>
-                  <th>28. INCLUSIVE DATES (From)</th>
-                  <th>INCLUSIVE DATES (To)</th>
-                  <th>POSITION TITLE</th>
-                  <th>DEPARTMENT / AGENCY / COMPANY</th>
-                  <th>MONTHLY SALARY</th>
-                  <th>SALARY GRADE & STEP</th>
-                  <th>STATUS OF APPOINTMENT</th>
-                  <th>GOV'T SERVICE?</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <tr key={i}>
-                    <td><input type="date" {...register(`work_${i}_from`)} /></td>
-                    <td><input type="date" {...register(`work_${i}_to`)} /></td>
-                    <td><input {...register(`work_${i}_title`)} /></td>
-                    <td><input {...register(`work_${i}_agency`)} /></td>
-                    <td><input {...register(`work_${i}_salary`)} /></td>
-                    <td><input {...register(`work_${i}_grade`)} /></td>
-                    <td><input {...register(`work_${i}_status`)} /></td>
-                    <td><input {...register(`work_${i}_govt`)} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <WorkExperienceSection control={control} register={register} />
           </div>
 
           {/* ================= PAGE 3 (Voluntary Work, L&D, Other Info) ================= */}
