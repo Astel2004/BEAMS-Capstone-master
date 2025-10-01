@@ -653,7 +653,7 @@ const PDSForm = () => {
                 </tr>
               </thead>
               <tbody>
-                {Array.from({ length: 5 }).map((_, i) => (
+                {Array.from({ length: 7 }).map((_, i) => (
                   <tr key={i}>
                     <td><input {...register(`vol_${i}_org`)} /></td>
                     <td><input type="date" {...register(`vol_${i}_from`)} /></td>
@@ -678,7 +678,7 @@ const PDSForm = () => {
                 </tr>
               </thead>
               <tbody>
-                {Array.from({ length: 5 }).map((_, i) => (
+                {Array.from({ length: 21 }).map((_, i) => (
                   <tr key={i}>
                     <td><input {...register(`ld_${i}_title`)} /></td>
                     <td><input type="date" {...register(`ld_${i}_from`)} /></td>
@@ -701,7 +701,7 @@ const PDSForm = () => {
                 </tr>
               </thead>
               <tbody>
-                {Array.from({ length: 6 }).map((_, i) => (
+                {Array.from({ length: 7 }).map((_, i) => (
                   <tr key={i}>
                     <td>
                       <input type="text" {...register(`skills_hobbies_${i}`)} />
