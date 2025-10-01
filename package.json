@@ -26,6 +26,7 @@
     "jsonwebtoken": "^9.0.0",
     "jspdf": "^3.0.3",
     "lucide-react": "^0.544.0",
+    "mammoth": "^1.11.0",
     "mongoose": "^6.13.8",
     "multer": "^2.0.2",
     "pizzip": "^3.2.0",

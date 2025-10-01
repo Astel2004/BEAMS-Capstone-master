@@ -42,12 +42,7 @@ function ChildrenSection({ register }) {
   );
 }
 
-function EligibilitySection({ control, register }) {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "eligibility",
-  });
-
+function EligibilitySection({ register }) {
   return (
     <div>
       <h4>IV. CIVIL SERVICE ELIGIBILITY</h4>
@@ -60,59 +55,29 @@ function EligibilitySection({ control, register }) {
             <th>PLACE OF EXAM</th>
             <th>LICENSE (No.)</th>
             <th>VALIDITY</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
-          {fields.map((field, i) => (
-            <tr key={field.id}>
-              <td>
-                <input {...register(`eligibility.${i}.service`)} />
-              </td>
-              <td>
-                <input {...register(`eligibility.${i}.title`)} />
-              </td>
-              <td>
-                <input type="date" {...register(`eligibility.${i}.date`)} />
-              </td>
-              <td>
-                <input {...register(`eligibility.${i}.place`)} />
-              </td>
-              <td>
-                <input {...register(`eligibility.${i}.license`)} />
-              </td>
-              <td>
-                <input type="date" {...register(`eligibility.${i}.valid`)} />
-              </td>
-              <td>
-                <button type="button" onClick={() => remove(i)}>Remove</button>
-              </td>
+          {Array.from({ length: 7 }).map((_, i) => (
+            <tr key={i}>
+              <td><input {...register(`elig_${i}_service`)} /></td>
+              <td><input {...register(`elig_${i}_title`)} /></td>
+              <td><input type="date" {...register(`elig_${i}_date`)} /></td>
+              <td><input {...register(`elig_${i}_place`)} /></td>
+              <td><input {...register(`elig_${i}_license`)} /></td>
+              <td><input type="date" {...register(`elig_${i}_valid`)} /></td>
             </tr>
           ))}
         </tbody>
       </table>
-      <button
-        type="button"
-        onClick={() => {
-          if (fields.length < 7) append({ service: "", title: "", date: "", place: "", license: "", valid: "" });
-        }}
-        disabled={fields.length >= 7}
-      >
-        Add Row
-      </button>
     </div>
   );
 }
 
-function WorkExperienceSection({ control, register }) {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "workExperience",
-  });
-
+function WorkExperienceSection({ register }) {
   return (
     <div>
-      <h4>V. WORK EXPERIENCE (Start from recent)</h4>
+      <h4>V. WORK EXPERIENCE</h4>
       <table>
         <thead>
           <tr>
@@ -124,38 +89,23 @@ function WorkExperienceSection({ control, register }) {
             <th>SALARY GRADE & STEP</th>
             <th>STATUS OF APPOINTMENT</th>
             <th>GOV'T SERVICE?</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
-          {fields.map((field, i) => (
-            <tr key={field.id}>
-              <td><input type="date" {...register(`workExperience.${i}.from`)} /></td>
-              <td><input type="date" {...register(`workExperience.${i}.to`)} /></td>
-              <td><input {...register(`workExperience.${i}.title`)} /></td>
-              <td><input {...register(`workExperience.${i}.agency`)} /></td>
-              <td><input {...register(`workExperience.${i}.salary`)} /></td>
-              <td><input {...register(`workExperience.${i}.grade`)} /></td>
-              <td><input {...register(`workExperience.${i}.status`)} /></td>
-              <td><input {...register(`workExperience.${i}.govt`)} /></td>
-              <td>
-                <button type="button" onClick={() => remove(i)}>Remove</button>
-              </td>
+          {Array.from({ length: 28 }).map((_, i) => (
+            <tr key={i}>
+              <td><input type="date" {...register(`work_${i}_from`)} /></td>
+              <td><input type="date" {...register(`work_${i}_to`)} /></td>
+              <td><input {...register(`work_${i}_title`)} /></td>
+              <td><input {...register(`work_${i}_agency`)} /></td>
+              <td><input {...register(`work_${i}_salary`)} /></td>
+              <td><input {...register(`work_${i}_grade`)} /></td>
+              <td><input {...register(`work_${i}_status`)} /></td>
+              <td><input {...register(`work_${i}_govt`)} /></td>
             </tr>
           ))}
         </tbody>
       </table>
-      <button
-        type="button"
-        onClick={() => {
-          if (fields.length < 28) append({
-            from: "", to: "", title: "", agency: "", salary: "", grade: "", status: "", govt: ""
-          });
-        }}
-        disabled={fields.length >= 28}
-      >
-        Add Row
-      </button>
     </div>
   );
 }
@@ -165,23 +115,13 @@ const PDSForm = () => {
   const wrapperRef = useRef();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewData, setPreviewData] = useState(null);
 
   // ---- Save data in console (debug) ----
   const onSubmit = (data) => {
-    const citizenshipPlaceholders = {
-      filipinoBox: data.citizenship === "Filipino" ? "✔" : "☐",
-      dualBox: data.citizenship === "Dual" ? "✔" : "☐",
-      byBirthBox: data.citizenship === "Dual" && data.dualType === "Birth" ? "✔" : "☐",
-      byNaturalBox: data.citizenship === "Dual" && data.dualType === "Naturalization" ? "✔" : "☐",
-      citizenshipCountry:
-        data.citizenship === "Dual" ? (data.citizenshipCountry || "") : ""
-    };
-
-    const placeholders = { ...data, ...citizenshipPlaceholders };
-
-    console.log("Final placeholders:", placeholders);
-
-    generateDocx(placeholders); // your existing docxtemplater call
+    setPreviewData(data);
+    setShowPreview(true);
   };
 
   // ---- Generate DOCX from template ----
@@ -326,6 +266,20 @@ const PDSForm = () => {
       setLoading(false);
       alert("There was an error generating the PDS DOCX. Check console.");
     }
+  };
+
+  // Download empty PDS template
+  const downloadEmptyTemplate = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/empty_pds_template.docx");
+      const blob = await response.blob();
+      saveAs(blob, "PDS_Empty_Template.docx");
+    } catch (error) {
+      alert("Failed to download empty template.");
+      console.error(error);
+    }
+    setLoading(false);
   };
 
   return (
@@ -633,10 +587,9 @@ const PDSForm = () => {
               </tbody>
             </table>
             {/* IV. Civil Service Eligibility*/}
-            <EligibilitySection control={control} register={register} />
+            <EligibilitySection register={register} />
 
-            <h4>V. WORK EXPERIENCE (Start from recent)</h4>
-            <WorkExperienceSection control={control} register={register} />
+            <WorkExperienceSection register={register} />
           </div>
 
           {/* ================= PAGE 3 (Voluntary Work, L&D, Other Info) ================= */}
@@ -898,36 +851,6 @@ const PDSForm = () => {
               <label>Date/Place of Issuance:</label>
               <input {...register("govIdIssuedAt")} />
             </div>
-
-            <div className="pds-grid three-col">
-              <div className="pds-field">
-                <label>Signature (Sign inside the box)</label>
-                <input {...register("signatureBox")} />
-              </div>
-              <div className="pds-field">
-                <label>Date Accomplished</label>
-                <input type="date" {...register("dateAccomplished")} />
-              </div>
-              <div className="pds-field">
-                <label>Right Thumbmark</label>
-                <input {...register("thumbmark")} />
-              </div>
-            </div>
-
-            <h4>XII. DECLARATION</h4>
-            <p className="declaration-text">
-              I declare under oath that I have personally accomplished this Personal Data Sheet which is a true, correct and complete statement...
-            </p>
-            <div className="pds-grid declaration-grid">
-              <div className="pds-field">
-                <label>Signature (Sign inside the box)</label>
-                <input {...register("declaration_signature")} />
-              </div>
-              <div className="pds-field">
-                <label>Date Accomplished</label>
-                <input type="date" {...register("declaration_date")} />
-              </div>
-            </div>
           </div>
         </form>
       </div>
@@ -949,6 +872,13 @@ const PDSForm = () => {
           ) : (
             "Download Filled PDS (DOCX)"
           )}
+        </button>
+        <button
+          className="download"
+          onClick={downloadEmptyTemplate}
+          disabled={loading}
+        >
+          Download Empty PDS Template (DOCX)
         </button>
       </div>
     </div>
