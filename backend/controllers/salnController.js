@@ -25,6 +25,31 @@ exports.createSALNForm = async (req, res) => {
   }
 };
 
+// Create SALN (with file upload if any)
+exports.createSALN = async (req, res) => {
+  try {
+    const { employeeId, formData, status } = req.body;
+
+    if (!employeeId) {
+      return res.status(400).json({ error: "Employee ID is required" });
+    }
+
+    const saln = new SALN({
+      employeeId,
+      formData: formData ? JSON.parse(formData) : {},
+      fileName: req.file ? req.file.originalname : undefined,
+      fileUrl: req.file ? req.file.path : undefined,
+      dateUploaded: new Date(),
+      status: status || "Pending",
+    });
+
+    await saln.save();
+    res.status(201).json({ message: "SALN saved successfully", saln });
+  } catch (error) {
+    res.status(500).json({ error: error.message || "Failed to save SALN." });
+  }
+};
+
 // Get all SALNs
 exports.getAllSALN = async (req, res) => {
   try {

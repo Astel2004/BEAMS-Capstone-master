@@ -6,7 +6,13 @@ const SALNSchema = new mongoose.Schema({
     ref: "Employee",
     required: true,
   },
+  // For uploaded files
+  fileName: { type: String },
+  fileUrl: { type: String },
+
+  // For form-only submissions
   formData: { type: Object }, // flexible JSON object for form fields
+
   dateUploaded: { type: Date, default: Date.now },
   status: {
     type: String,

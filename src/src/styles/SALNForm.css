@@ -1,11 +1,28 @@
 .saln-form-wrapper {
   max-width: 1200px;
+  height: 90vh;              /* limit height to viewport */
   margin: 0 auto;
   padding: 2rem;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  overflow-y: auto;
+
+  overflow-y: auto;          /* enable vertical scroll */
+  overflow-x: hidden;        /* prevent horizontal scroll */
+}
+
+/* Optional: make scrollbar styled (modern look) */
+.saln-form-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.saln-form-wrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.saln-form-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #888;
 }
 
 .saln-form h2 {
@@ -56,32 +73,104 @@
   grid-template-columns: repeat(4, 1fr);
 }
 
-.saln-field label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: 0.25rem;
+/* Add spacing between field groups */
+.saln-form .saln-field,
+.saln-form .saln-grid {
+  margin-bottom: 1.2rem;
+}
+
+/* Improve radio/checkbox group appearance */
+.saln-form .radio-group {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.saln-form .radio-group label {
+  display: flex;
+  align-items: center;
+  font-weight: 400;
   color: #333;
+  cursor: pointer;
+  gap: 0.4rem;
 }
 
-.saln-field input,
-.saln-field select,
-.saln-form table input {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  transition: border-color 0.2s ease;
+.saln-form input[type="radio"] {
+  accent-color: #007bff;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.3em;
 }
 
-.saln-field input:focus,
-.saln-form table input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 1px rgba(0,123,255,0.25);
+/* Section headers for clarity */
+.saln-form-section {
+  background: #f5f8ff;
+  border-radius: 8px;
+  padding: 1.2rem 1rem 1rem 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,123,255,0.04);
 }
 
-/* Table styling */
+/* Grid improvements for better alignment */
+.saln-grid.four-col > div,
+.saln-grid.three-col > div,
+.saln-grid.two-col > div,
+.saln-grid.one-col > div {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive: stack columns on small screens */
+@media (max-width: 900px) {
+  .saln-grid.four-col { grid-template-columns: 1fr 1fr; }
+  .saln-grid.three-col { grid-template-columns: 1fr 1fr; }
+  .saln-grid.two-col { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .saln-form-wrapper { padding: 0.5rem; }
+  .saln-grid.four-col,
+  .saln-grid.three-col,
+  .saln-grid.two-col,
+  .saln-grid.one-col {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Highlight required fields */
+.saln-form label.required::after {
+  content: " *";
+  color: #d00;
+  font-weight: bold;
+}
+
+/* Button group styling */
+.saln-form .button-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.saln-form .download,
+.saln-form .submit-hr {
+  padding: 0.7rem 1.5rem;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.saln-form .download:hover,
+.saln-form .submit-hr:hover {
+  background: #218838;
+}
+
+/* Table improvements for assets/liabilities */
 .saln-form table {
   width: 100%;
   border-collapse: collapse;
@@ -97,9 +186,9 @@
 }
 
 .saln-form table th {
-  background: #f9f9f9;
+  background: #e9f2ff;
+  color: #222;
   font-weight: 600;
-  color: #444;
 }
 
 .saln-form table tr:nth-child(even) {
@@ -107,6 +196,9 @@
 }
 
 /* Buttons */
+button{
+  margin: 0.5em;
+}
 .back-btn {
   background: none;
   border: none;
@@ -139,29 +231,19 @@
   background: #0056b3;
 }
 
-.saln-form-wrapper {
-  max-width: 1200px;
-  height: 90vh;              /* limit height to viewport */
-  margin: 0 auto;
-  padding: 2rem;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-
-  overflow-y: auto;          /* enable vertical scroll */
-  overflow-x: hidden;        /* prevent horizontal scroll */
+/* Add a subtle border to section headers */
+.saln-form h4 {
+  border-left: 4px solid #007bff;
+  padding-left: 0.5rem;
+  background: #f5f8ff;
 }
 
-/* Optional: make scrollbar styled (modern look) */
-.saln-form-wrapper::-webkit-scrollbar {
-  width: 8px;
+.saln-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
 }
 
-.saln-form-wrapper::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
-}
-
-.saln-form-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #888;
+.saln-table-scroll table {
+  min-width: 900px; /* or whatever width fits your columns */
 }
