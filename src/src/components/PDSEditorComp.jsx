@@ -312,13 +312,18 @@ const PDSForm = () => {
         return;
       }
 
+      // Use the surname from the last saved form data, or fallback
+      const surname = lastSavedFormData?.surname
+        ? lastSavedFormData.surname.replace(/[^a-zA-Z0-9]/g, "")
+        : "Employee";
+      const fileName = `${surname}PDS.docx`;
+
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", file, fileName); // <-- Specify the filename here!
       formData.append("employeeId", employeeId);
-      formData.append("type", "PDS"); // <-- Add this for filtering in Pending Records
+      formData.append("type", "PDS");
       formData.append("status", "Pending");
 
-      // Change endpoint to /api/documents
       const response = await fetch("http://localhost:5000/api/documents", {
         method: "POST",
         body: formData,

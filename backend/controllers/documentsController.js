@@ -16,7 +16,7 @@ exports.createDocuments = async (req, res) => {
     res.status(201).json(documents);
   } catch (error) {
     console.error("CREATE DOCUMENTS ERROR:", error);
-    res.status(500).json({ error: 'Failed to upload document.' });
+    res.status(500).json({ error: error.message || 'Failed to upload document.' });
   }
 };
 

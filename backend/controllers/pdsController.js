@@ -12,8 +12,9 @@ exports.createPDS = async (req, res) => {
 
     const pds = new PDS({
       employeeId,
-      formData: formData ? JSON.parse(formData) : {}, // if sent as JSON string
-      filePath: req.file ? req.file.path : null,      // handle uploaded file
+      formData: formData ? JSON.parse(formData) : {},
+      fileName: req.file ? req.file.originalname : undefined,
+      fileUrl: req.file ? req.file.path : undefined,
       dateUploaded: new Date(),
       status: status || "Pending"
     });
