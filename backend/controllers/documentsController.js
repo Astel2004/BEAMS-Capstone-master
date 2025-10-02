@@ -2,17 +2,20 @@ const Documents = require('../models/Documents');
 
 exports.createDocuments = async (req, res) => {
   try {
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
     const documents = new Documents({
       employeeId: req.body.employeeId,
-      fileName: req.file.originalname,
-      fileUrl: req.file.path,
-      type: req.body.type, // <-- Save type
+      fileName: req.file ? req.file.originalname : undefined,
+      fileUrl: req.file ? req.file.path : undefined,
+      type: req.body.type,
       dateUploaded: new Date(),
       status: req.body.status || 'Pending'
     });
     await documents.save();
     res.status(201).json(documents);
   } catch (error) {
+    console.error("CREATE DOCUMENTS ERROR:", error);
     res.status(500).json({ error: 'Failed to upload document.' });
   }
 };
@@ -20,13 +23,13 @@ exports.createDocuments = async (req, res) => {
 exports.getAllDocuments = async (req, res) => {
   try {
     const filter = {};
-    if (req.query.type) filter.type = req.query.type;
-    if (req.query.status) filter.status = req.query.status;
-    if (req.query.employeeId) filter.employeeId = req.query.employeeId;
-    const docs = await Documents.find(filter);
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+    const docs = await Documents.find(filter).populate('employeeId');
     res.json(docs);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch documents.' });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch documents" });
   }
 };
 

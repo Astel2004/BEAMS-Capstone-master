@@ -117,6 +117,8 @@ const PDSForm = () => {
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [previewData, setPreviewData] = useState(null);
+  const [showSubmitPopup, setShowSubmitPopup] = useState(false);
+  const [lastSavedFormData, setLastSavedFormData] = useState(null);
 
   // ---- Save data in console (debug) ----
   const onSubmit = async (formData) => {
@@ -144,6 +146,8 @@ const PDSForm = () => {
       if (response.ok) {
         alert("PDS form saved successfully!");
         console.log("Saved PDS:", result.pds);
+        setLastSavedFormData(formData); // Save form data for follow-up
+        setShowSubmitPopup(true);       // Show popup after save
       } else {
         alert(result.error || "Failed to save PDS form.");
       }
@@ -311,9 +315,11 @@ const PDSForm = () => {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("employeeId", employeeId);
+      formData.append("type", "PDS"); // <-- Add this for filtering in Pending Records
       formData.append("status", "Pending");
 
-      const response = await fetch("http://localhost:5000/api/pds", {
+      // Change endpoint to /api/documents
+      const response = await fetch("http://localhost:5000/api/documents", {
         method: "POST",
         body: formData,
       });
@@ -321,14 +327,14 @@ const PDSForm = () => {
       const result = await response.json();
 
       if (response.ok) {
-        alert("PDS with file uploaded successfully!");
-        console.log("Saved PDS:", result.pds);
+        alert("PDS submitted to HR and is now pending!");
+        console.log("Saved Document:", result.document);
       } else {
-        alert(result.error || "Failed to upload PDS.");
+        alert(result.error || "Failed to submit PDS.");
       }
     } catch (error) {
-      console.error("Error uploading PDS:", error);
-      alert("An error occurred while uploading PDS.");
+      console.error("Error submitting PDS:", error);
+      alert("An error occurred while submitting PDS.");
     }
   };
 
@@ -946,6 +952,70 @@ const PDSForm = () => {
           Download Empty PDS Template (DOCX)
         </button>
       </div>
+
+      {/* Submit Popup (after save) */}
+      {showSubmitPopup && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <h3>Do you want to submit this to the HR?</h3>
+      <div className="modal-actions">
+        <button
+          className="modal-btn"
+          onClick={async () => {
+            setShowSubmitPopup(false);
+            setLoading(true);
+            try {
+              // Generate DOCX from template
+              const response = await fetch("/pds-template.docx");
+              const templateArrayBuffer = await response.arrayBuffer();
+              const zip = new PizZip(templateArrayBuffer);
+              const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+              // Fill data as in your generateDocx function
+              const citizenshipPlaceholders = getCitizenshipPlaceholders(
+                lastSavedFormData.citizenship,
+                lastSavedFormData.dualType,
+                lastSavedFormData.citizenshipCountry
+              );
+              const filledData = {
+                ...lastSavedFormData,
+                maleBox: lastSavedFormData.sex === "Male" ? "✔" : "☐",
+                femaleBox: lastSavedFormData.sex === "Female" ? "✔" : "☐",
+                singleBox: lastSavedFormData.civilStatus === "Single" ? "✔" : "☐",
+                marriedBox: lastSavedFormData.civilStatus === "Married" ? "✔" : "☐",
+                widowedBox: lastSavedFormData.civilStatus === "Widowed" ? "✔" : "☐",
+                separatedBox: lastSavedFormData.civilStatus === "Separated" ? "✔" : "☐",
+                otherBox: lastSavedFormData.civilStatus === "Other" ? "✔" : "☐",
+                ...citizenshipPlaceholders,
+              };
+              doc.render(filledData);
+              const out = doc.getZip().generate({
+                type: "blob",
+                mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+              });
+
+              // Upload DOCX to backend (this submits to HR's pending records)
+              await uploadDocxToBackend(out);
+              setLoading(false);
+            } catch (error) {
+              setLoading(false);
+              alert("Error submitting to HR.");
+              console.error(error);
+            }
+          }}
+        >
+          YES
+        </button>
+        <button
+          className="modal-btn"
+          onClick={() => setShowSubmitPopup(false)}
+        >
+          NO
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

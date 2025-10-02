@@ -8,48 +8,25 @@ import NotificationPopup from "./NotificationPopUp";
 
 const EmployeeRecordsComp = () => {
   const [activeEmployees, setActiveEmployees] = useState([]);
-  const [sortBy, setSortBy] = useState('lastname');
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newEmployee, setNewEmployee] = useState({
-    surname: "",
-    firstname: "",
-    middlename: "",
-    extension: "",
-    civilStatus: "",
-    citizenship: "",
-    mobileNo: "",
-    email: "",
-    password: "",
-    contact: "",
-    birthdate: "",
-    dateJoined: "",
-    gender: "",
-    address: {
-      province: "",
-      city: "",
-      zipCode: "",
-      barangay: "",
-    },
-  });
+  const [sortBy, setSortBy] = useState("lastname");
   const [viewEmployee, setViewEmployee] = useState(null);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState("employees");
-  const [personalRecords, setPersonalRecords] = useState([]); // State for personal records
   const [personalEmployees, setPersonalEmployees] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [pendingRecords, setPendingRecords] = useState([]);
   const navigate = useNavigate();
 
   const handleViewClick = async (employeeId) => {
     try {
       const response = await fetch(`http://localhost:5000/api/employees/${employeeId}`);
-      if (!response.ok) throw new Error('Failed to fetch employee');
+      if (!response.ok) throw new Error("Failed to fetch employee");
       const data = await response.json();
       setViewEmployee(data);
     } catch (error) {
-      alert('Error fetching employee details.');
+      alert("Error fetching employee details.");
     }
   };
 
@@ -58,21 +35,19 @@ const EmployeeRecordsComp = () => {
     navigate("/login");
   };
 
-  // Fetch employee records from the backend
+  // Fetch employee records
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
         const response = await fetch("http://localhost:5000/api/employees");
         const data = await response.json();
-        // Ensure all employees have id, position, step, and status (for legacy data)
-        const normalized = data.map(emp => ({
+        const normalized = data.map((emp) => ({
           ...emp,
-          id: emp.id || emp._id?.slice(-4) || '-',
-          position: emp.position || '-',
-          step: emp.step || '-',
-          status: emp.status || 'Active',
+          id: emp.id || emp._id?.slice(-4) || "-",
+          position: emp.position || "-",
+          step: emp.step || "-",
+          status: emp.status || "Active",
         }));
-        // Sort by last name (surname) by default
         const sorted = normalized
           .filter((employee) => employee.status === "Active")
           .sort((a, b) => a.surname.localeCompare(b.surname));
@@ -84,21 +59,7 @@ const EmployeeRecordsComp = () => {
     fetchEmployees();
   }, []);
 
-  // Fetch personal records from the backend
-  useEffect(() => {
-    const fetchPersonalRecords = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/documents?type=Personal");
-        const data = await response.json();
-        setPersonalRecords(data);
-      } catch (error) {
-        setPersonalRecords([]);
-        console.error("Error fetching personal records:", error);
-      }
-    };
-    fetchPersonalRecords();
-  }, []);
-
+  // Fetch employees for personal records tab
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -115,131 +76,35 @@ const EmployeeRecordsComp = () => {
     }
   }, [activeTab]);
 
-  // Handle Add Employee Modal
-  const handleAddEmployeeClick = () => {
-    setShowAddModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowAddModal(false);
-    setNewEmployee({
-      surname: "",
-      firstname: "",
-      middlename: "",
-      extension: "",
-      civilStatus: "",
-      citizenship: "",
-      mobileNo: "",
-      email: "",
-      password: "",
-      contact: "",
-      birthdate: "",
-      dateJoined: "",
-      gender: "",
-      address: {
-        province: "",
-        city: "",
-        zipCode: "",
-        barangay: "",
-      },
-    });
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (["province", "city", "zipCode", "barangay"].includes(name)) {
-      setNewEmployee({
-        ...newEmployee,
-        address: { ...newEmployee.address, [name]: value }
-      });
-    } else {
-      setNewEmployee({ ...newEmployee, [name]: value });
-    }
-  };
-
-  const generateRandomId = () => {
-    return Math.floor(1000 + Math.random() * 9000).toString();
-  };
-
-  const handleAddEmployeeSubmit = async (e) => {
-    e.preventDefault();
-    // Validate required fields
-    const requiredFields = [
-      'surname', 'firstname', 'middlename', 'civilStatus', 'citizenship', 'mobileNo', 'email', 'birthdate', 'gender',
-      'province', 'city', 'zipCode', 'barangay', 'dateJoined'
-    ];
-    const missingFields = [];
-    requiredFields.forEach(field => {
-      if (["province", "city", "zipCode", "barangay"].includes(field)) {
-        if (!newEmployee.address[field] || newEmployee.address[field].trim() === "") {
-          missingFields.push(field.charAt(0).toUpperCase() + field.slice(1));
-        }
-      } else {
-        if (!newEmployee[field] || newEmployee[field].trim() === "") {
-          missingFields.push(field.charAt(0).toUpperCase() + field.slice(1));
-        }
+  // Fetch pending records for review
+  useEffect(() => {
+    const fetchPendingRecords = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/documents?status=Pending");
+        const data = await response.json();
+        setPendingRecords(data);
+      } catch (error) {
+        setPendingRecords([]);
+        console.error("Error fetching pending records:", error);
       }
-    });
-    if (missingFields.length > 0) {
-      alert("Please fill in all required fields: " + missingFields.join(", "));
-      return;
-    }
-    // Prepare employee data for backend
-    const employeeData = {
-      ...newEmployee,
-      id: generateRandomId(),
-      position: "HR Staff",
-      step: "Step 1",
-      status: "Active"
     };
-    try {
-      const response = await fetch("http://localhost:5000/api/employees", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(employeeData)
-      });
-      if (!response.ok) throw new Error("Failed to add employee");
-      const saved = await response.json();
-      setActiveEmployees((prev) => [...prev, { ...employeeData, _id: saved.employee._id }]);
-      handleCloseModal();
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-    } catch (error) {
-      alert("Error adding employee. Please try again.");
+    if (activeTab === "pending") {
+      fetchPendingRecords();
     }
-  };
+  }, [activeTab]);
 
   const handleCloseViewModal = () => setViewEmployee(null);
-
-  const handleDeleteEmployee = async (employeeId) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this employee?");
-    if (!confirmDelete) return;
-    try {
-      const response = await fetch(`http://localhost:5000/api/employees/${employeeId}`, {
-        method: "DELETE"
-      });
-      if (!response.ok) throw new Error("Failed to delete employee");
-      setActiveEmployees((prev) => prev.filter(emp => emp._id !== employeeId));
-    } catch (error) {
-      alert("Error deleting employee. Please try again.");
-    }
-  };
-
-  const handleDeleteClick = (employeeId) => {
-    setEmployeeToDelete(employeeId);
-    setShowDeleteModal(true);
-  };
 
   const handleDeleteEmployeeConfirmed = async () => {
     if (!employeeToDelete) return;
     try {
       const response = await fetch(`http://localhost:5000/api/employees/${employeeToDelete}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete employee");
-      setActiveEmployees((prev) => prev.filter(emp => emp._id !== employeeToDelete));
-      setShowDeleteSuccess(true); // Show success message
-      setTimeout(() => setShowDeleteSuccess(false), 2000); // Hide after 2 seconds
+      setActiveEmployees((prev) => prev.filter((emp) => emp._id !== employeeToDelete));
+      setShowDeleteSuccess(true);
+      setTimeout(() => setShowDeleteSuccess(false), 2000);
     } catch (error) {
       alert("Error deleting employee. Please try again.");
     }
@@ -247,12 +112,17 @@ const EmployeeRecordsComp = () => {
     setEmployeeToDelete(null);
   };
 
+  const handleDeleteClick = (employeeId) => {
+    setEmployeeToDelete(employeeId);
+    setShowDeleteModal(true);
+  };
+
   // Sorting handler
   const handleSortChange = (e) => {
     const value = e.target.value;
     setSortBy(value);
-    if (value === 'lastname') {
-      setActiveEmployees(prev => [...prev].sort((a, b) => a.surname.localeCompare(b.surname)));
+    if (value === "lastname") {
+      setActiveEmployees((prev) => [...prev].sort((a, b) => a.surname.localeCompare(b.surname)));
     }
   };
 
@@ -260,8 +130,8 @@ const EmployeeRecordsComp = () => {
     if (!dateJoined) return "Step 1";
     const joinDate = new Date(dateJoined);
     const now = new Date();
-    const diffMonths = Math.floor((now - joinDate) / (1000 * 60 * 60 * 24 * 30.44)); // Approximate months
-    const step = Math.floor(diffMonths / 3) + 1; // Every 3 months is a new step
+    const diffMonths = Math.floor((now - joinDate) / (1000 * 60 * 60 * 24 * 30.44));
+    const step = Math.floor(diffMonths / 3) + 1;
     return `Step ${step}`;
   }
 
@@ -296,12 +166,12 @@ const EmployeeRecordsComp = () => {
           <div className="header-icons">
             <span className="icon">📧</span>
             <span
-  className="icon"
-  style={{ cursor: "pointer" }}
-  onClick={() => setShowNotifications(true)}
->
-  🔔
-</span>
+              className="icon"
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowNotifications(true)}
+            >
+              🔔
+            </span>
             <div className="profile">
               <img src={Image} alt="Image" />
               <span>ADMIN</span>
@@ -333,289 +203,17 @@ const EmployeeRecordsComp = () => {
           >
             Service Records
           </button>
+          <button
+            className={`employee-nav-btn${activeTab === "pending" ? " active" : ""}`}
+            onClick={() => setActiveTab("pending")}
+          >
+            Pending Records
+          </button>
         </nav>
 
         {/* Tab Content */}
         {activeTab === "employees" && (
           <>
-            {/* Employee Table Controls */}
-            <div className="employee-table-controls">
-              <button className="add-employee-button" onClick={handleAddEmployeeClick}>
-                Add Employee
-              </button>
-              <div className="employee-sort-dropdown">
-                <label htmlFor="sortBy" className="employee-sort-label">Sort by:</label>
-                <select id="sortBy" value={sortBy} onChange={handleSortChange} className="employee-sort-select">
-                  <option value="lastname">By Last Name</option>
-                </select>
-              </div>
-            </div>
-            {showSuccess && (
-              <div className="employee-success-popup">Employee successfully added!</div>
-            )}
-            {showDeleteSuccess && (
-              <div className="employee-success-popup" style={{background: "#4caf50", color: "#fff"}}>
-                Employee Successfully Deleted!
-              </div>
-            )}
-
-            {/* Add Employee Modal */}
-            {showAddModal && (
-              <div className="modal-overlay">
-                <div className="modal-content">
-                  <div className="Form-title">
-                    <h3>Add Employee</h3>
-                  <p className="note">
-                    (Note: Field with <span style={{color: 'red'}}>*</span> is required)
-                  </p>
-                  </div>
-                  <form onSubmit={handleAddEmployeeSubmit} className="add-employee-form">
-                    <section className="info-section">
-                    <div className="employee-info1">
-                    <h4 className="section-title">Employee Information</h4>
-                    <label>
-                      Surname: <span style={{color: 'red'}}>*</span>
-                      <input
-                        type="text"
-                        name="surname"
-                        value={newEmployee.surname}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </label>
-                    <label>
-                      First Name: <span style={{color: 'red'}}>*</span>
-                      <input
-                        type="text"
-                        name="firstname"
-                        value={newEmployee.firstname}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </label>
-                    <label>
-                      Middle Name: <span style={{color: 'red'}}>*</span>
-                      <input
-                        type="text"
-                        name="middlename"
-                        value={newEmployee.middlename}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </label>
-                    <label>
-                      Extension:
-                      <input
-                        type="text"
-                        name="extension"
-                        value={newEmployee.extension}
-                        onChange={handleInputChange}
-                      />
-                    </label>
-                    <label>
-                      Civil Status: <span style={{color: 'red'}}>*</span>
-                      <select
-                        name="civilStatus"
-                        value={newEmployee.civilStatus}
-                        onChange={handleInputChange}
-                        required
-                      >
-                        <option value="">Select</option>
-                        <option value="Single">Single</option>
-                        <option value="Married">Married</option>
-                        <option value="Widowed">Widowed</option>
-                        <option value="Separated">Separated</option>
-                        <option value="Other/s">Other/s</option>
-                      </select>
-                    </label>
-                    </div>
-                    <div className="employee-info2">
-                    <label>
-                      Citizenship: <span style={{color: 'red'}}>*</span>
-                      <select
-                        name="citizenship"
-                        value={newEmployee.citizenship}
-                        onChange={handleInputChange}
-                        required
-                      >
-                        <option value="">Select</option>
-                        <option value="Filipino">Filipino</option>
-                        <option value="Dual Citizenship">Dual Citizenship</option>
-                      </select>
-                    </label>
-                    <label>
-                      Mobile No.: <span style={{color: 'red'}}>*</span>
-                      <input
-                        type="text"
-                        name="mobileNo"
-                        value={newEmployee.mobileNo}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </label>
-                    <label>
-                      Email Address: <span style={{color: 'red'}}>*</span>
-                      <input
-                        type="email"
-                        name="email"
-                        value={newEmployee.email}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </label>
-                    <label>
-                      Birthdate: <span style={{color: 'red'}}>*</span>
-                      <input
-                        type="date"
-                        name="birthdate"
-                        value={newEmployee.birthdate}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </label>
-                    <label>
-                      Date Joined: <span style={{color: 'red'}}>*</span>
-                      <input
-                      type="date"
-                      name="dateJoined"
-                      value={newEmployee.dateJoined}
-                      onChange={handleInputChange}
-                      required
-                      />
-                    </label>
-                    <label>
-                      Gender: <span style={{color: 'red'}}>*</span>
-                      <select
-                        name="gender"
-                        value={newEmployee.gender}
-                        onChange={handleInputChange}
-                        required
-                      >
-                        <option value="">Select</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                      </select>
-                    </label>                  
-                    </div>
-                    </section>
-
-                    <section className="address-section">
-                      <div className="address"> 
-                        <h4 className="section-title">Address</h4>
-                      <label>
-                        Province: <span style={{color: 'red'}}>*</span>
-                        <input
-                          type="text"
-                          name="province"
-                          value={newEmployee.address.province}
-                          onChange={e => setNewEmployee({
-                            ...newEmployee,
-                            address: { ...newEmployee.address, province: e.target.value }
-                          })}
-                          required
-                        />
-                      </label>
-                      <label>
-                        City/Municipality: <span style={{color: 'red'}}>*</span>
-                        <input
-                          type="text"
-                          name="city"
-                          value={newEmployee.address.city}
-                          onChange={e => setNewEmployee({
-                            ...newEmployee,
-                            address: { ...newEmployee.address, city: e.target.value }
-                          })}
-                          required
-                        />
-                      </label>
-                        <label>
-                        Zip Code: <span style={{color: 'red'}}>*</span>
-                        <input
-                          type="text"
-                          name="zipCode"
-                          value={newEmployee.address.zipCode}
-                          onChange={e => setNewEmployee({
-                            ...newEmployee,
-                            address: { ...newEmployee.address, zipCode: e.target.value }
-                          })}
-                          required
-                        />
-                      </label>
-                      <label>
-                        Barangay: <span style={{color: 'red'}}>*</span>
-                        <input
-                          type="text"
-                          name="barangay"
-                          value={newEmployee.address.barangay}
-                          onChange={e => setNewEmployee({
-                            ...newEmployee,
-                            address: { ...newEmployee.address, barangay: e.target.value }
-                          })}
-                          required
-                        />
-                      </label>
-                      </div>
-
-                      <div className="modal-actions">
-                      <button type="submit" className="add-employee-button">
-                        Add
-                      </button>
-                      <button type="button" className="delete-employee-button" onClick={handleCloseModal}>
-                        Cancel
-                      </button>
-                    </div>
-                    </section>
-                  </form>
-                </div>
-              </div>
-            )}
-
-            {/* View Employee Modal */}
-            {viewEmployee && (
-              <div className="modal-overlay">
-                <div className="view-employee-modal">
-                  <div className="view-employee-header">Employee Details</div>
-                  <div className="view-employee-details-grid">
-                    <div>
-                      <div className="view-employee-section-title">Personal Information</div>
-                      <div className="view-employee-info-list">
-                        <p><b>Surname:</b> <u>{viewEmployee.surname}</u> </p>
-                        <p><b>First Name:</b> <u>{viewEmployee.firstname}</u> </p>
-                        <p><b>Middle Name:</b> <u>{viewEmployee.middlename}</u> </p>
-                        <p><b>Extension:</b> <u>{viewEmployee.extension || '-'}</u> </p>
-                        <p><b>Civil Status:</b> <u>{viewEmployee.civilStatus}</u> </p>
-                        <p><b>Citizenship:</b> <u>{viewEmployee.citizenship}</u> </p>
-                        <p><b>Mobile No.:</b> <u>{viewEmployee.mobileNo}</u> </p>
-                        <p><b>Email:</b> <u>{viewEmployee.email}</u> </p>
-                        <p><b>Birthdate:</b> <u>{viewEmployee.birthdate ? new Date(viewEmployee.birthdate).toLocaleDateString() : '-'}</u> </p>
-                        <p><b>Date Joined:</b>
-                          <u>
-                            {viewEmployee.dateJoined
-                              ? (() => {
-                                  const d = new Date(viewEmployee.dateJoined);
-                                  return isNaN(d.getTime()) ? viewEmployee.dateJoined : d.toLocaleDateString();
-                            })()
-                          : '-'}
-                        </u>
-                        </p> 
-                        <p><b>Gender:</b> <u>{viewEmployee.gender}</u> </p>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="view-employee-section-title">Address</div>
-                      <div className="view-employee-address-list">
-                        <p><b>Province:</b> <u>{viewEmployee.address?.province || '-'}</u></p>
-                        <p><b>City/Municipality:</b> <u>{viewEmployee.address?.city || '-'}</u></p>
-                        <p><b>Zip Code:</b> <u>{viewEmployee.address?.zipCode || '-'}</u></p>
-                        <p><b>Barangay:</b> <u>{viewEmployee.address?.barangay || '-'}</u></p>
-                      </div>
-                    </div>
-                  </div>
-                  <button className="view-employee-close-btn" onClick={handleCloseViewModal}>Close</button>
-                </div>
-              </div>
-            )}
-
             {/* Employees Table */}
             <div className="employee-table">
               <div className="employee-table-scroll">
@@ -635,12 +233,14 @@ const EmployeeRecordsComp = () => {
                     {activeEmployees.length > 0 ? (
                       activeEmployees.map((employee) => (
                         <tr key={employee._id || employee.id}>
-                          <td className="employee-data">{employee.id || '-'}</td>
-                          <td className="lastName">{employee.surname} {employee.firstname} {employee.middlename} {employee.extension ? employee.extension : ''}</td>
-                          <td className="employee-data">{employee.email || '-'}</td>
-                          <td className="employee-data">{employee.position || '-'}</td>
+                          <td className="employee-data">{employee.id || "-"}</td>
+                          <td className="lastName">
+                            {employee.surname} {employee.firstname} {employee.middlename} {employee.extension ? employee.extension : ""}
+                          </td>
+                          <td className="employee-data">{employee.email || "-"}</td>
+                          <td className="employee-data">{employee.position || "-"}</td>
                           <td className="employee-data">{calculateStep(employee.dateJoined)}</td>
-                          <td className="employee-data">{employee.status || '-'}</td>
+                          <td className="employee-data">{employee.status || "-"}</td>
                           <td className="employee-data">
                             <button
                               className="view-button"
@@ -668,6 +268,52 @@ const EmployeeRecordsComp = () => {
               </div>
             </div>
 
+            {/* View Employee Modal */}
+            {viewEmployee && (
+              <div className="modal-overlay">
+                <div className="view-employee-modal">
+                  <div className="view-employee-header">Employee Details</div>
+                  <div className="view-employee-details-grid">
+                    <div>
+                      <div className="view-employee-section-title">Personal Information</div>
+                      <div className="view-employee-info-list">
+                        <p><b>Surname:</b> <u>{viewEmployee.surname}</u> </p>
+                        <p><b>First Name:</b> <u>{viewEmployee.firstname}</u> </p>
+                        <p><b>Middle Name:</b> <u>{viewEmployee.middlename}</u> </p>
+                        <p><b>Extension:</b> <u>{viewEmployee.extension || "-"}</u> </p>
+                        <p><b>Civil Status:</b> <u>{viewEmployee.civilStatus}</u> </p>
+                        <p><b>Citizenship:</b> <u>{viewEmployee.citizenship}</u> </p>
+                        <p><b>Mobile No.:</b> <u>{viewEmployee.mobileNo}</u> </p>
+                        <p><b>Email:</b> <u>{viewEmployee.email}</u> </p>
+                        <p><b>Birthdate:</b> <u>{viewEmployee.birthdate ? new Date(viewEmployee.birthdate).toLocaleDateString() : "-"}</u> </p>
+                        <p><b>Date Joined:</b>
+                          <u>
+                            {viewEmployee.dateJoined
+                              ? (() => {
+                                  const d = new Date(viewEmployee.dateJoined);
+                                  return isNaN(d.getTime()) ? viewEmployee.dateJoined : d.toLocaleDateString();
+                            })()
+                          : "-"}
+                        </u>
+                        </p>
+                        <p><b>Gender:</b> <u>{viewEmployee.gender}</u> </p>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="view-employee-section-title">Address</div>
+                      <div className="view-employee-address-list">
+                        <p><b>Province:</b> <u>{viewEmployee.address?.province || "-"}</u></p>
+                        <p><b>City/Municipality:</b> <u>{viewEmployee.address?.city || "-"}</u></p>
+                        <p><b>Zip Code:</b> <u>{viewEmployee.address?.zipCode || "-"}</u></p>
+                        <p><b>Barangay:</b> <u>{viewEmployee.address?.barangay || "-"}</u></p>
+                      </div>
+                    </div>
+                  </div>
+                  <button className="view-employee-close-btn" onClick={handleCloseViewModal}>Close</button>
+                </div>
+              </div>
+            )}
+
             {/* Delete Confirmation Modal */}
             {showDeleteModal && (
               <div className="modal-overlay">
@@ -680,6 +326,11 @@ const EmployeeRecordsComp = () => {
                 </div>
               </div>
             )}
+            {showDeleteSuccess && (
+              <div className="employee-success-popup" style={{background: "#4caf50", color: "#fff"}}>
+                Employee Successfully Deleted!
+              </div>
+            )}
           </>
         )}
 
@@ -687,40 +338,40 @@ const EmployeeRecordsComp = () => {
           <div>
             <h3>Personal Records</h3>
             <div className="uploaded-documents">
-      <table>
-        <thead>
-          <tr>
-            <th>Employee ID</th>
-            <th>Full Name</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {personalEmployees.length > 0 ? (
-            personalEmployees.map((emp) => (
-              <tr key={emp._id}>
-                <td>{emp.id || emp._id}</td>
-                <td>
-                  {emp.surname} {emp.firstname} {emp.middlename} {emp.extension ? emp.extension : ""}
-                </td>
-                <td>
-                  <button
-                    className="manage-records-btn"
-                    onClick={() => navigate(`/employee-records/${emp._id}/documents`)}
-                  >
-                    Manage Records
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="3">No employees found.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Employee ID</th>
+                    <th>Full Name</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {personalEmployees.length > 0 ? (
+                    personalEmployees.map((emp) => (
+                      <tr key={emp._id}>
+                        <td>{emp.id || emp._id}</td>
+                        <td>
+                          {emp.surname} {emp.firstname} {emp.middlename} {emp.extension ? emp.extension : ""}
+                        </td>
+                        <td>
+                          <button
+                            className="manage-records-btn"
+                            onClick={() => navigate(`/employee-records/${emp._id}/documents`)}
+                          >
+                            Manage Records
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3">No employees found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
@@ -728,6 +379,56 @@ const EmployeeRecordsComp = () => {
           <div>
             {/* Service Records content goes here */}
             <h3>Service Records</h3>
+          </div>
+        )}
+
+        {activeTab === "pending" && (
+          <div>
+            <h3>Pending Records</h3>
+            <div className="uploaded-documents">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Employee Name</th>
+                    <th>File Name</th>
+                    <th>Type</th>
+                    <th>Date Uploaded</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingRecords.length > 0 ? (
+                    pendingRecords.map((rec) => (
+                      <tr key={rec._id}>
+                        <td>{rec.employeeName || rec.employeeId || "-"}</td>
+                        <td>{rec.fileName}</td>
+                        <td>{rec.type || rec.fileType}</td>
+                        <td>{rec.dateUploaded ? new Date(rec.dateUploaded).toLocaleDateString() : "-"}</td>
+                        <td>{rec.status}</td>
+                        <td>
+                          {rec.fileUrl ? (
+                            <button
+                              className="view-btn"
+                              onClick={() => window.open(rec.fileUrl, "_blank")}
+                            >
+                              View
+                            </button>
+                          ) : (
+                            <span>-</span>
+                          )}
+                          {/* You can add Approve/Reject buttons here if needed */}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6">No pending records found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 

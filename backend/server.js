@@ -7,6 +7,7 @@ const userRoutes = require('./routes/userRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const pdsRoutes = require('./routes/pdsRoutes');   // ✅ Import PDS routes
 const salnRoutes = require('./routes/salnRoutes'); // ✅ Import SALN routes
+const documentsRoutes = require('./routes/documentsRoutes'); // Import Documents routes
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/pds', pdsRoutes);   // ✅ Use PDS routes
 app.use('/api/saln', salnRoutes); // ✅ Use SALN routes
+app.use('/api/documents', documentsRoutes); // Use Documents routes
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
