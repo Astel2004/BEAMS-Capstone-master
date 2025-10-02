@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
@@ -45,27 +45,59 @@ function ChildrenSection({ register }) {
 function EligibilitySection({ register }) {
   return (
     <div>
-      <h4>IV. CIVIL SERVICE ELIGIBILITY</h4>
+      <h4>IV. CIVIL SERVICE ELIGIBILITY <span className="required-asterisk">*</span></h4>
       <table>
         <thead>
           <tr>
-            <th>CAREER SERVICE / RA 1080 (BOARD/ BAR)</th>
-            <th>RATING</th>
-            <th>DATE OF EXAM / CONFERMENT</th>
-            <th>PLACE OF EXAM</th>
-            <th>LICENSE (No.)</th>
-            <th>VALIDITY</th>
+            <th>CAREER SERVICE / RA 1080 (BOARD/ BAR) <span className="required-asterisk">*</span></th>
+            <th>RATING <span className="required-asterisk">*</span></th>
+            <th>DATE OF EXAM / CONFERMENT <span className="required-asterisk">*</span></th>
+            <th>PLACE OF EXAM <span className="required-asterisk">*</span></th>
+            <th>LICENSE (No.) <span className="required-asterisk">*</span></th>
+            <th>VALIDITY <span className="required-asterisk">*</span></th>
           </tr>
         </thead>
         <tbody>
           {Array.from({ length: 7 }).map((_, i) => (
             <tr key={i}>
-              <td><input {...register(`elig_${i}_service`)} /></td>
-              <td><input {...register(`elig_${i}_title`)} /></td>
-              <td><input type="date" {...register(`elig_${i}_date`)} /></td>
-              <td><input {...register(`elig_${i}_place`)} /></td>
-              <td><input {...register(`elig_${i}_license`)} /></td>
-              <td><input type="date" {...register(`elig_${i}_valid`)} /></td>
+              <td>
+                <input
+                  {...register(`elig_${i}_service`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
+              <td>
+                <input
+                  {...register(`elig_${i}_title`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
+              <td>
+                <input
+                  type="date"
+                  {...register(`elig_${i}_date`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
+              <td>
+                <input
+                  {...register(`elig_${i}_place`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
+              <td>
+                <input
+                  {...register(`elig_${i}_license`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
+              <td>
+                <input
+                  type="date"
+                  {...register(`elig_${i}_valid`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
             </tr>
           ))}
         </tbody>
@@ -94,14 +126,56 @@ function WorkExperienceSection({ register }) {
         <tbody>
           {Array.from({ length: 28 }).map((_, i) => (
             <tr key={i}>
-              <td><input type="date" {...register(`work_${i}_from`)} /></td>
-              <td><input type="date" {...register(`work_${i}_to`)} /></td>
-              <td><input {...register(`work_${i}_title`)} /></td>
-              <td><input {...register(`work_${i}_agency`)} /></td>
-              <td><input {...register(`work_${i}_salary`)} /></td>
-              <td><input {...register(`work_${i}_grade`)} /></td>
-              <td><input {...register(`work_${i}_status`)} /></td>
-              <td><input {...register(`work_${i}_govt`)} /></td>
+              <td>
+                <input
+                  type="date"
+                  {...register(`work_${i}_from`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
+              <td>
+                <input
+                  type="date"
+                  {...register(`work_${i}_to`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
+              <td>
+                <input
+                  {...register(`work_${i}_title`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
+              <td>
+                <input
+                  {...register(`work_${i}_agency`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
+              <td>
+                <input
+                  {...register(`work_${i}_salary`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
+              <td>
+                <input
+                  {...register(`work_${i}_grade`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
+              <td>
+                <input
+                  {...register(`work_${i}_status`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
+              <td>
+                <input
+                  {...register(`work_${i}_govt`, { required: i === 0 ? "Required" : false })}
+                  placeholder={i === 0 ? "*" : ""}
+                />
+              </td>
             </tr>
           ))}
         </tbody>
@@ -111,7 +185,7 @@ function WorkExperienceSection({ register }) {
 }
 
 const PDSForm = () => {
-  const { register, handleSubmit, watch, control } = useForm();
+  const { register, handleSubmit, watch, formState: { errors }, getValues } = useForm();
   const wrapperRef = useRef();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -119,6 +193,16 @@ const PDSForm = () => {
   const [previewData, setPreviewData] = useState(null);
   const [showSubmitPopup, setShowSubmitPopup] = useState(false);
   const [lastSavedFormData, setLastSavedFormData] = useState(null);
+
+  // --- Custom validation for at least one complete row ---
+  const hasAtLeastOneRow = (prefix, fields) => {
+    const values = getValues();
+    for (let i = 0; i < 7; i++) {
+      const filled = fields.every(f => values[`${prefix}_${i}_${f}`] && values[`${prefix}_${i}_${f}`].toString().trim() !== "");
+      if (filled) return true;
+    }
+    return false;
+  };
 
   // ---- Save data in console (debug) ----
   const onSubmit = async (formData) => {
@@ -395,102 +479,166 @@ const PDSForm = () => {
             {/* 2. Name row */}
             <div className="pds-grid four-col">
               <div className="pds-field">
-                <label>2. SURNAME</label>
-                <input {...register("surname")} />
+                <label>
+                  2. SURNAME <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("surname", { required: "Required" })} />
+                {errors.surname && <span className="error">{errors.surname.message}</span>}
               </div>
               <div className="pds-field">
-                <label>FIRST NAME</label>
-                <input {...register("firstName")} />
+                <label>
+                  FIRST NAME <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("firstName", { required: "Required" })} />
+                {errors.firstName && <span className="error">{errors.firstName.message}</span>}
               </div>
               <div className="pds-field">
-                <label>MIDDLE NAME</label>
-                <input {...register("middleName")} />
+                <label>
+                  MIDDLE NAME <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("middleName", { required: "Required" })} />
+                {errors.middleName && <span className="error">{errors.middleName.message}</span>}
               </div>
               <div className="pds-field">
-                <label>NAME EXTENSION (JR., SR.)</label>
+                <label>
+                  NAME EXTENSION (JR., SR.)
+                </label>
                 <input {...register("nameExt")} />
               </div>
             </div>
 
-            {/* 3 & 4: DOB & Place of birth */}
             <div className="pds-grid two-col">
               <div className="pds-field">
-                <label>3. DATE OF BIRTH (mm/dd/yyyy)</label>
-                <input type="date" {...register("dateOfBirth")} />
+                <label>
+                  3. DATE OF BIRTH (mm/dd/yyyy) <span className="required-asterisk">*</span>
+                </label>
+                <input type="date" {...register("dateOfBirth", { required: "Required" })} />
+                {errors.dateOfBirth && <span className="error">{errors.dateOfBirth.message}</span>}
               </div>
               <div className="pds-field">
-                <label>4. PLACE OF BIRTH</label>
-                <input {...register("placeOfBirth")} />
+                <label>
+                  4. PLACE OF BIRTH <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("placeOfBirth", { required: "Required" })} />
+                {errors.placeOfBirth && <span className="error">{errors.placeOfBirth.message}</span>}
+              </div>
+            </div>
+
+            <div className="pds-grid three-col">
+              <div className="pds-field">
+                <label>
+                  5. SEX <span className="required-asterisk">*</span>
+                </label>
+                <div className="radio-group">
+                  <label>
+                    <input type="radio" value="Male" {...register("sex", { required: "Required" })} /> Male
+                  </label>
+                  <label>
+                    <input type="radio" value="Female" {...register("sex", { required: "Required" })} /> Female
+                  </label>
+                </div>
+                {errors.sex && <span className="error">{errors.sex.message}</span>}
+              </div>
+              <div className="pds-field">
+                <label>
+                  6. CIVIL STATUS <span className="required-asterisk">*</span>
+                </label>
+                <div className="radio-group">
+                  <label>
+                    <input type="radio" value="Single" {...register("civilStatus", { required: "Required" })} /> Single
+                  </label>
+                  <label>
+                    <input type="radio" value="Married" {...register("civilStatus", { required: "Required" })} /> Married
+                  </label>
+                  <label>
+                    <input type="radio" value="Widowed" {...register("civilStatus", { required: "Required" })} /> Widowed
+                  </label>
+                  <label>
+                    <input type="radio" value="Separated" {...register("civilStatus", { required: "Required" })} /> Separated
+                  </label>
+                  <label>
+                    Other: <input {...register("civilStatusOther")} />
+                  </label>
+                </div>
+                {errors.civilStatus && <span className="error">{errors.civilStatus.message}</span>}
+              </div>
+            </div>
+
+            <div className="pds-grid three-col">
+              <div className="pds-field">
+                <label>
+                  7. HEIGHT (m) <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("height", { required: "Required" })} placeholder="e.g., 1.65" />
+                {errors.height && <span className="error">{errors.height.message}</span>}
+              </div>
+              <div className="pds-field">
+                <label>
+                  8. WEIGHT (kg) <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("weight", { required: "Required" })} placeholder="e.g., 60" />
+                {errors.weight && <span className="error">{errors.weight.message}</span>}
+              </div>
+              <div className="pds-field">
+                <label>
+                  9. BLOOD TYPE <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("bloodType", { required: "Required" })} />
+                {errors.bloodType && <span className="error">{errors.bloodType.message}</span>}
+              </div>
+            </div>
+
+            <div className="pds-grid three-col">
+              <div className="pds-field">
+                <label>
+                  10. GSIS ID NO. <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("gsis", { required: "Required" })} />
+                {errors.gsis && <span className="error">{errors.gsis.message}</span>}
+              </div>
+              <div className="pds-field">
+                <label>
+                  11. PAG-IBIG ID NO. <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("pagibig", { required: "Required" })} />
+                {errors.pagibig && <span className="error">{errors.pagibig.message}</span>}
+              </div>
+              <div className="pds-field">
+                <label>
+                  12. PHILHEALTH NO. <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("philhealth", { required: "Required" })} />
+                {errors.philhealth && <span className="error">{errors.philhealth.message}</span>}
+              </div>
+            </div>
+
+            <div className="pds-grid three-col">
+              <div className="pds-field">
+                <label>
+                  13. SSS NO. <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("sss", { required: "Required" })} />
+                {errors.sss && <span className="error">{errors.sss.message}</span>}
+              </div>
+              <div className="pds-field">
+                <label>
+                  14. TIN NO. <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("tin", { required: "Required" })} />
+                {errors.tin && <span className="error">{errors.tin.message}</span>}
+              </div>
+              <div className="pds-field">
+                <label>
+                  15. AGENCY EMPLOYEE NO. <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("agencyEmployeeNo", { required: "Required" })} />
+                {errors.agencyEmployeeNo && <span className="error">{errors.agencyEmployeeNo.message}</span>}
               </div>
             </div>
 
             {/* Citizenship, Sex, Civil status */}
             <div className="pds-grid three-col">
               <div className="pds-field">
-                <label>5. SEX</label>
-                <div className="radio-group">
-                  <label><input type="radio" value="Male" {...register("sex")} /> Male</label>
-                  <label><input type="radio" value="Female" {...register("sex")} /> Female</label>
-                </div>
-              </div>
-              <div className="pds-field">
-                <label>6. CIVIL STATUS</label>
-                <div className="radio-group">
-                  <label><input type="radio" value="Single" {...register("civilStatus")} /> Single</label>
-                  <label><input type="radio" value="Married" {...register("civilStatus")} /> Married</label>
-                  <label><input type="radio" value="Widowed" {...register("civilStatus")} /> Widowed</label>
-                  <label><input type="radio" value="Separated" {...register("civilStatus")} /> Separated</label>
-                  <label>Other: <input {...register("civilStatusOther")} /></label>
-                </div>
-              </div>
-            </div>
-
-            {/* Height / Weight / Blood Type */}
-            <div className="pds-grid three-col">
-              <div className="pds-field">
-                <label>7. HEIGHT (m)</label>
-                <input {...register("height")} placeholder="e.g., 1.65" />
-              </div>
-              <div className="pds-field">
-                <label>8. WEIGHT (kg)</label>
-                <input {...register("weight")} placeholder="e.g., 60" />
-              </div>
-              <div className="pds-field">
-                <label>9. BLOOD TYPE</label>
-                <input {...register("bloodType")} />
-              </div>
-            </div>
-
-            {/* IDs (10-15), Contacts (19-21) */}
-            <div className="pds-grid three-col">
-              <div className="pds-field">
-                <label>10. GSIS ID NO.</label>
-                <input {...register("gsis")} />
-              </div>
-              <div className="pds-field">
-                <label>11. PAG-IBIG ID NO.</label>
-                <input {...register("pagibig")} />
-              </div>
-              <div className="pds-field">
-                <label>12. PHILHEALTH NO.</label>
-                <input {...register("philhealth")} />
-              </div>
-            </div>
-
-            <div className="pds-grid three-col">
-              <div className="pds-field">
-                <label>13. SSS NO.</label>
-                <input {...register("sss")} />
-              </div>
-              <div className="pds-field">
-                <label>14. TIN NO.</label>
-                <input {...register("tin")} />
-              </div>
-              <div className="pds-field">
-                <label>15. AGENCY EMPLOYEE NO.</label>
-                <input {...register("agencyEmployeeNo")} />
-              </div>
-              <div className="pds-field citizenship-field">
                 <label>16. CITIZENSHIP</label>
                 <div className="radio-group">
                   <label>
@@ -647,29 +795,80 @@ const PDSForm = () => {
                 </tr>
               </thead>
               <tbody>
-                {["ELEMENTARY", "SECONDARY", "VOCATIONAL", "COLLEGE", "GRADUATE"].map((lvl) => (
-                  <tr key={lvl}>
-                    <td>{lvl}</td>
-                    <td><input {...register(`${lvl}_school`)} /></td>
-                    <td><input {...register(`${lvl}_course`)} /></td>
-                    <td>
-                      <input {...register(`${lvl}_from`)} placeholder="From" /> - <input {...register(`${lvl}_to`)} placeholder="To" />
-                    </td>
-                    <td><input {...register(`${lvl}_highest`)} /></td>
-                    <td><input {...register(`${lvl}_gradYear`)} /></td>
-                    <td><input {...register(`${lvl}_honors`)} /></td>
-                  </tr>
-                ))}
+                {["ELEMENTARY", "SECONDARY", "VOCATIONAL", "COLLEGE", "GRADUATE"].map((lvl) => {
+                  const isRequired = ["ELEMENTARY", "SECONDARY", "COLLEGE"].includes(lvl);
+                  return (
+                    <tr key={lvl}>
+                      <td>
+                        {lvl}{isRequired && <span className="required-asterisk">*</span>}
+                      </td>
+                      <td>
+                        <input
+                          {...register(`${lvl}_school`, { required: isRequired ? "Required" : false })}
+                          placeholder={isRequired ? "*" : ""}
+                        />
+                        {errors[`${lvl}_school`] && <span className="error">{errors[`${lvl}_school`].message}</span>}
+                      </td>
+                      <td>
+                        <input
+                          {...register(`${lvl}_course`, { required: isRequired ? "Required" : false })}
+                          placeholder={isRequired ? "*" : ""}
+                        />
+                        {errors[`${lvl}_course`] && <span className="error">{errors[`${lvl}_course`].message}</span>}
+                      </td>
+                      <td>
+                        <input
+                          {...register(`${lvl}_from`, { required: isRequired ? "Required" : false })}
+                          placeholder={isRequired ? "*" : "From"}
+                          type="text"
+                        /> - 
+                        <input
+                          {...register(`${lvl}_to`, { required: isRequired ? "Required" : false })}
+                          placeholder={isRequired ? "*" : "To"}
+                          type="text"
+                        />
+                        {(errors[`${lvl}_from`] || errors[`${lvl}_to`]) && (
+                          <span className="error">
+                            {errors[`${lvl}_from`] && errors[`${lvl}_from`].message}
+                            {errors[`${lvl}_to`] && errors[`${lvl}_to`].message}
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        <input
+                          {...register(`${lvl}_highest`, { required: isRequired ? "Required" : false })}
+                          placeholder={isRequired ? "*" : ""}
+                        />
+                        {errors[`${lvl}_highest`] && <span className="error">{errors[`${lvl}_highest`].message}</span>}
+                      </td>
+                      <td>
+                        <input
+                          {...register(`${lvl}_gradYear`, { required: isRequired ? "Required" : false })}
+                          placeholder={isRequired ? "*" : ""}
+                        />
+                        {errors[`${lvl}_gradYear`] && <span className="error">{errors[`${lvl}_gradYear`].message}</span>}
+                      </td>
+                      <td>
+                        <input
+                          {...register(`${lvl}_honors`, { required: isRequired ? "Required" : false })}
+                          placeholder={isRequired ? "*" : ""}
+                        />
+                        {errors[`${lvl}_honors`] && <span className="error">{errors[`${lvl}_honors`].message}</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
-            {/* IV. Civil Service Eligibility*/}
+            {/* IV. Civil Service Eligibility */}
             <EligibilitySection register={register} />
-
+            {/* V. Work Experience */}
             <WorkExperienceSection register={register} />
           </div>
 
           {/* ================= PAGE 3 (Voluntary Work, L&D, Other Info) ================= */}
           <div className="page">
+            {/* VI. Voluntary Work */}
             <h4>VI. VOLUNTARY WORK OR INVOLVEMENT IN CIVIC / NON-GOV'T ORG</h4>
             <table>
               <thead>
@@ -684,16 +883,43 @@ const PDSForm = () => {
               <tbody>
                 {Array.from({ length: 7 }).map((_, i) => (
                   <tr key={i}>
-                    <td><input {...register(`vol_${i}_org`)} /></td>
-                    <td><input type="date" {...register(`vol_${i}_from`)} /></td>
-                    <td><input type="date" {...register(`vol_${i}_to`)} /></td>
-                    <td><input {...register(`vol_${i}_hours`)} /></td>
-                    <td><input {...register(`vol_${i}_pos`)} /></td>
+                    <td>
+                      <input
+                        {...register(`vol_${i}_org`, { required: i === 0 ? "Required" : false })}
+                        placeholder={i === 0 ? "*" : ""}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="date"
+                        {...register(`vol_${i}_from`, { required: i === 0 ? "Required" : false })}
+                        placeholder={i === 0 ? "*" : ""}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="date"
+                        {...register(`vol_${i}_to`, { required: i === 0 ? "Required" : false })}
+                        placeholder={i === 0 ? "*" : ""}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        {...register(`vol_${i}_hours`, { required: i === 0 ? "Required" : false })}
+                        placeholder={i === 0 ? "*" : ""}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        {...register(`vol_${i}_pos`, { required: i === 0 ? "Required" : false })}
+                        placeholder={i === 0 ? "*" : ""}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-
+            {/* VII. Learning and Development */}
             <h4>VII. LEARNING AND DEVELOPMENT</h4>
             <table>
               <thead>
@@ -709,12 +935,44 @@ const PDSForm = () => {
               <tbody>
                 {Array.from({ length: 21 }).map((_, i) => (
                   <tr key={i}>
-                    <td><input {...register(`ld_${i}_title`)} /></td>
-                    <td><input type="date" {...register(`ld_${i}_from`)} /></td>
-                    <td><input type="date" {...register(`ld_${i}_to`)} /></td>
-                    <td><input {...register(`ld_${i}_hours`)} /></td>
-                    <td><input {...register(`ld_${i}_type`)} /></td>
-                    <td><input {...register(`ld_${i}_sponsor`)} /></td>
+                    <td>
+                      <input
+                        {...register(`ld_${i}_title`, { required: i === 0 ? "Required" : false })}
+                        placeholder={i === 0 ? "*" : ""}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="date"
+                        {...register(`ld_${i}_from`, { required: i === 0 ? "Required" : false })}
+                        placeholder={i === 0 ? "*" : ""}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="date"
+                        {...register(`ld_${i}_to`, { required: i === 0 ? "Required" : false })}
+                        placeholder={i === 0 ? "*" : ""}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        {...register(`ld_${i}_hours`, { required: i === 0 ? "Required" : false })}
+                        placeholder={i === 0 ? "*" : ""}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        {...register(`ld_${i}_type`, { required: i === 0 ? "Required" : false })}
+                        placeholder={i === 0 ? "*" : ""}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        {...register(`ld_${i}_sponsor`, { required: i === 0 ? "Required" : false })}
+                        placeholder={i === 0 ? "*" : ""}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -763,15 +1021,15 @@ const PDSForm = () => {
    {/* Q34a */}
 <tr>
   <td>
-    34a. Are you related by consanguinity or affinity within the third degree to the appointing/recommending authority, 
+    <span className="required-asterisk">*</span>34a. Are you related by consanguinity or affinity within the third degree to the appointing/recommending authority, 
     or to the chief of bureau/office, or the person who has immediate supervision over you in the office, bureau or department where you will be appointed? 
     <b>a. within the third degree?</b>
   </td>
   <td>
-    <input type="radio" {...register("q34a")} value="Yes" /> Yes
+    <input type="radio" {...register("q34a", { required: "Required" })} value="Yes" /> Yes
   </td>
   <td>
-    <input type="radio" {...register("q34a")} value="No" /> No
+    <input type="radio" {...register("q34a", { required: "Required" })} value="No" /> No
   </td>
   <td>
     <input {...register("q34a_details")} placeholder="If YES, give details" />
@@ -781,13 +1039,13 @@ const PDSForm = () => {
 {/* Q34b */}
 <tr>
   <td>
-    34b. <b>b. Within the fourth degree (for Local Government Unit - Career Employees)?</b>
+    <span className="required-asterisk">*</span>34b. <b>b. Within the fourth degree (for Local Government Unit - Career Employees)?</b>
   </td>
   <td>
-    <input type="radio" {...register("q34b")} value="Yes" /> Yes
+    <input type="radio" {...register("q34b", { required: "Required" })} value="Yes" /> Yes
   </td>
   <td>
-    <input type="radio" {...register("q34b")} value="No" /> No
+    <input type="radio" {...register("q34b", { required: "Required" })} value="No" /> No
   </td>
   <td>
     <input {...register("q34b_details")} placeholder="If YES, give details" />
@@ -796,17 +1054,17 @@ const PDSForm = () => {
 
     {/* Q35a */}
     <tr>
-      <td>35a. Have you ever been found guilty of any administrative offense?</td>
-      <td><input type="radio" {...register("q35a")} value="Yes" /></td>
-      <td><input type="radio" {...register("q35a")} value="No" /></td>
+      <td><span className="required-asterisk">*</span>35a. Have you ever been found guilty of any administrative offense?</td>
+      <td><input type="radio" {...register("q35a", { required: "Required" })} value="Yes" /></td>
+      <td><input type="radio" {...register("q35a", { required: "Required" })} value="No" /></td>
       <td><input {...register("q35a_details")} /></td>
     </tr>
 
     {/* Q35b */}
     <tr>
-      <td>35b. Have you been criminally charged before any court?</td>
-      <td><input type="radio" {...register("q35b")} value="Yes" /></td>
-      <td><input type="radio" {...register("q35b")} value="No" /></td>
+      <td><span className="required-asterisk">*</span>35b. Have you been criminally charged before any court?</td>
+      <td><input type="radio" {...register("q35b", { required: "Required" })} value="Yes" /></td>
+      <td><input type="radio" {...register("q35b", { required: "Required" })} value="No" /></td>
       <td>
         <input {...register("q35b_details")} placeholder="Details" />
         <input {...register("q35b_dateFiled")} placeholder="Date Filed" />
@@ -816,44 +1074,44 @@ const PDSForm = () => {
 
     {/* Q36 */}
     <tr>
-      <td>36. Have you ever been convicted of any crime or violation of any law, decree, ordinance, or regulation by any court or tribunal?</td>
-      <td><input type="radio" {...register("q36")} value="Yes" /></td>
-      <td><input type="radio" {...register("q36")} value="No" /></td>
+      <td><span className="required-asterisk">*</span>36. Have you ever been convicted of any crime or violation of any law, decree, ordinance, or regulation by any court or tribunal?</td>
+      <td><input type="radio" {...register("q36", { required: "Required" })} value="Yes" /></td>
+      <td><input type="radio" {...register("q36", { required: "Required" })} value="No" /></td>
       <td><input {...register("q36_details")} /></td>
     </tr>
 
     {/* Q37 */}
     <tr>
       <td>
-        37. Have you ever been separated from the service in any of the following modes: resignation, retirement, dropped from the rolls, 
+        <span className="required-asterisk">*</span>37. Have you ever been separated from the service in any of the following modes: resignation, retirement, dropped from the rolls, 
         dismissal, termination, end of term, finished contract, or phased out (abolition) in the public or private sector?
       </td>
-      <td><input type="radio" {...register("q37")} value="Yes" /></td>
-      <td><input type="radio" {...register("q37")} value="No" /></td>
+      <td><input type="radio" {...register("q37", { required: "Required" })} value="Yes" /></td>
+      <td><input type="radio" {...register("q37", { required: "Required" })} value="No" /></td>
       <td><input {...register("q37_details")} /></td>
     </tr>
 
     {/* Q38a */}
     <tr>
-      <td>38a. Have you ever been a candidate in a national or local election held within the last year (except Barangay election)?</td>
-      <td><input type="radio" {...register("q38a")} value="Yes" /></td>
-      <td><input type="radio" {...register("q38a")} value="No" /></td>
+      <td><span className="required-asterisk">*</span>38a. Have you ever been a candidate in a national or local election held within the last year (except Barangay election)?</td>
+      <td><input type="radio" {...register("q38a", { required: "Required" })} value="Yes" /></td>
+      <td><input type="radio" {...register("q38a", { required: "Required" })} value="No" /></td>
       <td><input {...register("q38a_details")} /></td>
     </tr>
 
     {/* Q38b */}
     <tr>
-      <td>38b. Have you resigned from the government service during the three (3)-month period before the last election to promote/actively campaign for a national or local candidate?</td>
-      <td><input type="radio" {...register("q38b")} value="Yes" /></td>
-      <td><input type="radio" {...register("q38b")} value="No" /></td>
+      <td><span className="required-asterisk">*</span>38b. Have you resigned from the government service during the three (3)-month period before the last election to promote/actively campaign for a national or local candidate?</td>
+      <td><input type="radio" {...register("q38b", { required: "Required" })} value="Yes" /></td>
+      <td><input type="radio" {...register("q38b", { required: "Required" })} value="No" /></td>
       <td><input {...register("q38b_details")} /></td>
     </tr>
 
     {/* Q39 */}
     <tr>
-      <td>39. Have you acquired the status of an immigrant or permanent resident of another country?</td>
-      <td><input type="radio" {...register("q39")} value="Yes" /></td>
-      <td><input type="radio" {...register("q39")} value="No" /></td>
+      <td><span className="required-asterisk">*</span>39. Have you acquired the status of an immigrant or permanent resident of another country?</td>
+      <td><input type="radio" {...register("q39", { required: "Required" })} value="Yes" /></td>
+      <td><input type="radio" {...register("q39", { required: "Required" })} value="No" /></td>
       <td><input {...register("q39_details")} placeholder="If YES, give country" /></td>
     </tr>
 
@@ -867,25 +1125,25 @@ const PDSForm = () => {
 
 {/* Q40a */}
 <tr>
-  <td>a. Are you a member of any indigenous group?</td>
-  <td><input type="radio" {...register("q40a")} value="Yes" /></td>
-  <td><input type="radio" {...register("q40a")} value="No" /></td>
+  <td><span className="required-asterisk">*</span>a. Are you a member of any indigenous group?</td>
+  <td><input type="radio" {...register("q40a", { required: "Required" })} value="Yes" /></td>
+  <td><input type="radio" {...register("q40a", { required: "Required" })} value="No" /></td>
   <td><input {...register("q40a_details")} placeholder="If YES, please specify" /></td>
 </tr>
 
 {/* Q40b */}
 <tr>
-  <td>b. Are you a person with disability?</td>
-  <td><input type="radio" {...register("q40b")} value="Yes" /></td>
-  <td><input type="radio" {...register("q40b")} value="No" /></td>
+  <td><span className="required-asterisk">*</span>b. Are you a person with disability?</td>
+  <td><input type="radio" {...register("q40b", { required: "Required" })} value="Yes" /></td>
+  <td><input type="radio" {...register("q40b", { required: "Required" })} value="No" /></td>
   <td><input {...register("q40b_details")} placeholder="If YES, specify ID No." /></td>
 </tr>
 
 {/* Q40c */}
 <tr>
-  <td>c. Are you a solo parent?</td>
-  <td><input type="radio" {...register("q40c")} value="Yes" /></td>
-  <td><input type="radio" {...register("q40c")} value="No" /></td>
+  <td><span className="required-asterisk">*</span>c. Are you a solo parent?</td>
+  <td><input type="radio" {...register("q40c", { required: "Required" })} value="Yes" /></td>
+  <td><input type="radio" {...register("q40c", { required: "Required" })} value="No" /></td>
   <td><input {...register("q40c_details")} placeholder="If YES, specify ID No." /></td>
 </tr>
   </tbody>
@@ -915,17 +1173,26 @@ const PDSForm = () => {
             <h4>XI. GOVERNMENT ISSUED ID (i.e., Passport, Driver’s License, etc.)</h4>
             <div className="pds-grid two-col">
               <div className="pds-field">
-                <label>Government Issued ID:</label>
-                <input {...register("govId")} />
+                <label>
+                  Government Issued ID: <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("govId", { required: "ID Type is required" })} />
+                {errors.govId && <span className="error">{errors.govId.message}</span>}
               </div>
               <div className="pds-field">
-                <label>ID/License/Passport No.:</label>
-                <input {...register("govIdNo")} />
+                <label>
+                  ID/License/Passport No.: <span className="required-asterisk">*</span>
+                </label>
+                <input {...register("govIdNo", { required: "ID Number is required" })} />
+                {errors.govIdNo && <span className="error">{errors.govIdNo.message}</span>}
               </div>
             </div>
             <div className="pds-field">
-              <label>Date/Place of Issuance:</label>
-              <input {...register("govIdIssuedAt")} />
+              <label>
+                Date/Place of Issuance: <span className="required-asterisk">*</span>
+              </label>
+              <input {...register("govIdIssuedAt", { required: "Date/Place of Issuance is required" })} />
+              {errors.govIdIssuedAt && <span className="error">{errors.govIdIssuedAt.message}</span>}
             </div>
           </div>
         </form>

@@ -62,22 +62,54 @@ const PersonalDocuments = () => {
     setNotification(""); // Clear previous notification
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (file) {
       // Validate file type based on active tab
       if (!allowedTypes[activeTab].includes(file.type)) {
         setNotification("❌ Invalid file type for this tab.");
         return;
       }
-      const newDocument = {
-        fileName: file.name,
-        type: activeTab === "EmployeeRecords" ? "EmployeeRecords" : "Supporting",
-        dateUploaded: new Date().toLocaleDateString(),
-        status: "Pending",
-      };
-      setUploadedDocuments([...uploadedDocuments, newDocument]);
-      setFile(null);
-      setNotification("✅ File uploaded successfully!");
+
+      const user = JSON.parse(localStorage.getItem("user"));
+      const employeeId = user?._id;
+      if (!employeeId) {
+        setNotification("❌ User Employee ID missing. Please log in again.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("employeeId", employeeId);
+      formData.append("type", activeTab === "EmployeeRecords" ? "EmployeeRecord" : "Supporting");
+      formData.append("status", "Pending");
+
+      try {
+        // Adjust the endpoint as needed for your backend
+        const response = await fetch("http://localhost:5000/api/documents", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          setNotification("❌ Failed to upload file to server.");
+          return;
+        }
+
+        const result = await response.json();
+
+        const newDocument = {
+          fileName: file.name,
+          type: activeTab === "EmployeeRecords" ? "EmployeeRecords" : "Supporting",
+          dateUploaded: new Date().toLocaleDateString(),
+          status: "Pending",
+        };
+        setUploadedDocuments([...uploadedDocuments, newDocument]);
+        setFile(null);
+        setNotification("✅ File uploaded successfully!");
+      } catch (error) {
+        setNotification("❌ Error uploading file.");
+        console.error(error);
+      }
     } else {
       setNotification("❌ Please select a file to upload.");
     }
@@ -285,7 +317,7 @@ const PersonalDocuments = () => {
                     .map((doc) => (
                       <tr key={doc.fileName}>
                         <td>{doc.fileName}</td>
-                        <td>{doc.type}</td>
+                        <td>{doc.fileName.split('.').pop().toUpperCase()}</td>
                         <td>{doc.dateUploaded}</td>
                         <td>{doc.status}</td>
                         <td>
