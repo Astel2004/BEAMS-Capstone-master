@@ -21,9 +21,21 @@ const LoginForm = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data); // Debug: See what role is returned
+        console.log("Login response:", data);
+
+        // ✅ Save important info in localStorage
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.role);
+        localStorage.setItem("beamsId", data.beamsId);   // BEAMS ID
+        localStorage.setItem("userId", data.user._id);   // MongoDB ObjectId for Employee reference
+        localStorage.setItem("email", data.user.email);
+
+        // ✅ Save full user object
+        localStorage.setItem("user", JSON.stringify(data.user));
+
         alert("Login successful!");
 
+        // Redirect based on role
         if (data.role === "HR") {
           navigate("/hr-dashboard");
         } else if (data.role === "Employee") {
@@ -36,7 +48,7 @@ const LoginForm = () => {
         alert("Login failed: " + (errorData.message || errorData.error));
       }
     } catch (error) {
-      console.error(error);
+      console.error("Login error:", error);
       alert("An error occurred. Please try again.");
     }
   };
@@ -54,6 +66,7 @@ const LoginForm = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
+                required
               />
             </div>
             <div className="form-group">
@@ -63,9 +76,12 @@ const LoginForm = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
+                required
               />
             </div>
-            <button type="submit" className="login-button">LOG IN</button>
+            <button type="submit" className="login-button">
+              LOG IN
+            </button>
           </form>
         </div>
       </div>

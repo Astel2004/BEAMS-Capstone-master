@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const UserAccounts = require('../models/UserAccounts');
 const jwt = require('jsonwebtoken');
 
-// This login route works for BOTH HR and Employee roles
+// ===================== LOGIN =====================
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   console.log("Login attempt:", email);
@@ -28,9 +28,6 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials.' });
     }
 
-    // At this point, user can be HR or Employee
-    // You can add more roles if needed
-
     // Generate JWT
     const token = jwt.sign(
       { id: user._id, role: user.role },
@@ -38,55 +35,82 @@ router.post('/login', async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
     );
 
-    // Respond with role so frontend can redirect accordingly
-    res.status(200).json({ message: 'Login successful!', token, role: user.role });
+    // ✅ Updated response to include beamsId and user details
+    res.status(200).json({
+      message: 'Login successful!',
+      token,
+      role: user.role,
+      beamsId: user.beamsId, // ✅ send beamsId directly
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+        beamsId: user.beamsId // ✅ duplicate for convenience
+      }
+    });
+
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'An error occurred. Please try again.' });
   }
 });
 
-// Add User route (for user management)
+// ===================== BEAMS ID HELPERS =====================
+function generateBeamsId() {
+  return Math.floor(1000 + Math.random() * 9000).toString();
+}
+
+async function getUniqueBeamsId() {
+  let beamsId;
+  let exists = true;
+  while (exists) {
+    beamsId = generateBeamsId();
+    exists = await UserAccounts.findOne({ beamsId });
+  }
+  return beamsId;
+}
+
+// ===================== ADD USER =====================
 router.post('/add-user', async (req, res) => {
   const { firstName, lastName, middleName, email, password, role, status } = req.body;
 
   try {
-    // Validate required fields
     if (!firstName || !lastName || !email || !password || !role) {
       return res.status(400).json({ error: 'All fields are required.' });
     }
 
-    // Build full name
     const name = `${firstName} ${middleName || ""} ${lastName}`.trim();
 
-    // Check if user already exists by email
     const existingUser = await UserAccounts.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ error: 'User already exists with this email.' });
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
+    // Generate unique BEAMS ID
+    const beamsId = await getUniqueBeamsId();
+
     const newUser = new UserAccounts({
       name,
       email,
       password: hashedPassword,
       role,
-      status: status || "Active" // default to Active if not provided
+      status: status || "Active",
+      beamsId // ✅ saved here
     });
 
     await newUser.save();
-    res.status(201).json({ message: 'User added successfully!' });
+    res.status(201).json({ message: 'User added successfully!', beamsId });
   } catch (error) {
     console.error('Add user error:', error);
     res.status(500).json({ error: 'An error occurred. Please try again.' });
   }
 });
 
-
-// Get all users (for user management)
+// ===================== GET ALL USERS =====================
 router.get('/list', async (req, res) => {
   try {
     const users = await UserAccounts.find({});
@@ -97,6 +121,7 @@ router.get('/list', async (req, res) => {
   }
 });
 
+// ===================== DELETE USER =====================
 router.delete('/:id', async (req, res) => {
   try {
     const deletedUser = await UserAccounts.findByIdAndDelete(req.params.id);
@@ -108,6 +133,5 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: 'An error occurred. Please try again.' });
   }
 });
-
 
 module.exports = router;

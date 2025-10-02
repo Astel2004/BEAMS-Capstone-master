@@ -1,0 +1,167 @@
+.saln-form-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow-y: auto;
+}
+
+.saln-form h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.saln-form h4 {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #444;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.3rem;
+}
+
+.saln-form h5 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #555;
+}
+
+/* Grid layout reused from PDS */
+.saln-grid {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.saln-grid.one-col {
+  grid-template-columns: 1fr;
+}
+
+.saln-grid.two-col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.saln-grid.three-col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.saln-grid.four-col {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.saln-field label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: #333;
+}
+
+.saln-field input,
+.saln-field select,
+.saln-form table input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+}
+
+.saln-field input:focus,
+.saln-form table input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 1px rgba(0,123,255,0.25);
+}
+
+/* Table styling */
+.saln-form table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.saln-form table th,
+.saln-form table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.saln-form table th {
+  background: #f9f9f9;
+  font-weight: 600;
+  color: #444;
+}
+
+.saln-form table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Buttons */
+.back-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.back-btn:hover {
+  color: #0056b3;
+}
+
+.save-btn {
+  display: block;
+  margin: 2rem auto 0;
+  padding: 0.75rem 2rem;
+  background: #007bff;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.save-btn:hover {
+  background: #0056b3;
+}
+
+.saln-form-wrapper {
+  max-width: 1200px;
+  height: 90vh;              /* limit height to viewport */
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+  overflow-y: auto;          /* enable vertical scroll */
+  overflow-x: hidden;        /* prevent horizontal scroll */
+}
+
+/* Optional: make scrollbar styled (modern look) */
+.saln-form-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.saln-form-wrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.saln-form-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}

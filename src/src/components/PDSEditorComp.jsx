@@ -119,9 +119,38 @@ const PDSForm = () => {
   const [previewData, setPreviewData] = useState(null);
 
   // ---- Save data in console (debug) ----
-  const onSubmit = (data) => {
-    setPreviewData(data);
-    setShowPreview(true);
+  const onSubmit = async (formData) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const employeeId = user?._id;
+
+      if (!employeeId) {
+        alert("User Employee ID missing. Please log in again.");
+        return;
+      }
+
+      const response = await fetch("http://localhost:5000/api/pds/form", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          employeeId,
+          formData,
+          status: "Pending"
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert("PDS form saved successfully!");
+        console.log("Saved PDS:", result.pds);
+      } else {
+        alert(result.error || "Failed to save PDS form.");
+      }
+    } catch (error) {
+      console.error("Error saving PDS:", error);
+      alert("An error occurred while saving PDS.");
+    }
   };
 
   // ---- Generate DOCX from template ----
@@ -267,6 +296,42 @@ const PDSForm = () => {
       alert("There was an error generating the PDS DOCX. Check console.");
     }
   };
+
+  // utils/uploadDocx.js
+  const uploadDocxToBackend = async (file) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const employeeId = user?._id;
+
+      if (!employeeId) {
+        alert("User Employee ID missing. Please log in again.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("employeeId", employeeId);
+      formData.append("status", "Pending");
+
+      const response = await fetch("http://localhost:5000/api/pds", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert("PDS with file uploaded successfully!");
+        console.log("Saved PDS:", result.pds);
+      } else {
+        alert(result.error || "Failed to upload PDS.");
+      }
+    } catch (error) {
+      console.error("Error uploading PDS:", error);
+      alert("An error occurred while uploading PDS.");
+    }
+  };
+
 
   // Download empty PDS template
   const downloadEmptyTemplate = async () => {

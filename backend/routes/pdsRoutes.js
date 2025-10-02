@@ -16,7 +16,16 @@ const upload = multer({ storage: storage });
 
 // Use upload.single('file') for file upload
 router.post('/', upload.single('file'), pdsController.createPDS);
+
+// For form-only (no file)
+router.post('/form', pdsController.createPDSForm);
+
 router.get('/', pdsController.getAllPDS);
-// Add more routes for update, delete, etc.
+
+// Update a PDS by ID
+router.put('/:id', pdsController.updatePDS);
+
+// Delete a PDS by ID
+router.delete('/:id', pdsController.deletePDS);
 
 module.exports = router;

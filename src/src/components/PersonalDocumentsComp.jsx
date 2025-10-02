@@ -204,7 +204,7 @@ const PersonalDocuments = () => {
               </button>
               <button
                 className="create-button"
-                onClick={() => alert("Create SALN coming soon...")}
+                onClick={() => navigate("/saln-form")} // Redirect to SALN form page
               >
                 Create SALN
               </button>

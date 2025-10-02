@@ -9,7 +9,8 @@ const userAccountsSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, required: true },
-  status: { type: String, default: "Active" }
+  status: { type: String, default: "Active" },
+  beamsId: { type: String, unique: true, required: true }
 });
 
 module.exports = mongoose.model('UserAccounts', userAccountsSchema);
