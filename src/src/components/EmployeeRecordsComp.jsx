@@ -17,6 +17,7 @@ const EmployeeRecordsComp = () => {
   const [personalEmployees, setPersonalEmployees] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [pendingRecords, setPendingRecords] = useState([]);
+  const [approvedEmployees, setApprovedEmployees] = useState([]);
   const navigate = useNavigate();
 
   const handleViewClick = async (employeeId) => {
@@ -92,6 +93,20 @@ const EmployeeRecordsComp = () => {
       fetchPendingRecords();
     }
   }, [activeTab]);
+
+  // Fetch approved employees
+  useEffect(() => {
+    const fetchApprovedEmployees = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/employees/approved");
+        const data = await response.json();
+        setApprovedEmployees(data);
+      } catch (error) {
+        console.error("Error fetching approved employees:", error);
+      }
+    };
+    fetchApprovedEmployees();
+  }, []);
 
   const handleCloseViewModal = () => setViewEmployee(null);
 
@@ -189,13 +204,13 @@ const EmployeeRecordsComp = () => {
             className={`employee-nav-btn${activeTab === "employees" ? " active" : ""}`}
             onClick={() => setActiveTab("employees")}
           >
-            Employees
+            Employee Records List
           </button>
           <button
-            className={`employee-nav-btn${activeTab === "personal" ? " active" : ""}`}
-            onClick={() => setActiveTab("personal")}
+            className={`employee-nav-btn${activeTab === "supporting" ? " active" : ""}`}
+            onClick={() => setActiveTab("supporting")}
           >
-            Personal Records
+            Supporting Documents
           </button>
           <button
             className={`employee-nav-btn${activeTab === "service" ? " active" : ""}`}
@@ -309,6 +324,26 @@ const EmployeeRecordsComp = () => {
                       </div>
                     </div>
                   </div>
+                  {viewEmployee.pdsData && (
+                    <div>
+                      <div className="view-employee-section-title">Extracted PDS Data</div>
+                      <div className="view-employee-info-list">
+                        {Object.entries(viewEmployee.pdsData).map(([key, value]) => (
+                          <p key={key}><b>{key}:</b> <u>{value ? value.toString() : "-"}</u></p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {viewEmployee.salnData && (
+                    <div>
+                      <div className="view-employee-section-title">Extracted SALN Data</div>
+                      <div className="view-employee-info-list">
+                        {Object.entries(viewEmployee.salnData).map(([key, value]) => (
+                          <p key={key}><b>{key}:</b> <u>{value ? value.toString() : "-"}</u></p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <button className="view-employee-close-btn" onClick={handleCloseViewModal}>Close</button>
                 </div>
               </div>
@@ -334,9 +369,9 @@ const EmployeeRecordsComp = () => {
           </>
         )}
 
-        {activeTab === "personal" && (
+        {activeTab === "supporting" && (
           <div>
-            <h3>Personal Records</h3>
+            <h3>Supporting Documents</h3>
             <div className="uploaded-documents">
               <table>
                 <thead>
@@ -403,7 +438,12 @@ const EmployeeRecordsComp = () => {
                       <tr key={rec._id}>
                         <td>{rec.employeeName || rec.employeeId || "-"}</td>
                         <td>{rec.fileName}</td>
-                        <td>{rec.type || rec.fileType}</td>
+                        <td>
+                          {/* Show file format type from fileName */}
+                          {rec.fileName && rec.fileName.includes('.') 
+                            ? rec.fileName.split('.').pop().toUpperCase() 
+                            : "-"}
+                        </td>
                         <td>{rec.dateUploaded ? new Date(rec.dateUploaded).toLocaleDateString() : "-"}</td>
                         <td>{rec.status}</td>
                         <td>
@@ -417,7 +457,38 @@ const EmployeeRecordsComp = () => {
                           ) : (
                             <span>-</span>
                           )}
-                          {/* You can add Approve/Reject buttons here if needed */}
+                          <button
+                            className="approve-btn"
+                            style={{ marginLeft: "4px", background: "#4caf50", color: "#fff", border: "none", padding: "4px 8px", borderRadius: "3px" }}
+                            onClick={async () => {
+                              try {
+                                const response = await fetch(`http://localhost:5000/api/documents/${rec._id}/approve`, { method: "POST" });
+                                if (!response.ok) throw new Error("Failed to approve record");
+                                setPendingRecords((prev) => prev.filter((r) => r._id !== rec._id));
+                                alert("Record approved!");
+                              } catch (error) {
+                                alert("Error approving record.");
+                              }
+                            }}
+                          >
+                            Approve
+                          </button>
+                          <button
+                            className="reject-btn"
+                            style={{ marginLeft: "4px", background: "#f44336", color: "#fff", border: "none", padding: "4px 8px", borderRadius: "3px" }}
+                            onClick={async () => {
+                              try {
+                                const response = await fetch(`http://localhost:5000/api/documents/${rec._id}/reject`, { method: "POST" });
+                                if (!response.ok) throw new Error("Failed to reject record");
+                                setPendingRecords((prev) => prev.filter((r) => r._id !== rec._id));
+                                alert("Record rejected!");
+                              } catch (error) {
+                                alert("Error rejecting record.");
+                              }
+                            }}
+                          >
+                            Reject
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -429,6 +500,81 @@ const EmployeeRecordsComp = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {activeTab === "approved" && (
+          <div>
+            <h3>Approved Employee Records</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Employee Id</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Position</th>
+                  <th>PDS Status</th>
+                  <th>SALN Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {approvedEmployees.length > 0 ? (
+                  approvedEmployees.map((employee) => (
+                    <tr key={employee._id}>
+                      <td>{employee.id}</td>
+                      <td>
+                        {employee.surname} {employee.firstname} {employee.middlename}
+                      </td>
+                      <td>{employee.email}</td>
+                      <td>{employee.position}</td>
+                      <td>{employee.pdsStatus}</td>
+                      <td>{employee.salnStatus}</td>
+                      <td>
+                        <button onClick={() => setViewEmployee(employee)}>
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7">No approved employees found.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+
+            {viewEmployee && (
+              <div className="modal-overlay">
+                <div className="view-employee-modal">
+                  <h3>Employee Details</h3>
+                  <p><b>ID:</b> {viewEmployee.id}</p>
+                  <p><b>Name:</b> {viewEmployee.surname} {viewEmployee.firstname} {viewEmployee.middlename}</p>
+                  <p><b>Email:</b> {viewEmployee.email}</p>
+                  <p><b>Position:</b> {viewEmployee.position}</p>
+                  <p><b>PDS Status:</b> {viewEmployee.pdsStatus}</p>
+                  <p><b>SALN Status:</b> {viewEmployee.salnStatus}</p>
+                  {viewEmployee.pdsData && Object.keys(viewEmployee.pdsData).length > 0 && (
+                    <div>
+                      <h4>PDS Data</h4>
+                      {Object.entries(viewEmployee.pdsData).map(([key, value]) => (
+                        <p key={key}><b>{key}:</b> {value ? value.toString() : "-"}</p>
+                      ))}
+                    </div>
+                  )}
+                  {viewEmployee.salnData && Object.keys(viewEmployee.salnData).length > 0 && (
+                    <div>
+                      <h4>SALN Data</h4>
+                      {Object.entries(viewEmployee.salnData).map(([key, value]) => (
+                        <p key={key}><b>{key}:</b> {value ? value.toString() : "-"}</p>
+                      ))}
+                    </div>
+                  )}
+                  <button onClick={() => setViewEmployee(null)}>Close</button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

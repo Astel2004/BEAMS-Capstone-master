@@ -228,18 +228,22 @@ const PersonalDocuments = () => {
               >
                 Upload
               </button>
-              <button
-                className="create-button"
-                onClick={() => navigate("/pds-form")} // Redirect to PDS form page
-              >
-                Create PDS
-              </button>
-              <button
-                className="create-button"
-                onClick={() => navigate("/saln-form")} // Redirect to SALN form page
-              >
-                Create SALN
-              </button>
+              {activeTab === "EmployeeRecords" && (
+                <>
+                  <button
+                    className="create-button"
+                    onClick={() => navigate("/pds-form")}
+                  >
+                    Create PDS
+                  </button>
+                  <button
+                    className="create-button"
+                    onClick={() => navigate("/saln-form")}
+                  >
+                    Create SALN
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
