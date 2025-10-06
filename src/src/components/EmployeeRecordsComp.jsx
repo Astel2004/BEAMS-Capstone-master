@@ -47,7 +47,6 @@ const EmployeeRecordsComp = () => {
           id: emp.id || emp._id?.slice(-4) || "-",
           position: emp.position || "-",
           step: emp.step || "-",
-          status: emp.status || "Active",
         }));
         const sorted = normalized
           .filter((employee) => employee.status === "Active")
@@ -235,12 +234,10 @@ const EmployeeRecordsComp = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>Employee Id</th>
                       <th>Full Name</th>
                       <th>Email Address</th>
                       <th>Position</th>
                       <th>Current Step</th>
-                      <th>Status</th>
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -248,14 +245,12 @@ const EmployeeRecordsComp = () => {
                     {activeEmployees.length > 0 ? (
                       activeEmployees.map((employee) => (
                         <tr key={employee._id || employee.id}>
-                          <td className="employee-data">{employee.id || "-"}</td>
                           <td className="lastName">
                             {employee.surname} {employee.firstname} {employee.middlename} {employee.extension ? employee.extension : ""}
                           </td>
                           <td className="employee-data">{employee.email || "-"}</td>
                           <td className="employee-data">{employee.position || "-"}</td>
                           <td className="employee-data">{calculateStep(employee.dateJoined)}</td>
-                          <td className="employee-data">{employee.status || "-"}</td>
                           <td className="employee-data">
                             <button
                               className="view-button"
@@ -275,7 +270,7 @@ const EmployeeRecordsComp = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="7">No active employees found.</td>
+                        <td colSpan="5">No active employees found.</td> {/* Update colspan to 5 */}
                       </tr>
                     )}
                   </tbody>
@@ -376,7 +371,6 @@ const EmployeeRecordsComp = () => {
               <table>
                 <thead>
                   <tr>
-                    <th>Employee ID</th>
                     <th>Full Name</th>
                     <th>Action</th>
                   </tr>
@@ -385,7 +379,6 @@ const EmployeeRecordsComp = () => {
                   {personalEmployees.length > 0 ? (
                     personalEmployees.map((emp) => (
                       <tr key={emp._id}>
-                        <td>{emp.id || emp._id}</td>
                         <td>
                           {emp.surname} {emp.firstname} {emp.middlename} {emp.extension ? emp.extension : ""}
                         </td>
@@ -401,7 +394,7 @@ const EmployeeRecordsComp = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="3">No employees found.</td>
+                      <td colSpan="2">No employees found.</td> {/* Update colspan to 2 */}
                     </tr>
                   )}
                 </tbody>
