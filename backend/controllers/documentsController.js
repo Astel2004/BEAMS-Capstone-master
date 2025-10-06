@@ -1,4 +1,5 @@
 const Documents = require('../models/Documents');
+const Employees = require('../models/Employees'); // Add this line if you want to update employee data
 
 exports.createDocuments = async (req, res) => {
   try {
@@ -33,4 +34,18 @@ exports.getAllDocuments = async (req, res) => {
   }
 };
 
-// Add more functions for update, delete, etc.
+// Approve Document Controller
+exports.approveDocument = async (req, res) => {
+  try {
+    const doc = await Documents.findById(req.params.id);
+    if (!doc) return res.status(404).json({ error: "Document not found" });
+
+    doc.status = "Approved";
+    await doc.save();
+
+    res.json({ success: true, message: "Document approved successfully." });
+  } catch (err) {
+    console.error("APPROVE DOCUMENT ERROR:", err);
+    res.status(500).json({ error: "Failed to approve document" });
+  }
+};

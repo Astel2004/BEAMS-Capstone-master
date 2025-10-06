@@ -17,6 +17,7 @@ const upload = multer({ storage: storage });
 // Use upload.single('file') for file upload
 router.post('/', upload.single('file'), documentsController.createDocuments);
 router.get('/', documentsController.getAllDocuments);
+router.post('/:id/approve', documentsController.approveDocument);
 // Add more routes for update, delete, etc.
 
 module.exports = router;

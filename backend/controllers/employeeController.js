@@ -146,6 +146,22 @@ const deleteEmployee = async (req, res) => {
   }
 };
 
+// Get approved employees
+const getApprovedEmployees = async (req, res) => {
+  try {
+    const approvedEmployees = await Employee.find({
+      $or: [
+        { pdsStatus: "Approved" },
+        { salnStatus: "Approved" }
+      ]
+    });
+    res.status(200).json(approvedEmployees);
+  } catch (error) {
+    console.error('Error fetching approved employees:', error);
+    res.status(500).json({ message: 'Error fetching approved employees', error });
+  }
+};
+
 module.exports = {
   createEmployee,
   getAllEmployees,
@@ -153,4 +169,5 @@ module.exports = {
   getEmployeeByCustomId,
   updateEmployee,
   deleteEmployee,
+  getApprovedEmployees,
 };

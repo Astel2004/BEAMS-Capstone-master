@@ -26,4 +26,20 @@ exports.getAllEmployeeRecords = async (req, res) => {
   }
 };
 
+exports.approveEmployeeRecord = async (req, res) => {
+  try {
+    const record = await EmployeeRecords.findById(req.params.id);
+    if (!record) return res.status(404).json({ error: "Record not found" });
+
+    record.status = "Approved";
+    await record.save();
+
+    // Optionally: update Employee model with extracted data here
+
+    res.json({ success: true, record });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to approve EmployeeRecords document.' });
+  }
+};
+
 // Add more functions for update, delete, etc.

@@ -6,12 +6,14 @@ const {
   getEmployeeByCustomId,
   updateEmployee,
   deleteEmployee,
+  getApprovedEmployees,
 } = require('../controllers/employeeController');
 
 const router = express.Router();
 
 router.post('/', createEmployee); // Create a new employee
 router.get('/', getAllEmployees); // Get all employees
+router.get('/approved', getApprovedEmployees); // Get approved employees
 router.get('/:id', getEmployeeById); // Get a single employee by custom ID
 router.get('/custom/:customId', getEmployeeByCustomId); // Get a single employee by custom ID
 router.put('/:id', updateEmployee); // Update an employee by custom ID
