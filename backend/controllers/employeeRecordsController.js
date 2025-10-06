@@ -2,13 +2,13 @@ const EmployeeRecords = require('../models/EmployeeRecords');
 
 exports.createEmployeeRecords = async (req, res) => {
   try {
-    // req.file contains file info, req.body contains other metadata
     const employeeRecords = new EmployeeRecords({
       employeeId: req.body.employeeId,
       fileName: req.file.originalname,
-      fileUrl: req.file.path, // Save file path
+      fileUrl: req.file.path,
       dateUploaded: new Date(),
-      status: req.body.status || 'Pending'
+      status: req.body.status || 'Pending',
+      formData: req.body.formData ? JSON.parse(req.body.formData) : undefined // Add this line if sending formData as JSON string
     });
     await employeeRecords.save();
     res.status(201).json(employeeRecords);
@@ -39,6 +39,20 @@ exports.approveEmployeeRecord = async (req, res) => {
     res.json({ success: true, record });
   } catch (error) {
     res.status(500).json({ error: 'Failed to approve EmployeeRecords document.' });
+  }
+};
+
+exports.rejectEmployeeRecord = async (req, res) => {
+  try {
+    const record = await EmployeeRecords.findById(req.params.id);
+    if (!record) return res.status(404).json({ error: "Record not found" });
+
+    record.status = "Rejected";
+    await record.save();
+
+    res.json({ success: true, record });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to reject EmployeeRecords document.' });
   }
 };
 

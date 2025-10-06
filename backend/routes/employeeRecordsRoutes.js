@@ -15,9 +15,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Use upload.single('file') for file upload
-router.post('/', upload.single('file'), employeeRecordsController.createEgetAllEmployeeRecords);
+router.post('/', upload.single('file'), employeeRecordsController.createEmployeeRecords);
 router.get('/', employeeRecordsController.getAllEmployeeRecords);
 router.post('/:id/approve', employeeRecordsController.approveEmployeeRecord);
+router.post('/:id/reject', employeeRecordsController.rejectEmployeeRecord);
 // Add more routes for update, delete, etc.
 
 module.exports = router;

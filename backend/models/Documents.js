@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const DocumentsSchema = new mongoose.Schema({
+const PendingDocumentsSchema = new mongoose.Schema({
   employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
   fileName: { type: String },
   fileUrl: { type: String },
@@ -9,4 +9,4 @@ const DocumentsSchema = new mongoose.Schema({
   dateUploaded: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Documents', DocumentsSchema);
+module.exports = mongoose.model('PendingDocuments', PendingDocumentsSchema);
