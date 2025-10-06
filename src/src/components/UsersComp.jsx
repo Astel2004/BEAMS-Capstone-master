@@ -162,7 +162,7 @@ const UsersComp = () => {
           <div className="icon">
             <img src={profileImage} alt="Image" />  
           </div>
-          <div className="profile-icon">HR ADMIN</div>
+          <div className="profile-icon">HR OFFICER</div>
         </div>
         <nav className="sidebar-nav">
           <ul>
@@ -195,7 +195,7 @@ const UsersComp = () => {
               <span className="user">
                 <img src={Image} alt="Image" />
               </span>
-              ADMIN
+              HR OFFICER
             </div>
           </div>
         </header>

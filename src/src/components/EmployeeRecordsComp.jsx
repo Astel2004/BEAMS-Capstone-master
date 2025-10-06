@@ -157,7 +157,7 @@ const EmployeeRecordsComp = () => {
           <div className="icon">
             <img src={profileImage} alt="Profile" />
           </div>
-          <div className="profile-icon">HR ADMIN</div>
+          <div className="profile-icon">HR OFFICER</div>
         </div>
         <nav className="sidebar-nav">
           <ul>
@@ -188,7 +188,7 @@ const EmployeeRecordsComp = () => {
             </span>
             <div className="profile">
               <img src={Image} alt="Image" />
-              <span>ADMIN</span>
+              <span>HR OFFICER</span>
             </div>
           </div>
         </header>
@@ -270,7 +270,7 @@ const EmployeeRecordsComp = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="5">No active employees found.</td> {/* Update colspan to 5 */}
+                        <td colSpan="5">No active employees found.</td>   
                       </tr>
                     )}
                   </tbody>
@@ -394,7 +394,7 @@ const EmployeeRecordsComp = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="2">No employees found.</td> {/* Update colspan to 2 */}
+                      <td colSpan="2">No employees found.</td> 
                     </tr>
                   )}
                 </tbody>

@@ -134,7 +134,7 @@ const StepIncrementComp = () => {
           <div className="icon">
             <img src={profileImage} alt="Profile" />
           </div>
-          <div className="profile-icon">HR ADMIN</div>
+          <div className="profile-icon">HR OFFICER</div>
         </div>
         <nav className="sidebar-nav">
           <ul>
@@ -165,7 +165,7 @@ const StepIncrementComp = () => {
             </span>
             <div className="profile">
               <img src={Image} alt="Profile" />
-              <span>ADMIN</span>
+              <span>HR OFFICER</span>
             </div>
           </div>
         </header>

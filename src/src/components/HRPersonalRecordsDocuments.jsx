@@ -59,7 +59,7 @@ const HRPersonalRecordsDocuments = () => {
               🔔
             </span>
             <div className="profile">
-              <span>ADMIN</span>
+              <span>HR OFFICER</span>
             </div>
           </div>
         </header>
