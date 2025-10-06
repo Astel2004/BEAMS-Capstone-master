@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"; 
+import React, { useState, useEffect, useRef } from "react"; // ✅ added useRef
 import "../styles/Dashboard.css";
 import "../styles/StepIncrement.css";
 import profileImage from "../assets/profile-user.png";

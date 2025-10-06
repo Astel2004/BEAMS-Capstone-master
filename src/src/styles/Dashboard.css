@@ -61,6 +61,8 @@
   display: flex;
   width: 70rem;
   flex-direction: column;
+  overflow: auto;
+  scrollbar-width: thin;
 }
 
 .my-profile-content{
