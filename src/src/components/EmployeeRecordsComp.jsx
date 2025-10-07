@@ -371,7 +371,6 @@ const EmployeeRecordsComp = () => {
                       <div>
                         <div className="view-employee-section-title">Personal Information</div>
                         <div className="view-employee-info-list">
-                          <p><b>CS ID No:</b> <u>{viewEmployee.csIdNo || "-"}</u></p>
                           <p><b>Surname:</b> <u>{viewEmployee.surname || "-"}</u></p>
                           <p><b>First Name:</b> <u>{viewEmployee.firstName || "-"}</u></p>
                           <p><b>Middle Name:</b> <u>{viewEmployee.middleName || "-"}</u></p>

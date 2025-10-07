@@ -19,6 +19,10 @@ router.post('/', upload.single('file'), documentsController.createDocuments);
 router.get('/', documentsController.getAllDocuments);
 router.post('/:id/approve', documentsController.approveDocument);
 router.post('/:id/reject', documentsController.rejectDocument);
+// DELETE a document by ID
+router.delete('/:id', documentsController.deleteDocument);
+// Extract PDS data from uploaded DOCX
+router.post('/extract', upload.single('file'), documentsController.extractPDSData);
 // Add more routes for update, delete, etc.
 
 module.exports = router;

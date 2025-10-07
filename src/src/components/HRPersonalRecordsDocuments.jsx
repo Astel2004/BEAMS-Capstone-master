@@ -63,11 +63,11 @@ const HRPersonalRecordsDocuments = () => {
 
   const handleDelete = async (docId) => {
     try {
-      await fetch(`http://localhost:5000/api/documents/${docId}`, {
+      const response = await fetch(`http://localhost:5000/api/documents/${docId}`, {
         method: "DELETE",
       });
+      if (!response.ok) throw new Error("Delete failed");
       setNotification({ visible: true, message: "Document deleted successfully." });
-      // Refresh documents after deletion
       setDocuments((prevDocs) => prevDocs.filter((doc) => doc._id !== docId));
     } catch (error) {
       setNotification({ visible: true, message: "Error deleting document." });
