@@ -55,12 +55,14 @@ const NotificationPopup = ({
                   className="notification-title-link"
                   style={{ color: "#1976d2", cursor: "pointer", textDecoration: "underline" }}
                   onClick={() => {
-                    if (note.fileUrl) {
-                      window.open(note.fileUrl, "_blank");
-                    }
+                    navigate("/employee-records"); // Go to Employee Records page
+                    onClose();
+                    // Wait for navigation, then set tab to "pending"
+                    setTimeout(() => {
+                      localStorage.setItem("employeeRecordsActiveTab", "pending");
+                    }, 100);
                     if (activeTab === "unread" && onMarkAsRead) {
                       onMarkAsRead(note._id);
-                      // Save to localStorage for cross-page sync
                       const prev = JSON.parse(localStorage.getItem("readNotifIds") || "[]");
                       localStorage.setItem("readNotifIds", JSON.stringify([...prev, note._id]));
                     }

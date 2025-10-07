@@ -67,7 +67,28 @@ const EmployeeRecordsComp = () => {
       try {
         const response = await fetch("http://localhost:5000/api/documents?status=Pending");
         const data = await response.json();
-        setPendingRecords(data);
+
+        // Attach employee name to each record
+        const recordsWithNames = await Promise.all(
+          data.map(async (rec) => {
+            if (rec.employeeName) return rec;
+            if (rec.employeeId) {
+              try {
+                const empRes = await fetch(`http://localhost:5000/api/employees/${rec.employeeId}`);
+                const empData = await empRes.json();
+                return {
+                  ...rec,
+                  employeeName: `${empData.surname} ${empData.firstname} ${empData.middlename || ""}`.trim(),
+                };
+              } catch {
+                return { ...rec, employeeName: rec.employeeId };
+              }
+            }
+            return rec;
+          })
+        );
+
+        setPendingRecords(recordsWithNames);
       } catch (error) {
         setPendingRecords([]);
         console.error("Error fetching pending records:", error);
@@ -151,6 +172,14 @@ const EmployeeRecordsComp = () => {
     const step = Math.floor(diffMonths / 3) + 1;
     return `Step ${step}`;
   }
+
+  useEffect(() => {
+    const tab = localStorage.getItem("employeeRecordsActiveTab");
+    if (tab) {
+      setActiveTab(tab);
+      localStorage.removeItem("employeeRecordsActiveTab");
+    }
+  }, []);
 
   return (
     <div className="dashboard-container">
