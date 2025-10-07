@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Dashboard.css";
-import "../styles/MyProfile.css"; // Add specific styles for My Profile
+import "../styles/MyProfile.css";
 import profileImage from "../assets/profile-user.png";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
+import { useNavigate } from "react-router-dom";
+import NotificationPopup from "./NotificationPopUp";
 
-const MyProfileComp = () => {
+const MyProfileComp = ({
+  unreadNotifications = [],
+  readNotifications = [],
+  handleMarkAsRead,
+  userType = "employee",
+}) => {
   const [profile, setProfile] = useState(null); // State to store the profile details
   const [isEditing, setIsEditing] = useState(false); // State to toggle edit mode
   const [formData, setFormData] = useState({}); // State to store form data
@@ -191,7 +196,10 @@ const MyProfileComp = () => {
       <NotificationPopup
         visible={showNotifications}
         onClose={() => setShowNotifications(false)}
-        userType="employee"
+        userType={userType}
+        unreadNotifications={unreadNotifications}
+        readNotifications={readNotifications}
+        onMarkAsRead={handleMarkAsRead}
       />
     </div>
   );

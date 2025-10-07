@@ -4,8 +4,13 @@ import "../styles/EmployeeIncrement.css";
 import profileImage from "../assets/profile-user.png";
 import { useNavigate } from "react-router-dom";
 import NotificationPopup from "./NotificationPopUp";
-  
-const EmployeeIncrementComp = () => {
+
+const EmployeeIncrementComp = ({
+  unreadNotifications = [],
+  readNotifications = [],
+  handleMarkAsRead,
+  userType = "employee",
+}) => {
   const [employee, setEmployee] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
@@ -176,7 +181,10 @@ const EmployeeIncrementComp = () => {
       <NotificationPopup
         visible={showNotifications}
         onClose={() => setShowNotifications(false)}
-        userType="employee"
+        userType={userType}
+        unreadNotifications={unreadNotifications}
+        readNotifications={readNotifications}
+        onMarkAsRead={handleMarkAsRead}
       />
     </div>
   );

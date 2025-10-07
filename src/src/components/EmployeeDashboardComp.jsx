@@ -1,17 +1,21 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import "../styles/Dashboard.css"; // Import the CSS file for styling
-import profileImage from "../assets/profile-user.png"; // Import the profile image
-import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
+import { useNavigate } from "react-router-dom";
+import "../styles/Dashboard.css";
+import profileImage from "../assets/profile-user.png";
+import NotificationPopup from "./NotificationPopUp";
 
-const EmployeeDashboardComp = () => {
+const EmployeeDashboardComp = ({
+  unreadNotifications = [],
+  readNotifications = [],
+  handleMarkAsRead,
+  userType = "employee",
+}) => {
   const [showNotifications, setShowNotifications] = useState(false);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Perform logout logic here (e.g., clearing tokens)
     alert("You have been logged out.");
-    navigate("/login"); // Redirect to the login page
+    navigate("/login");
   };
 
   return (
@@ -47,10 +51,13 @@ const EmployeeDashboardComp = () => {
             <span className="icon">📧</span>
             <span
               className="icon"
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", position: "relative" }}
               onClick={() => setShowNotifications(true)}
             >
               🔔
+              {unreadNotifications.length > 0 && (
+                <span className="notif-badge">{unreadNotifications.length}</span>
+              )}
             </span>
             <div className="profile">
               <img src={profileImage} alt="Profile" className="profile-image" />
@@ -96,7 +103,10 @@ const EmployeeDashboardComp = () => {
       <NotificationPopup
         visible={showNotifications}
         onClose={() => setShowNotifications(false)}
-        userType="employee"
+        userType={userType}
+        unreadNotifications={unreadNotifications}
+        readNotifications={readNotifications}
+        onMarkAsRead={handleMarkAsRead}
       />
     </div>
   );

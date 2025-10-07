@@ -1,5 +1,6 @@
 const Documents = require('../models/Documents');
 const EmployeeRecords = require('../models/EmployeeRecords');
+const Notification = require('../models/Notification'); // Create this model if not yet
 
 exports.createDocuments = async (req, res) => {
   try {
@@ -54,9 +55,46 @@ exports.approveDocument = async (req, res) => {
     // Optionally delete the document from Documents collection
     await Documents.findByIdAndDelete(doc._id);
 
+    // After approving a document
+    await Notification.create({
+      employeeId: doc.employeeId,
+      type: "document",
+      status: "approved",
+      fileName: doc.fileName,
+      date: new Date(),
+      message: "Your document has been approved."
+    });
+
     res.json({ success: true, message: "Document approved and moved to EmployeeRecords." });
   } catch (err) {
     console.error("APPROVE DOCUMENT ERROR:", err);
     res.status(500).json({ error: "Failed to approve and move document" });
+  }
+};
+
+// Reject Document Controller
+exports.rejectDocument = async (req, res) => {
+  try {
+    const doc = await Documents.findById(req.params.id);
+    if (!doc) return res.status(404).json({ error: "Document not found" });
+
+    doc.status = "Rejected";
+    doc.rejectionFeedback = req.body.feedback || "";
+    await doc.save();
+
+    // After rejecting a document
+    await Notification.create({
+      employeeId: doc.employeeId,
+      type: "document",
+      status: "rejected",
+      fileName: doc.fileName,
+      date: new Date(),
+      message: `Your document was rejected. Reason: ${doc.rejectionFeedback}`
+    });
+
+    res.json({ success: true, message: "Document rejected.", feedback: doc.rejectionFeedback });
+  } catch (err) {
+    console.error("REJECT DOCUMENT ERROR:", err);
+    res.status(500).json({ error: "Failed to reject document" });
   }
 };

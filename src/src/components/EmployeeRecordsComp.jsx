@@ -21,6 +21,9 @@ const EmployeeRecordsComp = () => {
     const saved = localStorage.getItem("readNotifIds");
     return saved ? JSON.parse(saved) : [];
   });
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectRecordId, setRejectRecordId] = useState(null);
+  const [rejectFeedback, setRejectFeedback] = useState("");
   const navigate = useNavigate();
 
   // Fetch employee records
@@ -180,6 +183,34 @@ const EmployeeRecordsComp = () => {
       localStorage.removeItem("employeeRecordsActiveTab");
     }
   }, []);
+
+  // Reject handler
+  const handleRejectClick = (recordId) => {
+    setRejectRecordId(recordId);
+    setRejectFeedback("");
+    setShowRejectModal(true);
+  };
+
+  const handleSendReject = async () => {
+    if (!rejectRecordId || !rejectFeedback.trim()) {
+      alert("Please provide feedback before rejecting.");
+      return;
+    }
+    try {
+      const response = await fetch(`http://localhost:5000/api/documents/${rejectRecordId}/reject`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feedback: rejectFeedback }),
+      });
+      if (!response.ok) throw new Error("Failed to reject record");
+      setPendingRecords((prev) => prev.filter((r) => r._id !== rejectRecordId));
+      setShowRejectModal(false);
+      setRejectRecordId(null);
+      setRejectFeedback("");
+    } catch (error) {
+      alert("Error rejecting record.");
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -460,15 +491,7 @@ const EmployeeRecordsComp = () => {
                           <button
                             className="reject-btn"
                             style={{ marginLeft: "4px", background: "#f44336", color: "#fff", border: "none", padding: "4px 8px", borderRadius: "3px" }}
-                            onClick={async () => {
-                              try {
-                                const response = await fetch(`http://localhost:5000/api/documents/${rec._id}/reject`, { method: "POST" });
-                                if (!response.ok) throw new Error("Failed to reject record");
-                                setPendingRecords((prev) => prev.filter((r) => r._id !== rec._id));
-                              } catch (error) {
-                                alert("Error rejecting record.");
-                              }
-                            }}
+                            onClick={() => handleRejectClick(rec._id)}
                           >
                             Reject
                           </button>
@@ -482,6 +505,43 @@ const EmployeeRecordsComp = () => {
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {/* Reject Modal */}
+        {showRejectModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h3>Reject Document</h3>
+              <p>Please provide feedback for the employee:</p>
+              <textarea
+                value={rejectFeedback}
+                onChange={e => setRejectFeedback(e.target.value)}
+                rows={4}
+                style={{ width: "100%", marginBottom: "12px" }}
+                placeholder="Why are you rejecting this document?"
+              />
+              <div className="modal-actions">
+                <button
+                  className="modal-btn"
+                  style={{ background: "#f44336", color: "#fff" }}
+                  onClick={handleSendReject}
+                >
+                  Reject
+                </button>
+                <button
+                  className="modal-btn"
+                  style={{ background: "#ccc", color: "#333" }}
+                  onClick={() => {
+                    setShowRejectModal(false);
+                    setRejectRecordId(null);
+                    setRejectFeedback("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         )}

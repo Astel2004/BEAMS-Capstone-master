@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/NotificationPopup.css";
 
@@ -8,16 +8,21 @@ const NotificationPopup = ({
   unreadNotifications = [],
   readNotifications = [],
   onMarkAsRead,
+  userType = "hr",
 }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("unread");
 
   // Persist read notifications in localStorage for cross-page sync
-  React.useEffect(() => {
+  useEffect(() => {
+    const key = userType === "employee" ? "employeeReadNotifIds" : "hrReadNotifIds";
     if (readNotifications.length > 0) {
-      localStorage.setItem("readNotifIds", JSON.stringify(readNotifications.map(n => n._id)));
+      localStorage.setItem(key, JSON.stringify(readNotifications.map(n => n._id)));
     }
-  }, [readNotifications]);
+  }, [readNotifications, userType]);
+
+  console.log("unreadNotifications:", unreadNotifications);
+  console.log("readNotifications:", readNotifications);
 
   if (!visible) return null;
   const notifications = activeTab === "unread" ? unreadNotifications : readNotifications;
@@ -55,26 +60,38 @@ const NotificationPopup = ({
                   className="notification-title-link"
                   style={{ color: "#1976d2", cursor: "pointer", textDecoration: "underline" }}
                   onClick={() => {
-                    navigate("/employee-records"); // Go to Employee Records page
+                    // HR: go to pending tab; Employee: go to personal documents
+                    if (userType === "hr") {
+                      navigate("/employee-records");
+                      setTimeout(() => {
+                        localStorage.setItem("employeeRecordsActiveTab", "pending");
+                      }, 100);
+                    } else {
+                      navigate("/personal-documents");
+                    }
                     onClose();
-                    // Wait for navigation, then set tab to "pending"
-                    setTimeout(() => {
-                      localStorage.setItem("employeeRecordsActiveTab", "pending");
-                    }, 100);
                     if (activeTab === "unread" && onMarkAsRead) {
                       onMarkAsRead(note._id);
-                      const prev = JSON.parse(localStorage.getItem("readNotifIds") || "[]");
-                      localStorage.setItem("readNotifIds", JSON.stringify([...prev, note._id]));
+                      const key = userType === "employee" ? "employeeReadNotifIds" : "hrReadNotifIds";
+                      const prev = JSON.parse(localStorage.getItem(key) || "[]");
+                      localStorage.setItem(key, JSON.stringify([...prev, note._id]));
                     }
                   }}
                 >
-                  New Document Submitted
+                  {note.status === "approved"
+                    ? "Document Approved"
+                    : note.status === "rejected"
+                    ? "Document Rejected"
+                    : "New Document Submitted"}
                 </b>
                 <p>
-                  {note.employeeName || note.employeeId || "Unknown Employee"} submitted <b>{note.fileName}</b>
+                  {note.fileName}<br />
+                  {note.message}
                 </p>
                 <span className="notification-date">
-                  {note.dateUploaded ? new Date(note.dateUploaded).toLocaleDateString() : ""}
+                  {note.dateUploaded || note.date
+                    ? new Date(note.dateUploaded || note.date).toLocaleDateString()
+                    : ""}
                 </span>
               </div>
             ))

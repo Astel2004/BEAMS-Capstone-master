@@ -5,7 +5,12 @@ import profileImage from "../assets/profile-user.png";
 import { useNavigate } from "react-router-dom"; 
 import NotificationPopup from "./NotificationPopUp";
 
-const PersonalDocuments = () => {
+const PersonalDocumentsComp = ({
+  unreadNotifications = [],
+  readNotifications = [],
+  handleMarkAsRead,
+  userType = "employee",
+}) => {
   const [uploadedDocuments, setUploadedDocuments] = useState([
     {
       fileName: "PDS_2025.pdf",
@@ -407,11 +412,14 @@ const PersonalDocuments = () => {
         <NotificationPopup
           visible={showNotifications}
           onClose={() => setShowNotifications(false)}
-          userType="employee"
+          userType={userType}
+          unreadNotifications={unreadNotifications}
+          readNotifications={readNotifications}
+          onMarkAsRead={handleMarkAsRead}
         />
       </main>
     </div>
   );
 };
 
-export default PersonalDocuments;
+export default PersonalDocumentsComp;

@@ -23,26 +23,27 @@ const LoginForm = () => {
         const data = await response.json();
         console.log("Login response:", data);
 
-        // ✅ Save important info in localStorage
+        // Save important info in localStorage
         localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.role);
-        localStorage.setItem("beamsId", data.beamsId);   // BEAMS ID
-        localStorage.setItem("userId", data.user._id);   // MongoDB ObjectId for Employee reference
+        localStorage.setItem("beamsId", data.beamsId);
         localStorage.setItem("email", data.user.email);
-
-        // ✅ Save full user object
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        alert("Login successful!");
-
-        // Redirect based on role
-        if (data.role === "HR") {
-          navigate("/hr-dashboard");
-        } else if (data.role === "Employee") {
+        // Set userType and employeeId for notification system
+        if (data.role === "Employee") {
+          localStorage.setItem("userType", "employee");
+          localStorage.setItem("employeeId", data.user._id); // MongoDB ObjectId
           navigate("/employee-dashboard");
+        } else if (data.role === "HR Officer" || data.role === "HR") {
+          localStorage.setItem("userType", "hr");
+          localStorage.setItem("hrId", data.user._id); // Optional for HR
+          navigate("/hr-dashboard");
         } else {
+          localStorage.setItem("userType", "guest");
           navigate("/");
         }
+
+        alert("Login successful!");
       } else {
         const errorData = await response.json();
         alert("Login failed: " + (errorData.message || errorData.error));
