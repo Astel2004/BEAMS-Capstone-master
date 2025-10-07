@@ -193,3 +193,68 @@
 .view-btn { background: #1976d2; color: #fff; }
 .delete-btn { background: #d32f2f; color: #fff; }
 .validate-btn { background: #43a047; color: #fff; }
+
+/* Personal Documents Table */
+.personal-documents-table {
+  margin: 1rem;
+  max-height: 350px;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Make the table header and section header sticky */
+.personal-documents-table h3 {
+  background: #f7faff;
+  padding: 8px 0;
+  margin: 0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-bottom: 1px solid #e3eafc;
+}
+
+.personal-documents-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.personal-documents-table th,
+.personal-documents-table td {
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.personal-documents-table th {
+  background-color: #1abc9c !important;
+  color: white;
+  font-weight: bold;
+  position: sticky;
+  top: 38px; /* Height of h3 header */
+  z-index: 1;
+  border-bottom: 2px solid #bcd4fa;
+  background-clip: padding-box;
+}
+
+.personal-documents-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.personal-documents-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.view-btn, .delete-btn, .validate-btn {
+  margin-right: 6px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.view-btn { background: #1976d2; color: #fff; }
+.delete-btn { background: #d32f2f; color: #fff; }
+.validate-btn { background: #43a047; color: #fff; }

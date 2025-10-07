@@ -1,8 +1,8 @@
-import React, { useState, useRef } from "react";
-import "../styles/Dashboard.css"; 
-import "../styles/PersonalDocuments.css"; 
-import profileImage from "../assets/profile-user.png"; 
-import { useNavigate } from "react-router-dom"; 
+import React, { useState, useEffect, useRef } from "react";
+import "../styles/Dashboard.css";
+import "../styles/PersonalDocuments.css";
+import profileImage from "../assets/profile-user.png";
+import { useNavigate } from "react-router-dom";
 import NotificationPopup from "./NotificationPopUp";
 
 const PersonalDocumentsComp = ({
@@ -11,26 +11,7 @@ const PersonalDocumentsComp = ({
   handleMarkAsRead,
   userType = "employee",
 }) => {
-  const [uploadedDocuments, setUploadedDocuments] = useState([
-    {
-      fileName: "PDS_2025.pdf",
-      type: "PDS",
-      dateUploaded: "April 27, 2025",
-      status: "Pending",
-    },
-    {
-      fileName: "SALN.pdf",
-      type: "SALN",
-      dateUploaded: "March 31, 2025",
-      status: "Verified",
-    },
-    {
-      fileName: "Resume.pdf",
-      type: "Supporting",
-      dateUploaded: "May 5, 2025",
-      status: "Pending",
-    },
-  ]);
+  const [uploadedDocuments, setUploadedDocuments] = useState([]);
   const [file, setFile] = useState(null);
   const [activeTab, setActiveTab] = useState("EmployeeRecords");
   const [showNotifications, setShowNotifications] = useState(false);
@@ -39,6 +20,25 @@ const PersonalDocumentsComp = ({
 
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+
+  // Fetch documents for the logged-in employee
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const employeeId = user?._id;
+    if (!employeeId) return;
+
+    const fetchDocuments = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/documents?employeeId=${employeeId}`);
+        const data = await response.json();
+        setUploadedDocuments(data);
+      } catch (error) {
+        setUploadedDocuments([]);
+      }
+    };
+
+    fetchDocuments();
+  }, []);
 
   // Allowed file types for each tab
   const allowedTypes = {
@@ -64,12 +64,11 @@ const PersonalDocumentsComp = ({
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
-    setNotification(""); // Clear previous notification
+    setNotification("");
   };
 
   const handleUpload = async () => {
     if (file) {
-      // Validate file type based on active tab
       if (!allowedTypes[activeTab].includes(file.type)) {
         setNotification("❌ Invalid file type for this tab.");
         return;
@@ -89,7 +88,6 @@ const PersonalDocumentsComp = ({
       formData.append("status", "Pending");
 
       try {
-        // Adjust the endpoint as needed for your backend
         const response = await fetch("http://localhost:5000/api/documents", {
           method: "POST",
           body: formData,
@@ -101,14 +99,18 @@ const PersonalDocumentsComp = ({
         }
 
         const result = await response.json();
-
-        const newDocument = {
-          fileName: file.name,
-          type: activeTab === "EmployeeRecords" ? "EmployeeRecords" : "Supporting",
-          dateUploaded: new Date().toLocaleDateString(),
-          status: "Pending",
+        // Refetch documents after upload
+        const fetchDocuments = async () => {
+          try {
+            const response = await fetch(`http://localhost:5000/api/documents?employeeId=${employeeId}`);
+            const data = await response.json();
+            setUploadedDocuments(data);
+          } catch (error) {
+            setUploadedDocuments([]);
+          }
         };
-        setUploadedDocuments([...uploadedDocuments, newDocument]);
+        fetchDocuments();
+
         setFile(null);
         setNotification("✅ File uploaded successfully!");
       } catch (error) {
@@ -139,13 +141,12 @@ const PersonalDocumentsComp = ({
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const droppedFile = e.dataTransfer.files[0];
-      // Validate file type based on active tab
       if (!allowedTypes[activeTab].includes(droppedFile.type)) {
         setNotification("❌ Invalid file type for this tab.");
         return;
       }
       setFile(droppedFile);
-      setNotification(""); // Clear previous notification
+      setNotification("");
     }
   };
 
@@ -154,13 +155,7 @@ const PersonalDocumentsComp = ({
     navigate("/login");
   };
 
-  const handleDelete = (fileName) => {
-    const updatedDocuments = uploadedDocuments.filter(
-      (doc) => doc.fileName !== fileName
-    );
-    setUploadedDocuments(updatedDocuments);
-    alert("File deleted successfully!");
-  };
+  // Optionally implement delete and validation actions with backend support
 
   return (
     <div className="dashboard-container">
@@ -303,7 +298,7 @@ const PersonalDocumentsComp = ({
 
         {/* Employee Records Table */}
         {activeTab === "EmployeeRecords" && (
-          <div className="uploaded-documents">
+          <div className="personal-documents-table">
             <h3>Employee Records (PDS & SALN)</h3>
             <table>
               <thead>
@@ -317,37 +312,30 @@ const PersonalDocumentsComp = ({
               </thead>
               <tbody>
                 {uploadedDocuments.filter(
-                  (doc) => doc.type === "PDS" || doc.type === "SALN" || doc.type === "EmployeeRecords"
+                  (doc) => doc.type === "PDS" || doc.type === "SALN" || doc.type === "EmployeeRecord"
                 ).length > 0 ? (
                   uploadedDocuments
                     .filter(
-                      (doc) => doc.type === "PDS" || doc.type === "SALN" || doc.type === "EmployeeRecords"
+                      (doc) => doc.type === "PDS" || doc.type === "SALN" || doc.type === "EmployeeRecord"
                     )
                     .map((doc) => (
-                      <tr key={doc.fileName}>
+                      <tr key={doc._id}>
                         <td>{doc.fileName}</td>
                         <td>{doc.fileName.split('.').pop().toUpperCase()}</td>
-                        <td>{doc.dateUploaded}</td>
+                        <td>{doc.dateUploaded ? new Date(doc.dateUploaded).toLocaleDateString() : "-"}</td>
                         <td>{doc.status}</td>
                         <td>
-                          <button
-                            className="view-btn"
-                            onClick={() => alert(`Viewing ${doc.fileName}`)}
-                          >
-                            View
-                          </button>
-                          <button
-                            className="delete-btn"
-                            onClick={() => handleDelete(doc.fileName)}
-                          >
-                            Request Delete
-                          </button>
-                          <button
-                            className="validate-btn"
-                            onClick={() => alert(`Submitted ${doc.fileName} for validation`)}
-                          >
-                            Submit for Validation
-                          </button>
+                          {doc.fileUrl ? (
+                            <button
+                              className="view-btn"
+                              onClick={() => window.open(doc.fileUrl, "_blank")}
+                            >
+                              View
+                            </button>
+                          ) : (
+                            <span>-</span>
+                          )}
+                          {/* Add delete/validate actions as needed */}
                         </td>
                       </tr>
                     ))
@@ -363,7 +351,7 @@ const PersonalDocumentsComp = ({
 
         {/* Supporting Documents Table */}
         {activeTab === "Supporting" && (
-          <div className="uploaded-documents">
+          <div className="personal-documents-table">
             <h3>Supporting Documents</h3>
             <table>
               <thead>
@@ -379,23 +367,22 @@ const PersonalDocumentsComp = ({
                   uploadedDocuments
                     .filter((doc) => doc.type === "Supporting")
                     .map((doc) => (
-                      <tr key={doc.fileName}>
+                      <tr key={doc._id}>
                         <td>{doc.fileName}</td>
-                        <td>{doc.dateUploaded}</td>
+                        <td>{doc.dateUploaded ? new Date(doc.dateUploaded).toLocaleDateString() : "-"}</td>
                         <td>{doc.status}</td>
                         <td>
-                          <button
-                            className="view-btn"
-                            onClick={() => alert(`Viewing ${doc.fileName}`)}
-                          >
-                            View
-                          </button>
-                          <button
-                            className="delete-btn"
-                            onClick={() => handleDelete(doc.fileName)}
-                          >
-                            Request Delete
-                          </button>
+                          {doc.fileUrl ? (
+                            <button
+                              className="view-btn"
+                              onClick={() => window.open(doc.fileUrl, "_blank")}
+                            >
+                              View
+                            </button>
+                          ) : (
+                            <span>-</span>
+                          )}
+                          {/* Add delete action as needed */}
                         </td>
                       </tr>
                     ))
