@@ -12,6 +12,7 @@ const HRPersonalRecordsDocuments = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [pendingRecords, setPendingRecords] = useState([]);
   const [readNotifIds, setReadNotifIds] = useState([]);
+  const [activeTab, setActiveTab] = useState("EmployeeRecords");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,6 +61,19 @@ const HRPersonalRecordsDocuments = () => {
     }
   };
 
+  const handleDelete = async (docId) => {
+    try {
+      await fetch(`http://localhost:5000/api/documents/${docId}`, {
+        method: "DELETE",
+      });
+      setNotification({ visible: true, message: "Document deleted successfully." });
+      // Refresh documents after deletion
+      setDocuments((prevDocs) => prevDocs.filter((doc) => doc._id !== docId));
+    } catch (error) {
+      setNotification({ visible: true, message: "Error deleting document." });
+    }
+  };
+
   const unreadNotifications = pendingRecords.filter(
     (rec) => !readNotifIds.includes(rec._id)
   );
@@ -70,6 +84,13 @@ const HRPersonalRecordsDocuments = () => {
   const handleMarkAsRead = (notifId) => {
     setReadNotifIds((prev) => [...prev, notifId]);
   };
+
+  const employeeRecords = documents.filter(
+    (doc) => doc.type === "PDS" || doc.type === "SALN" || doc.type === "EmployeeRecord"
+  );
+  const supportingDocuments = documents.filter(
+    (doc) => doc.type === "Supporting"
+  );
 
   return (
     <div className="dashboard-container" style={{ background: "#f5f7fa", minHeight: "100vh" }}>
@@ -106,46 +127,94 @@ const HRPersonalRecordsDocuments = () => {
           ← Back to Personal Records
         </button>
 
-        <div className="employee-table">
-          <div className="employee-table-scroll" style={{ maxHeight: "60vh", overflowY: "auto" }}>
-            <table>
-              <thead>
-                <tr>
-                  <th>File Name</th>
-                  <th>File Type</th>
-                  <th>Date Uploaded</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {documents.length > 0 ? (
-                  documents.map((doc) => (
-                    <tr key={doc._id}>
-                      <td>{doc.fileName}</td>
-                      <td>{doc.fileType || doc.type}</td>
-                      <td>{doc.dateUploaded ? new Date(doc.dateUploaded).toLocaleDateString() : "-"}</td>
-                      <td>{doc.status}</td>
-                      <td>
-                        <button className="view-btn" onClick={() => window.open(doc.fileUrl, "_blank")}>View</button>
-                        <button
-                          className="approve-btn"
-                          onClick={() => handleApprove(doc._id)}
-                        >
-                          Approve
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5">No personal records found for this employee.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+        <div className="file-type-buttons" style={{ marginBottom: "1rem" }}>
+          <button
+            className={`type-btn ${activeTab === "EmployeeRecords" ? "active" : ""}`}
+            onClick={() => setActiveTab("EmployeeRecords")}
+          >
+            Employee Records
+          </button>
+          <button
+            className={`type-btn ${activeTab === "Supporting" ? "active" : ""}`}
+            onClick={() => setActiveTab("Supporting")}
+          >
+            Supporting Documents
+          </button>
         </div>
+
+        {activeTab === "EmployeeRecords" && (
+          <div className="employee-table">
+            <div className="employee-table-scroll" style={{ maxHeight: "60vh", overflowY: "auto" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>File Name</th>
+                    <th>File Type</th>
+                    <th>Date Uploaded</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employeeRecords.length > 0 ? (
+                    employeeRecords.map((doc) => (
+                      <tr key={doc._id}>
+                        <td>{doc.fileName}</td>
+                        <td>{doc.fileType || doc.type}</td>
+                        <td>{doc.dateUploaded ? new Date(doc.dateUploaded).toLocaleDateString() : "-"}</td>
+                        <td>{doc.status}</td>
+                        <td>
+                          <button className="view-btn" onClick={() => window.open(doc.fileUrl, "_blank")}>View</button>
+                          <button className="delete-btn" onClick={() => handleDelete(doc._id)}>Delete</button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5">No employee records found for this employee.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "Supporting" && (
+          <div className="employee-table">
+            <div className="employee-table-scroll" style={{ maxHeight: "60vh", overflowY: "auto" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>File Name</th>
+                    <th>Date Uploaded</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {supportingDocuments.length > 0 ? (
+                    supportingDocuments.map((doc) => (
+                      <tr key={doc._id}>
+                        <td>{doc.fileName}</td>
+                        <td>{doc.dateUploaded ? new Date(doc.dateUploaded).toLocaleDateString() : "-"}</td>
+                        <td>{doc.status}</td>
+                        <td>
+                          <button className="view-btn" onClick={() => window.open(doc.fileUrl, "_blank")}>View</button>
+                          <button className="delete-btn" onClick={() => handleDelete(doc._id)}>Delete</button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="4">No supporting documents found for this employee.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {notification.visible && (
           <NotificationPopup message={notification.message} onClose={() => setNotification({ visible: false, message: "" })} />

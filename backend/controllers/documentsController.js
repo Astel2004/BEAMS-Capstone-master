@@ -1,23 +1,22 @@
 const Documents = require('../models/Documents');
 const EmployeeRecords = require('../models/EmployeeRecords');
-const Notification = require('../models/Notification'); // Create this model if not yet
+const Notification = require('../models/Notification');
+const Employee = require('../models/Employees'); // Use your actual employee model filename
 
 exports.createDocuments = async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
     const documents = new Documents({
       employeeId: req.body.employeeId,
       fileName: req.file ? req.file.originalname : undefined,
       fileUrl: req.file ? req.file.path : undefined,
       type: req.body.type,
       dateUploaded: new Date(),
-      status: req.body.status || 'Pending'
+      status: req.body.status || 'Pending',
+      formData: req.body.formData // <-- Add this line
     });
     await documents.save();
     res.status(201).json(documents);
   } catch (error) {
-    console.error("CREATE DOCUMENTS ERROR:", error);
     res.status(500).json({ error: error.message || 'Failed to upload document.' });
   }
 };
@@ -28,34 +27,42 @@ exports.getAllDocuments = async (req, res) => {
     if (req.query.status) {
       filter.status = req.query.status;
     }
-    const docs = await Documents.find(filter).populate('employeeId');
+    const docs = await Documents.find(filter)
+      .populate('employeeId', 'surname firstname middlename extension');
     res.json(docs);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch documents" });
   }
 };
 
-// Approve Document Controller
 exports.approveDocument = async (req, res) => {
   try {
     const doc = await Documents.findById(req.params.id);
     if (!doc) return res.status(404).json({ error: "Document not found" });
 
-    // Create a new EmployeeRecord with the approved document's data
+    // Only update employee if this is a PDS document and has formData
+    if (doc.type === "PDS" && doc.formData) {
+      const employee = await Employee.findById(doc.employeeId);
+      if (employee) {
+        console.log("Approving PDS for employee:", doc.employeeId, doc.formData);
+        Object.assign(employee, doc.formData); // Copy all PDS fields to employee
+        employee.pdsStatus = "Approved";
+        await employee.save();
+      }
+    }
+
     const employeeRecord = new EmployeeRecords({
       employeeId: doc.employeeId,
       fileName: doc.fileName,
       fileUrl: doc.fileUrl,
       dateUploaded: doc.dateUploaded,
       status: "Approved",
-      formData: doc.formData // if you have extracted data
+      formData: doc.formData
     });
     await employeeRecord.save();
 
-    // Optionally delete the document from Documents collection
     await Documents.findByIdAndDelete(doc._id);
 
-    // After approving a document
     await Notification.create({
       employeeId: doc.employeeId,
       type: "document",
@@ -65,14 +72,12 @@ exports.approveDocument = async (req, res) => {
       message: "Your document has been approved."
     });
 
-    res.json({ success: true, message: "Document approved and moved to EmployeeRecords." });
+    res.json({ success: true, message: "Document approved and employee updated." });
   } catch (err) {
-    console.error("APPROVE DOCUMENT ERROR:", err);
-    res.status(500).json({ error: "Failed to approve and move document" });
+    res.status(500).json({ error: "Failed to approve and update employee" });
   }
 };
 
-// Reject Document Controller
 exports.rejectDocument = async (req, res) => {
   try {
     const doc = await Documents.findById(req.params.id);
@@ -82,7 +87,6 @@ exports.rejectDocument = async (req, res) => {
     doc.rejectionFeedback = req.body.feedback || "";
     await doc.save();
 
-    // After rejecting a document
     await Notification.create({
       employeeId: doc.employeeId,
       type: "document",
@@ -94,7 +98,6 @@ exports.rejectDocument = async (req, res) => {
 
     res.json({ success: true, message: "Document rejected.", feedback: doc.rejectionFeedback });
   } catch (err) {
-    console.error("REJECT DOCUMENT ERROR:", err);
     res.status(500).json({ error: "Failed to reject document" });
   }
 };

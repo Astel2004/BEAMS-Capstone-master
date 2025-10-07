@@ -212,6 +212,21 @@ const EmployeeRecordsComp = () => {
     }
   };
 
+  const [employees, setEmployees] = useState([]);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/employees");
+        const data = await response.json();
+        setEmployees(data);
+      } catch (error) {
+        setEmployees([]);
+      }
+    };
+    fetchEmployees();
+  }, []);
+
   return (
     <div className="dashboard-container">
       {/* Sidebar */}
@@ -350,19 +365,76 @@ const EmployeeRecordsComp = () => {
               <div className="modal-overlay">
                 <div className="view-employee-modal">
                   <div className="view-employee-header">Employee Details</div>
-                  <div className="view-employee-details-grid">
-                    <div>
-                      <div className="view-employee-section-title">Personal Information</div>
-                      <div className="view-employee-info-list">
-                        <p><b>Surname:</b> <u>{viewEmployee.surname}</u> </p>
-                        <p><b>First Name:</b> <u>{viewEmployee.firstname}</u> </p>
-                        <p><b>Middle Name:</b> <u>{viewEmployee.middlename}</u> </p>
-                        <p><b>Extension:</b> <u>{viewEmployee.extension || "-"}</u> </p>
-                        <p><b>Email:</b> <u>{viewEmployee.email}</u> </p>
-                        <p><b>Position:</b> <u>{viewEmployee.position || "-"}</u> </p>
+                  {viewEmployee.pdsStatus === "Approved" ? (
+                    <div className="view-employee-details-grid">
+                      {/* PERSONAL INFORMATION */}
+                      <div>
+                        <div className="view-employee-section-title">Personal Information</div>
+                        <div className="view-employee-info-list">
+                          <p><b>CS ID No:</b> <u>{viewEmployee.csIdNo || "-"}</u></p>
+                          <p><b>Surname:</b> <u>{viewEmployee.surname || "-"}</u></p>
+                          <p><b>First Name:</b> <u>{viewEmployee.firstName || "-"}</u></p>
+                          <p><b>Middle Name:</b> <u>{viewEmployee.middleName || "-"}</u></p>
+                          <p><b>Name Extension:</b> <u>{viewEmployee.nameExt || "-"}</u></p>
+                          <p><b>Date of Birth:</b> <u>{viewEmployee.dateOfBirth || "-"}</u></p>
+                          <p><b>Place of Birth:</b> <u>{viewEmployee.placeOfBirth || "-"}</u></p>
+                          <p><b>Sex:</b> <u>{viewEmployee.sex || "-"}</u></p>
+                          <p><b>Civil Status:</b> <u>{viewEmployee.civilStatus || "-"}</u></p>
+                          <p><b>Height (m):</b> <u>{viewEmployee.height || "-"}</u></p>
+                          <p><b>Weight (kg):</b> <u>{viewEmployee.weight || "-"}</u></p>
+                          <p><b>Blood Type:</b> <u>{viewEmployee.bloodType || "-"}</u></p>
+                          <p><b>GSIS ID No.:</b> <u>{viewEmployee.gsis || "-"}</u></p>
+                          <p><b>PAG-IBIG ID No.:</b> <u>{viewEmployee.pagibig || "-"}</u></p>
+                          <p><b>PHILHEALTH No.:</b> <u>{viewEmployee.philhealth || "-"}</u></p>
+                          <p><b>SSS No.:</b> <u>{viewEmployee.sss || "-"}</u></p>
+                          <p><b>TIN No.:</b> <u>{viewEmployee.tin || "-"}</u></p>
+                          <p><b>Agency Employee No.:</b> <u>{viewEmployee.agencyEmployeeNo || "-"}</u></p>
+                          <p><b>Citizenship:</b> <u>{viewEmployee.citizenship || "-"}</u></p>
+                          <p><b>Dual Citizenship Type:</b> <u>{viewEmployee.dualType || "-"}</u></p>
+                          <p><b>Citizenship Country:</b> <u>{viewEmployee.citizenshipCountry || "-"}</u></p>
+                        </div>
+                      </div>
+
+                      {/* FAMILY BACKGROUND */}
+                      <div>
+                        <div className="view-employee-section-title">Family Background</div>
+                        <div className="view-employee-info-list">
+                          <p><b>Spouse:</b></p>
+                          <p>Surname: <u>{viewEmployee.spouse_surname || "-"}</u></p>
+                          <p>First Name: <u>{viewEmployee.spouse_first || "-"}</u></p>
+                          <p>Name Extension: <u>{viewEmployee.spouse_extension || "-"}</u></p>
+                          <p>Middle Name: <u>{viewEmployee.spouse_middle || "-"}</u></p>
+                          <p>Occupation: <u>{viewEmployee.spouse_occupation || "-"}</u></p>
+                          <p>Employer/Business Name: <u>{viewEmployee.spouse_employer || "-"}</u></p>
+                          <p>Business Address: <u>{viewEmployee.spouse_businessAddress || "-"}</u></p>
+                          <p>Telephone No.: <u>{viewEmployee.spouse_tel || "-"}</u></p>
+                          <p><b>Children:</b></p>
+                          {(viewEmployee.children && viewEmployee.children.length > 0) ? (
+                            viewEmployee.children.map((child, idx) => (
+                              <p key={idx}>
+                                {child.name || "-"} ({child.dob || "-"})
+                              </p>
+                            ))
+                          ) : (
+                            <p>-</p>
+                          )}
+                          <p><b>Father:</b></p>
+                          <p>Surname: <u>{viewEmployee.father_surname || "-"}</u></p>
+                          <p>First Name: <u>{viewEmployee.father_first || "-"}</u></p>
+                          <p>Middle Name: <u>{viewEmployee.father_middle || "-"}</u></p>
+                          <p>Name Extension: <u>{viewEmployee.father_ext || "-"}</u></p>
+                          <p><b>Mother:</b></p>
+                          <p>Surname: <u>{viewEmployee.mother_surname || "-"}</u></p>
+                          <p>First Name: <u>{viewEmployee.mother_first || "-"}</u></p>
+                          <p>Middle Name: <u>{viewEmployee.mother_middle || "-"}</u></p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div style={{ padding: "2rem", textAlign: "center" }}>
+                      <b>No approved PDS yet.</b>
+                    </div>
+                  )}
                   <button className="view-employee-close-btn" onClick={handleCloseViewModal}>Close</button>
                 </div>
               </div>
@@ -400,18 +472,18 @@ const EmployeeRecordsComp = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {personalEmployees.length > 0 ? (
-                    personalEmployees.map((emp) => (
-                      <tr key={emp._id}>
+                  {activeEmployees.length > 0 ? (
+                    activeEmployees.map((employee) => (
+                      <tr key={employee._id || employee.id}>
                         <td>
-                          {emp.surname} {emp.firstname} {emp.middlename} {emp.extension ? emp.extension : ""}
+                          {employee.surname} {employee.firstname} {employee.middlename} {employee.extension ? employee.extension : ""}
                         </td>
                         <td>
                           <button
-                            className="manage-records-btn"
-                            onClick={() => navigate(`/employee-records/${emp._id}/documents`)}
+                            className="view-btn"
+                            onClick={() => navigate(`/employee-records/${employee._id}/documents`)}
                           >
-                            Manage Records
+                            View Documents
                           </button>
                         </td>
                       </tr>
@@ -453,7 +525,7 @@ const EmployeeRecordsComp = () => {
                   {pendingRecords.length > 0 ? (
                     pendingRecords.map((rec) => (
                       <tr key={rec._id}>
-                        <td>{rec.employeeName || rec.employeeId || "-"}</td>
+                        <td>{rec.employeeId ? `${rec.employeeId.surname} ${rec.employeeId.firstname} ${rec.employeeId.middlename} ${rec.employeeId.extension || ""}` : "-"}</td>
                         <td>{rec.fileName}</td>
                         <td>
                           {rec.fileName && rec.fileName.includes('.') 

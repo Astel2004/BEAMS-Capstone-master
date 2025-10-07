@@ -474,3 +474,20 @@
   text-align: center;
   z-index: 10;
 }
+
+/* Make Pending Records table scrollable with sticky header */
+.uploaded-documents {
+  max-height: 350px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.uploaded-documents th {
+  position: sticky;
+  top: 0;
+  background: #1abc9c !important;
+  color: white;
+  z-index: 2;
+  border-bottom: 2px solid #bcd4fa;
+  background-clip: padding-box;
+}
