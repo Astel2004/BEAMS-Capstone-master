@@ -17,7 +17,6 @@ const EmployeeRecordsComp = () => {
   const [personalEmployees, setPersonalEmployees] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [pendingRecords, setPendingRecords] = useState([]);
-  const [approvedEmployees, setApprovedEmployees] = useState([]);
   const navigate = useNavigate();
 
   const handleViewClick = async (employeeId) => {
@@ -49,7 +48,6 @@ const EmployeeRecordsComp = () => {
           step: emp.step || "-",
         }));
         const sorted = normalized
-          .filter((employee) => employee.status === "Active")
           .sort((a, b) => a.surname.localeCompare(b.surname));
         setActiveEmployees(sorted);
       } catch (error) {
@@ -92,20 +90,6 @@ const EmployeeRecordsComp = () => {
       fetchPendingRecords();
     }
   }, [activeTab]);
-
-  // Fetch approved employees
-  useEffect(() => {
-    const fetchApprovedEmployees = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/employees/approved");
-        const data = await response.json();
-        setApprovedEmployees(data);
-      } catch (error) {
-        console.error("Error fetching approved employees:", error);
-      }
-    };
-    fetchApprovedEmployees();
-  }, []);
 
   const handleCloseViewModal = () => setViewEmployee(null);
 
@@ -203,13 +187,13 @@ const EmployeeRecordsComp = () => {
             className={`employee-nav-btn${activeTab === "employees" ? " active" : ""}`}
             onClick={() => setActiveTab("employees")}
           >
-            Employee Records List
+            Employee List
           </button>
           <button
-            className={`employee-nav-btn${activeTab === "supporting" ? " active" : ""}`}
-            onClick={() => setActiveTab("supporting")}
+            className={`employee-nav-btn${activeTab === "documents" ? " active" : ""}`}
+            onClick={() => setActiveTab("documents")}
           >
-            Supporting Documents
+            Employee Documents
           </button>
           <button
             className={`employee-nav-btn${activeTab === "service" ? " active" : ""}`}
@@ -229,6 +213,7 @@ const EmployeeRecordsComp = () => {
         {activeTab === "employees" && (
           <>
             {/* Employees Table */}
+            <h3>Employee List</h3>
             <div className="employee-table">
               <div className="employee-table-scroll">
                 <table>
@@ -270,7 +255,7 @@ const EmployeeRecordsComp = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="5">No active employees found.</td>   
+                        <td colSpan="5">No active employees found.</td>
                       </tr>
                     )}
                   </tbody>
@@ -291,54 +276,11 @@ const EmployeeRecordsComp = () => {
                         <p><b>First Name:</b> <u>{viewEmployee.firstname}</u> </p>
                         <p><b>Middle Name:</b> <u>{viewEmployee.middlename}</u> </p>
                         <p><b>Extension:</b> <u>{viewEmployee.extension || "-"}</u> </p>
-                        <p><b>Civil Status:</b> <u>{viewEmployee.civilStatus}</u> </p>
-                        <p><b>Citizenship:</b> <u>{viewEmployee.citizenship}</u> </p>
-                        <p><b>Mobile No.:</b> <u>{viewEmployee.mobileNo}</u> </p>
                         <p><b>Email:</b> <u>{viewEmployee.email}</u> </p>
-                        <p><b>Birthdate:</b> <u>{viewEmployee.birthdate ? new Date(viewEmployee.birthdate).toLocaleDateString() : "-"}</u> </p>
-                        <p><b>Date Joined:</b>
-                          <u>
-                            {viewEmployee.dateJoined
-                              ? (() => {
-                                  const d = new Date(viewEmployee.dateJoined);
-                                  return isNaN(d.getTime()) ? viewEmployee.dateJoined : d.toLocaleDateString();
-                            })()
-                          : "-"}
-                        </u>
-                        </p>
-                        <p><b>Gender:</b> <u>{viewEmployee.gender}</u> </p>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="view-employee-section-title">Address</div>
-                      <div className="view-employee-address-list">
-                        <p><b>Province:</b> <u>{viewEmployee.address?.province || "-"}</u></p>
-                        <p><b>City/Municipality:</b> <u>{viewEmployee.address?.city || "-"}</u></p>
-                        <p><b>Zip Code:</b> <u>{viewEmployee.address?.zipCode || "-"}</u></p>
-                        <p><b>Barangay:</b> <u>{viewEmployee.address?.barangay || "-"}</u></p>
+                        <p><b>Position:</b> <u>{viewEmployee.position || "-"}</u> </p>
                       </div>
                     </div>
                   </div>
-                  {viewEmployee.pdsData && (
-                    <div>
-                      <div className="view-employee-section-title">Extracted PDS Data</div>
-                      <div className="view-employee-info-list">
-                        {Object.entries(viewEmployee.pdsData).map(([key, value]) => (
-                          <p key={key}><b>{key}:</b> <u>{value ? value.toString() : "-"}</u></p>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {viewEmployee.salnData && (
-                    <div>
-                      <div className="view-employee-section-title">Extracted SALN Data</div>
-                      <div className="view-employee-info-list">
-                        {Object.entries(viewEmployee.salnData).map(([key, value]) => (
-                          <p key={key}><b>{key}:</b> <u>{value ? value.toString() : "-"}</u></p>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                   <button className="view-employee-close-btn" onClick={handleCloseViewModal}>Close</button>
                 </div>
               </div>
@@ -364,9 +306,9 @@ const EmployeeRecordsComp = () => {
           </>
         )}
 
-        {activeTab === "supporting" && (
+        {activeTab === "documents" && (
           <div>
-            <h3>Supporting Documents</h3>
+            <h3>Employee Documents</h3>
             <div className="uploaded-documents">
               <table>
                 <thead>
@@ -394,7 +336,7 @@ const EmployeeRecordsComp = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="2">No employees found.</td> 
+                      <td colSpan="2">No employees found.</td>
                     </tr>
                   )}
                 </tbody>
@@ -432,7 +374,6 @@ const EmployeeRecordsComp = () => {
                         <td>{rec.employeeName || rec.employeeId || "-"}</td>
                         <td>{rec.fileName}</td>
                         <td>
-                          {/* Show file format type from fileName */}
                           {rec.fileName && rec.fileName.includes('.') 
                             ? rec.fileName.split('.').pop().toUpperCase() 
                             : "-"}
@@ -493,81 +434,6 @@ const EmployeeRecordsComp = () => {
                 </tbody>
               </table>
             </div>
-          </div>
-        )}
-
-        {activeTab === "approved" && (
-          <div>
-            <h3>Approved Employee Records</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Employee Id</th>
-                  <th>Full Name</th>
-                  <th>Email</th>
-                  <th>Position</th>
-                  <th>PDS Status</th>
-                  <th>SALN Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {approvedEmployees.length > 0 ? (
-                  approvedEmployees.map((employee) => (
-                    <tr key={employee._id}>
-                      <td>{employee.id}</td>
-                      <td>
-                        {employee.surname} {employee.firstname} {employee.middlename}
-                      </td>
-                      <td>{employee.email}</td>
-                      <td>{employee.position}</td>
-                      <td>{employee.pdsStatus}</td>
-                      <td>{employee.salnStatus}</td>
-                      <td>
-                        <button onClick={() => setViewEmployee(employee)}>
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="7">No approved employees found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-
-            {viewEmployee && (
-              <div className="modal-overlay">
-                <div className="view-employee-modal">
-                  <h3>Employee Details</h3>
-                  <p><b>ID:</b> {viewEmployee.id}</p>
-                  <p><b>Name:</b> {viewEmployee.surname} {viewEmployee.firstname} {viewEmployee.middlename}</p>
-                  <p><b>Email:</b> {viewEmployee.email}</p>
-                  <p><b>Position:</b> {viewEmployee.position}</p>
-                  <p><b>PDS Status:</b> {viewEmployee.pdsStatus}</p>
-                  <p><b>SALN Status:</b> {viewEmployee.salnStatus}</p>
-                  {viewEmployee.pdsData && Object.keys(viewEmployee.pdsData).length > 0 && (
-                    <div>
-                      <h4>PDS Data</h4>
-                      {Object.entries(viewEmployee.pdsData).map(([key, value]) => (
-                        <p key={key}><b>{key}:</b> {value ? value.toString() : "-"}</p>
-                      ))}
-                    </div>
-                  )}
-                  {viewEmployee.salnData && Object.keys(viewEmployee.salnData).length > 0 && (
-                    <div>
-                      <h4>SALN Data</h4>
-                      {Object.entries(viewEmployee.salnData).map(([key, value]) => (
-                        <p key={key}><b>{key}:</b> {value ? value.toString() : "-"}</p>
-                      ))}
-                    </div>
-                  )}
-                  <button onClick={() => setViewEmployee(null)}>Close</button>
-                </div>
-              </div>
-            )}
           </div>
         )}
 

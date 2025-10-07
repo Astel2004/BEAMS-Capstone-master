@@ -16,8 +16,7 @@ const UsersComp = () => {
     middleName: '',
     email: '',
     password: '',
-    role: 'Employee',
-    status: 'Active'
+    role: 'Employee'
   });
 
   // Fetch users for user list
@@ -70,8 +69,7 @@ const UsersComp = () => {
     middleName: addUserForm.middleName?.trim() || "", // allow blank if needed
     email: finalEmail,
     password: addUserForm.password,
-    role: addUserForm.role,
-    status: addUserForm.status
+    role: addUserForm.role
   };
 
   console.log("🚀 Payload being sent:", payload); // 👈 check values here
@@ -94,8 +92,7 @@ const UsersComp = () => {
         middleName: '',
         email: '',
         password: '',
-        role: 'Employee',
-        status: 'Active'
+        role: 'Employee'
       });
       setActiveTab('list');
 
@@ -233,14 +230,13 @@ const UsersComp = () => {
                     <th>Middle Name</th>
                     <th>Email</th>
                     <th>Role</th>
-                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {Array.isArray(users) && users.length === 0 ? (
                     <tr>
-                      <td colSpan="7" style={{ textAlign: 'center', color: '#888' }}>No users found.</td>
+                      <td colSpan="6" style={{ textAlign: 'center', color: '#888' }}>No users found.</td>
                     </tr>
                   ) : Array.isArray(users) ? (
                     users.map((user, idx) => (
@@ -250,7 +246,6 @@ const UsersComp = () => {
                         <td>{user.middleName || ""}</td>
                         <td>{user.email}</td>
                         <td>{user.role}</td>
-                        <td>{user.status}</td>
                         <td>
                           <button>View</button>
                           <button className="user-delete-btn" onClick={() => handleDeleteClick(user._id)}>Delete</button>
@@ -259,7 +254,7 @@ const UsersComp = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="7" style={{ textAlign: 'center', color: 'red' }}>User list error</td>
+                      <td colSpan="6" style={{ textAlign: 'center', color: 'red' }}>User list error</td>
                     </tr>
                   )}
                 </tbody>
@@ -339,20 +334,7 @@ const UsersComp = () => {
                     onChange={e => setAddUserForm(f => ({ ...f, role: e.target.value }))}
                   >
                     <option value="Employee">Employee</option>
-                    <option value="HR">HR</option>
-                    <option value="Admin">Admin</option>
-                  </select>
-                </div>
-                <div className="add-user-form-row">
-                  <label htmlFor="status">Status:</label>
-                  <select
-                    id="status"
-                    name="status"
-                    value={addUserForm.status}
-                    onChange={e => setAddUserForm(f => ({ ...f, status: e.target.value }))}
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
+                    <option value="Department Head">Department Head</option>
                   </select>
                 </div>
                 <button type="submit" className="add-user-button">Create User</button>

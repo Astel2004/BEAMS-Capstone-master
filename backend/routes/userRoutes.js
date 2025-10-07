@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const UserAccounts = require('../models/UserAccounts');
+const Employees = require('../models/Employees'); // <-- ADD THIS LINE
 const jwt = require('jsonwebtoken');
 
 // ===================== LOGIN =====================
@@ -74,7 +75,12 @@ async function getUniqueBeamsId() {
 
 // ===================== ADD USER =====================
 router.post('/add-user', async (req, res) => {
-  const { firstName, lastName, middleName, email, password, role, status } = req.body;
+  const { firstName, lastName, middleName, email, password, role } = req.body;
+
+  const allowedRoles = ["Employee", "HR Staff", "Department Head"];
+  if (!allowedRoles.includes(role)) {
+    return res.status(400).json({ error: 'Invalid role selected.' });
+  }
 
   try {
     if (!firstName || !lastName || !email || !password || !role) {
@@ -98,11 +104,23 @@ router.post('/add-user', async (req, res) => {
       email,
       password: hashedPassword,
       role,
-      status: status || "Active",
-      beamsId // ✅ saved here
+      beamsId
     });
 
     await newUser.save();
+
+    // --- CREATE CORRESPONDING EMPLOYEE RECORD ---
+    const newEmployee = new Employees({
+      surname: lastName,
+      firstname: firstName,
+      middlename: middleName,
+      email: email,
+      position: role, // or set to "" if you want to leave blank
+      // Add other fields as needed
+    });
+    await newEmployee.save();
+    // --------------------------------------------
+
     res.status(201).json({ message: 'User added successfully!', beamsId });
   } catch (error) {
     console.error('Add user error:', error);
@@ -131,6 +149,16 @@ router.delete('/:id', async (req, res) => {
     res.json({ message: 'User deleted successfully!' });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred. Please try again.' });
+  }
+});
+
+// ===================== GET EMPLOYEES =====================
+router.get('/employees', async (req, res) => {
+  try {
+    const employees = await UserAccounts.find({ role: "Employee" });
+    res.json(employees);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch employees.' });
   }
 });
 
