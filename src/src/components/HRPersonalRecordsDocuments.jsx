@@ -3,7 +3,7 @@ import "../styles/Dashboard.css";
 import "../styles/EmployeeRecords.css";
 import "../styles/HRPersonalRecordsDocuments.css";
 import { useParams, useNavigate } from "react-router-dom";
-import NotificationPopup from "../context/NotificationPopUp";
+import NotificationPopup from "./NotificationPopUp";
 
 const HRPersonalRecordsDocuments = () => {
   const { employeeId } = useParams();

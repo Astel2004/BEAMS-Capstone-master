@@ -4,7 +4,7 @@ import "../styles/Dashboard.css";
 import "../styles/EmployeeProfile.css";
 import profileImage from "../assets/profile-user.png";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import NotificationPopup from "../context/NotificationPopUp"; // Import NotificationPopup component
+import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
 
 const EmployeeProfileRecordComp = () => {
   const { id } = useParams(); // Get the custom employee ID from the URL

@@ -42,6 +42,21 @@
   max-height: 320px;
   overflow-y: auto;
   background: #f7faff;
+  /* Add smooth scrolling for better UX */
+  scrollbar-width: thin;
+  scrollbar-color: #1976d2 #e3eafc;
+}
+
+/* Optional: style the scrollbar for Webkit browsers */
+.notification-popup-body::-webkit-scrollbar {
+  width: 8px;
+}
+.notification-popup-body::-webkit-scrollbar-thumb {
+  background: #1976d2;
+  border-radius: 4px;
+}
+.notification-popup-body::-webkit-scrollbar-track {
+  background: #e3eafc;
 }
 
 .notification-item {

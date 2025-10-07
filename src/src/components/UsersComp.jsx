@@ -4,7 +4,7 @@ import "../styles/Dashboard.css";
 import "../styles/Users.css";
 import profileImage from "../assets/profile-user.png";
 import Image from "../assets/user.png";
-import NotificationPopup from "../context/NotificationPopUp";
+import NotificationPopup from "./NotificationPopUp";
 
 const UsersComp = () => {
   const navigate = useNavigate();
@@ -20,7 +20,10 @@ const UsersComp = () => {
   });
   const [showNotifications, setShowNotifications] = useState(false);
   const [pendingRecords, setPendingRecords] = useState([]);
-  const [readNotifIds, setReadNotifIds] = useState([]);
+  const [readNotifIds, setReadNotifIds] = useState(() => {
+    const saved = localStorage.getItem("readNotifIds");
+    return saved ? JSON.parse(saved) : [];
+  });
 
   // Fetch users for user list
   useEffect(() => {
@@ -60,63 +63,57 @@ const UsersComp = () => {
 
   // Handle create user form submit
   const handleAddUserSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    const cleanedLastName = addUserForm.lastName.replace(/\s+/g, "").toLowerCase();
+    const finalEmail = `${cleanedLastName}@beams.com`;
 
-  // Always regenerate email
-  const cleanedLastName = addUserForm.lastName.replace(/\s+/g, "").toLowerCase();
-  const finalEmail = `${cleanedLastName}@beams.com`;
+    const payload = {
+      firstName: addUserForm.firstName?.trim(),
+      lastName: addUserForm.lastName?.trim(),
+      middleName: addUserForm.middleName?.trim() || "",
+      email: finalEmail,
+      password: addUserForm.password,
+      role: addUserForm.role
+    };
 
-  const payload = {
-    firstName: addUserForm.firstName?.trim(),
-    lastName: addUserForm.lastName?.trim(),
-    middleName: addUserForm.middleName?.trim() || "", // allow blank if needed
-    email: finalEmail,
-    password: addUserForm.password,
-    role: addUserForm.role
-  };
-
-  console.log("🚀 Payload being sent:", payload); // 👈 check values here
-
-  try {
-    const response = await fetch('http://localhost:5000/api/user/add-user', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-    console.log("✅ Server response:", data);
-
-    if (response.ok) {
-      alert('User created successfully!');
-      setAddUserForm({
-        firstName: '',
-        lastName: '',
-        middleName: '',
-        email: '',
-        password: '',
-        role: 'Employee'
+    try {
+      const response = await fetch('http://localhost:5000/api/user/add-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
-      setActiveTab('list');
 
-      // Refresh user list
-      const usersRes = await fetch("http://localhost:5000/api/user/list");
-      const usersData = await usersRes.json();
-      if (Array.isArray(usersData)) {
-        setUsers(usersData);
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('User created successfully!');
+        setAddUserForm({
+          firstName: '',
+          lastName: '',
+          middleName: '',
+          email: '',
+          password: '',
+          role: 'Employee'
+        });
+        setActiveTab('list');
+
+        // Refresh user list
+        const usersRes = await fetch("http://localhost:5000/api/user/list");
+        const usersData = await usersRes.json();
+        if (Array.isArray(usersData)) {
+          setUsers(usersData);
+        } else {
+          setUsers([]);
+          console.error('User list API did not return an array:', usersData);
+        }
       } else {
-        setUsers([]);
-        console.error('User list API did not return an array:', usersData);
+        alert(data.error || 'Failed to create user.');
       }
-    } else {
-      alert(data.error || 'Failed to create user.');
+    } catch (error) {
+      console.error("❌ Submission error:", error);
+      alert('An error occurred. Please try again.');
     }
-  } catch (error) {
-    console.error("❌ Submission error:", error);
-    alert('An error occurred. Please try again.');
-  }
-};
-
+  };
 
   // Handle delete user
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -152,6 +149,7 @@ const UsersComp = () => {
     navigate("/login");
   };
 
+  // Fetch pending records for notifications
   useEffect(() => {
     const fetchPendingRecords = async () => {
       try {
@@ -168,6 +166,7 @@ const UsersComp = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Calculate notifications locally
   const unreadNotifications = pendingRecords.filter(
     (rec) => !readNotifIds.includes(rec._id)
   );
@@ -175,8 +174,14 @@ const UsersComp = () => {
     (rec) => readNotifIds.includes(rec._id)
   );
 
+  // Mark notification as read and sync with localStorage
   const handleMarkAsRead = (notifId) => {
-    setReadNotifIds((prev) => [...prev, notifId]);
+    setReadNotifIds((prev) => {
+      if (prev.includes(notifId)) return prev;
+      const updated = [...prev, notifId];
+      localStorage.setItem("readNotifIds", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   return (

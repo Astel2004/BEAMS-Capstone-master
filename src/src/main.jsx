@@ -19,6 +19,7 @@ import PDSEditorComp from './components/PDSEditorComp.jsx'; // Import PDS Form C
 import SALNEditorComp from './components/SALNEditorComp.jsx'; // Import SALN Form Component
 import EmployeeIncrementComp from "./components/EmployeeIncrementComp.jsx"; // Import Employee Increment Tracker
 import EmployeeFillUpComp from "./components/EmployeeFillUpComp.jsx"; // Import Employee Fill-Up Form
+import NotificationManager from "./components/NotificationManager";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -35,7 +36,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         {/* Route for the Employee Dashboard */}
         <Route path="/employee-dashboard" element={<EmployeeDashboardComp />} />
         {/* Route for Employee Records */}
-        <Route path="/employee-records" element={<EmployeeRecords />} />
+        <Route
+          path="/employee-records"
+          element={
+            <NotificationManager>
+              {(notifProps) => <EmployeeRecords {...notifProps} />}
+            </NotificationManager>
+          }
+        />
         {/* Route for HR Personal Records Documents */}
         <Route path="/employee-records/:employeeId/documents" element={<HRPersonalRecordsDocuments />} />
         {/* Route for Employee Profile Record */}
@@ -45,7 +53,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         {/* Route for Reports and Analytics */}
         <Route path="/reports" element={<Reports />} />
         {/* Route for Settings and User Management */}
-        <Route path="/users" element={<UsersComp />} />
+        <Route
+          path="/users"
+          element={
+            <NotificationManager>
+              {(notifProps) => <UsersComp {...notifProps} />}
+            </NotificationManager>
+          }
+        />
         {/* Route for My Profile */}
         <Route path="/my-profile" element={<MyProfileComp />} />
         {/* Route for My Documents */}

@@ -4,7 +4,7 @@ import "../styles/StepIncrement.css";
 import profileImage from "../assets/profile-user.png";
 import Image from "../assets/user.png";
 import { useNavigate } from "react-router-dom";
-import NotificationPopup from "../context/NotificationPopUp";
+import NotificationPopup from "./NotificationPopUp";
 
 const StepIncrementComp = () => {
   const [eligibleEmployees, setEligibleEmployees] = useState([]);

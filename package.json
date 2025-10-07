@@ -16,7 +16,7 @@
     "@react-pdf-viewer/default-layout": "^3.12.0",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
-    "docx-preview": "^0.3.6",
+    "docx-preview": "^0.3.7",
     "docx4js": "^3.3.0",
     "docxtemplater": "^3.66.3",
     "dotenv": "^16.5.0",

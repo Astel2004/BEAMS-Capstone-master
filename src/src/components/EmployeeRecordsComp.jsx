@@ -4,7 +4,7 @@ import "../styles/EmployeeRecords.css";
 import profileImage from "../assets/profile-user.png";
 import Image from "../assets/user.png";
 import { useNavigate } from "react-router-dom";
-import NotificationPopup from "../context/NotificationPopUp";
+import NotificationPopup from "./NotificationPopUp";
 
 const EmployeeRecordsComp = () => {
   const [activeEmployees, setActiveEmployees] = useState([]);
@@ -17,7 +17,10 @@ const EmployeeRecordsComp = () => {
   const [personalEmployees, setPersonalEmployees] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [pendingRecords, setPendingRecords] = useState([]);
-  const [readNotifIds, setReadNotifIds] = useState([]);
+  const [readNotifIds, setReadNotifIds] = useState(() => {
+    const saved = localStorage.getItem("readNotifIds");
+    return saved ? JSON.parse(saved) : [];
+  });
   const navigate = useNavigate();
 
   // Fetch employee records
@@ -84,7 +87,11 @@ const EmployeeRecordsComp = () => {
   );
 
   const handleMarkAsRead = (notifId) => {
-    setReadNotifIds((prev) => [...prev, notifId]);
+    setReadNotifIds((prev) => {
+      const updated = [...prev, notifId];
+      localStorage.setItem("readNotifIds", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const handleViewClick = async (employeeId) => {

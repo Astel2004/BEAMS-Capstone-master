@@ -12,6 +12,13 @@ const NotificationPopup = ({
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("unread");
 
+  // Persist read notifications in localStorage for cross-page sync
+  React.useEffect(() => {
+    if (readNotifications.length > 0) {
+      localStorage.setItem("readNotifIds", JSON.stringify(readNotifications.map(n => n._id)));
+    }
+  }, [readNotifications]);
+
   if (!visible) return null;
   const notifications = activeTab === "unread" ? unreadNotifications : readNotifications;
 
@@ -53,6 +60,9 @@ const NotificationPopup = ({
                     }
                     if (activeTab === "unread" && onMarkAsRead) {
                       onMarkAsRead(note._id);
+                      // Save to localStorage for cross-page sync
+                      const prev = JSON.parse(localStorage.getItem("readNotifIds") || "[]");
+                      localStorage.setItem("readNotifIds", JSON.stringify([...prev, note._id]));
                     }
                   }}
                 >

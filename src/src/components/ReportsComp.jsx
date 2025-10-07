@@ -4,7 +4,7 @@ import "../styles/Reports.css"; // Add specific styles for reports
 import profileImage from "../assets/profile-user.png"; // Import the profile image
 import Image from "../assets/user.png"; // Import the admin image
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import NotificationPopup from "../context/NotificationPopUp"; // Import NotificationPopup component
+import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
 
 const ReportsComp = () => {
   const [employees, setEmployees] = useState([]); // State to store employee data
@@ -13,7 +13,10 @@ const ReportsComp = () => {
   const [sortBy, setSortBy] = useState('lastname');
   const [showNotifications, setShowNotifications] = useState(false);
   const [pendingRecords, setPendingRecords] = useState([]);
-  const [readNotifIds, setReadNotifIds] = useState([]);
+  const [readNotifIds, setReadNotifIds] = useState(() => {
+    const saved = localStorage.getItem("readNotifIds");
+    return saved ? JSON.parse(saved) : [];
+  });
   const navigate = useNavigate(); // Initialize useNavigate
 
   // Sorting handler

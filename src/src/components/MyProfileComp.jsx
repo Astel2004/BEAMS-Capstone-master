@@ -3,7 +3,7 @@ import "../styles/Dashboard.css";
 import "../styles/MyProfile.css"; // Add specific styles for My Profile
 import profileImage from "../assets/profile-user.png";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import NotificationPopup from "../context/NotificationPopUp"; // Import NotificationPopup component
+import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
 
 const MyProfileComp = () => {
   const [profile, setProfile] = useState(null); // State to store the profile details
