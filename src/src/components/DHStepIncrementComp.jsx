@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"; 
+import React, { useState, useEffect, useRef } from "react"; // ✅ added useRef
 import "../styles/Dashboard.css";
 import "../styles/StepIncrement.css";
 import profileImage from "../assets/profile-user.png";
@@ -163,7 +163,7 @@ const StepIncrementComp = () => {
           <div className="icon">
             <img src={profileImage} alt="Profile" />
           </div>
-          <div className="profile-icon">HR OFFICER</div>
+          <div className="profile-icon">HR ADMIN</div>
         </div>
         <nav className="sidebar-nav">
           <ul>
@@ -198,7 +198,7 @@ const StepIncrementComp = () => {
             </span>
             <div className="profile">
               <img src={Image} alt="Profile" />
-              <span>HR OFFICER</span>
+              <span>ADMIN</span>
             </div>
           </div>
         </header>
