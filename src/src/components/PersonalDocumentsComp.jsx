@@ -3,7 +3,7 @@ import "../styles/Dashboard.css";
 import "../styles/PersonalDocuments.css"; 
 import profileImage from "../assets/profile-user.png"; 
 import { useNavigate } from "react-router-dom"; 
-import NotificationPopup from "./NotificationPopUp";
+import NotificationPopup from "../context/NotificationPopUp";
 
 const PersonalDocuments = () => {
   const [uploadedDocuments, setUploadedDocuments] = useState([

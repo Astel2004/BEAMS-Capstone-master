@@ -4,7 +4,7 @@ import "../styles/Reports.css"; // Add specific styles for reports
 import profileImage from "../assets/profile-user.png"; // Import the profile image
 import Image from "../assets/user.png"; // Import the admin image
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
+import NotificationPopup from "../context/NotificationPopUp"; // Import NotificationPopup component
 
 const ReportsComp = () => {
   const [employees, setEmployees] = useState([]); // State to store employee data
@@ -12,6 +12,8 @@ const ReportsComp = () => {
   const [selectedReport, setSelectedReport] = useState(""); // State for selected report type
   const [sortBy, setSortBy] = useState('lastname');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [pendingRecords, setPendingRecords] = useState([]);
+  const [readNotifIds, setReadNotifIds] = useState([]);
   const navigate = useNavigate(); // Initialize useNavigate
 
   // Sorting handler
@@ -32,9 +34,6 @@ const ReportsComp = () => {
     setDisplayedEmployees(sorted);
   }, [sortBy, employees]);
 
-
-  // Sorting state and handler
-
   // Fetch employee data from the backend
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -49,6 +48,34 @@ const ReportsComp = () => {
 
     fetchEmployees();
   }, []);
+
+  // Notification fetching and handling
+  useEffect(() => {
+    const fetchPendingRecords = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/documents?status=Pending");
+        const data = await response.json();
+        setPendingRecords(data);
+      } catch (error) {
+        setPendingRecords([]);
+        console.error("Error fetching pending records:", error);
+      }
+    };
+    fetchPendingRecords();
+    const interval = setInterval(fetchPendingRecords, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const unreadNotifications = pendingRecords.filter(
+    (rec) => !readNotifIds.includes(rec._id)
+  );
+  const readNotifications = pendingRecords.filter(
+    (rec) => readNotifIds.includes(rec._id)
+  );
+
+  const handleMarkAsRead = (notifId) => {
+    setReadNotifIds((prev) => [...prev, notifId]);
+  };
 
   const handleLogout = () => {
     // Perform logout logic here (e.g., clearing tokens)
@@ -92,10 +119,13 @@ const ReportsComp = () => {
             <span className="icon">📧</span>
             <span
               className="icon"
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", position: "relative" }}
               onClick={() => setShowNotifications(true)}
             >
               🔔
+              {unreadNotifications.length > 0 && (
+                <span className="notif-badge">{unreadNotifications.length}</span>
+              )}
             </span>
             <div className="profile">
               <img src={Image} alt="Profile" />
@@ -175,6 +205,9 @@ const ReportsComp = () => {
   visible={showNotifications}
   onClose={() => setShowNotifications(false)}
   userType="hr"
+  unreadNotifications={unreadNotifications}
+  readNotifications={readNotifications}
+  onMarkAsRead={handleMarkAsRead}
 />
     </div>
   );

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/Dashboard.css";
 import profileImage from "../assets/profile-user.png";
 import Image from "../assets/user.png";
-import NotificationPopup from "./NotificationPopUp";
+import NotificationPopup from "../context/NotificationPopUp";
 
 const HRDashboardComp = () => {
   const navigate = useNavigate();

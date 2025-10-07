@@ -3,13 +3,15 @@ import "../styles/Dashboard.css";
 import "../styles/EmployeeRecords.css";
 import "../styles/HRPersonalRecordsDocuments.css";
 import { useParams, useNavigate } from "react-router-dom";
-import NotificationPopup from "./NotificationPopUp";
+import NotificationPopup from "../context/NotificationPopUp";
 
 const HRPersonalRecordsDocuments = () => {
   const { employeeId } = useParams();
   const [documents, setDocuments] = useState([]);
   const [notification, setNotification] = useState({ visible: false, message: "" });
   const [showNotifications, setShowNotifications] = useState(false);
+  const [pendingRecords, setPendingRecords] = useState([]);
+  const [readNotifIds, setReadNotifIds] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +26,22 @@ const HRPersonalRecordsDocuments = () => {
     };
     fetchDocs();
   }, [employeeId]);
+
+  useEffect(() => {
+    const fetchPendingRecords = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/documents?status=Pending");
+        const data = await response.json();
+        setPendingRecords(data);
+      } catch (error) {
+        setPendingRecords([]);
+        console.error("Error fetching pending records:", error);
+      }
+    };
+    fetchPendingRecords();
+    const interval = setInterval(fetchPendingRecords, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleApprove = async (docId) => {
     try {
@@ -42,6 +60,17 @@ const HRPersonalRecordsDocuments = () => {
     }
   };
 
+  const unreadNotifications = pendingRecords.filter(
+    (rec) => !readNotifIds.includes(rec._id)
+  );
+  const readNotifications = pendingRecords.filter(
+    (rec) => readNotifIds.includes(rec._id)
+  );
+
+  const handleMarkAsRead = (notifId) => {
+    setReadNotifIds((prev) => [...prev, notifId]);
+  };
+
   return (
     <div className="dashboard-container" style={{ background: "#f5f7fa", minHeight: "100vh" }}>
       <main className="main-content">
@@ -53,10 +82,13 @@ const HRPersonalRecordsDocuments = () => {
             <span className="icon">📧</span>
             <span
               className="icon"
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", position: "relative" }}
               onClick={() => setShowNotifications(true)}
             >
               🔔
+              {unreadNotifications.length > 0 && (
+                <span className="notif-badge">{unreadNotifications.length}</span>
+              )}
             </span>
             <div className="profile">
               <span>HR OFFICER</span>
@@ -122,6 +154,9 @@ const HRPersonalRecordsDocuments = () => {
           visible={showNotifications}
           onClose={() => setShowNotifications(false)}
           userType="hr"
+          unreadNotifications={unreadNotifications}
+          readNotifications={readNotifications}
+          onMarkAsRead={handleMarkAsRead}
         />
       </main>
     </div>

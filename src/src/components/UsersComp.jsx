@@ -4,7 +4,7 @@ import "../styles/Dashboard.css";
 import "../styles/Users.css";
 import profileImage from "../assets/profile-user.png";
 import Image from "../assets/user.png";
-import NotificationPopup from "./NotificationPopUp";
+import NotificationPopup from "../context/NotificationPopUp";
 
 const UsersComp = () => {
   const navigate = useNavigate();
@@ -18,6 +18,9 @@ const UsersComp = () => {
     password: '',
     role: 'Employee'
   });
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [pendingRecords, setPendingRecords] = useState([]);
+  const [readNotifIds, setReadNotifIds] = useState([]);
 
   // Fetch users for user list
   useEffect(() => {
@@ -149,7 +152,32 @@ const UsersComp = () => {
     navigate("/login");
   };
 
-  const [showNotifications, setShowNotifications] = useState(false);
+  useEffect(() => {
+    const fetchPendingRecords = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/documents?status=Pending");
+        const data = await response.json();
+        setPendingRecords(data);
+      } catch (error) {
+        setPendingRecords([]);
+        console.error("Error fetching pending records:", error);
+      }
+    };
+    fetchPendingRecords();
+    const interval = setInterval(fetchPendingRecords, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const unreadNotifications = pendingRecords.filter(
+    (rec) => !readNotifIds.includes(rec._id)
+  );
+  const readNotifications = pendingRecords.filter(
+    (rec) => readNotifIds.includes(rec._id)
+  );
+
+  const handleMarkAsRead = (notifId) => {
+    setReadNotifIds((prev) => [...prev, notifId]);
+  };
 
   return (
     <div className="dashboard-container">
@@ -183,10 +211,13 @@ const UsersComp = () => {
             <span className="icon">📧</span>
             <span
               className="icon"
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", position: "relative" }}
               onClick={() => setShowNotifications(true)}
             >
               🔔
+              {unreadNotifications.length > 0 && (
+                <span className="notif-badge">{unreadNotifications.length}</span>
+              )}
             </span>
             <div className="profile">
               <span className="user">
@@ -359,6 +390,9 @@ const UsersComp = () => {
           visible={showNotifications}
           onClose={() => setShowNotifications(false)}
           userType="hr"
+          unreadNotifications={unreadNotifications}
+          readNotifications={readNotifications}
+          onMarkAsRead={handleMarkAsRead}
         />
       </main>
     </div>

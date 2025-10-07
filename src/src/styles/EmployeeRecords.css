@@ -458,3 +458,19 @@
   font-weight: bold;
   cursor: pointer;
 }
+
+/* Notification badge for pending documents */
+.notif-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #f44336;
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 7px;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+  z-index: 10;
+}

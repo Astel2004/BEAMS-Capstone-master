@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import "../styles/Dashboard.css"; // Import the CSS file for styling
 import profileImage from "../assets/profile-user.png"; // Import the profile image
-import NotificationPopup from "./NotificationPopUp"; // Import NotificationPopup component
+import NotificationPopup from "../context/NotificationPopUp"; // Import NotificationPopup component
 
 const EmployeeDashboardComp = () => {
   const [showNotifications, setShowNotifications] = useState(false);

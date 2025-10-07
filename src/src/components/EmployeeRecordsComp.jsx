@@ -4,7 +4,7 @@ import "../styles/EmployeeRecords.css";
 import profileImage from "../assets/profile-user.png";
 import Image from "../assets/user.png";
 import { useNavigate } from "react-router-dom";
-import NotificationPopup from "./NotificationPopUp";
+import NotificationPopup from "../context/NotificationPopUp";
 
 const EmployeeRecordsComp = () => {
   const [activeEmployees, setActiveEmployees] = useState([]);
@@ -17,23 +17,8 @@ const EmployeeRecordsComp = () => {
   const [personalEmployees, setPersonalEmployees] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [pendingRecords, setPendingRecords] = useState([]);
+  const [readNotifIds, setReadNotifIds] = useState([]);
   const navigate = useNavigate();
-
-  const handleViewClick = async (employeeId) => {
-    try {
-      const response = await fetch(`http://localhost:5000/api/employees/${employeeId}`);
-      if (!response.ok) throw new Error("Failed to fetch employee");
-      const data = await response.json();
-      setViewEmployee(data);
-    } catch (error) {
-      alert("Error fetching employee details.");
-    }
-  };
-
-  const handleLogout = () => {
-    alert("You have been logged out.");
-    navigate("/login");
-  };
 
   // Fetch employee records
   useEffect(() => {
@@ -47,8 +32,7 @@ const EmployeeRecordsComp = () => {
           position: emp.position || "-",
           step: emp.step || "-",
         }));
-        const sorted = normalized
-          .sort((a, b) => a.surname.localeCompare(b.surname));
+        const sorted = normalized.sort((a, b) => a.surname.localeCompare(b.surname));
         setActiveEmployees(sorted);
       } catch (error) {
         console.error("Error fetching employee records:", error);
@@ -74,7 +58,7 @@ const EmployeeRecordsComp = () => {
     }
   }, [activeTab]);
 
-  // Fetch pending records for review
+  // Fetch pending records for review (notifications)
   useEffect(() => {
     const fetchPendingRecords = async () => {
       try {
@@ -86,10 +70,38 @@ const EmployeeRecordsComp = () => {
         console.error("Error fetching pending records:", error);
       }
     };
-    if (activeTab === "pending") {
-      fetchPendingRecords();
+    fetchPendingRecords();
+    const interval = setInterval(fetchPendingRecords, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Notification logic
+  const unreadNotifications = pendingRecords.filter(
+    (rec) => !readNotifIds.includes(rec._id)
+  );
+  const readNotifications = pendingRecords.filter(
+    (rec) => readNotifIds.includes(rec._id)
+  );
+
+  const handleMarkAsRead = (notifId) => {
+    setReadNotifIds((prev) => [...prev, notifId]);
+  };
+
+  const handleViewClick = async (employeeId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/employees/${employeeId}`);
+      if (!response.ok) throw new Error("Failed to fetch employee");
+      const data = await response.json();
+      setViewEmployee(data);
+    } catch (error) {
+      alert("Error fetching employee details.");
     }
-  }, [activeTab]);
+  };
+
+  const handleLogout = () => {
+    alert("You have been logged out.");
+    navigate("/login");
+  };
 
   const handleCloseViewModal = () => setViewEmployee(null);
 
@@ -165,10 +177,13 @@ const EmployeeRecordsComp = () => {
             <span className="icon">📧</span>
             <span
               className="icon"
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", position: "relative" }}
               onClick={() => setShowNotifications(true)}
             >
               🔔
+              {unreadNotifications.length > 0 && (
+                <span className="notif-badge">{unreadNotifications.length}</span>
+              )}
             </span>
             <div className="profile">
               <img src={Image} alt="Image" />
@@ -399,7 +414,6 @@ const EmployeeRecordsComp = () => {
                                 const response = await fetch(`http://localhost:5000/api/documents/${rec._id}/approve`, { method: "POST" });
                                 if (!response.ok) throw new Error("Failed to approve record");
                                 setPendingRecords((prev) => prev.filter((r) => r._id !== rec._id));
-                                alert("Record approved!");
                               } catch (error) {
                                 alert("Error approving record.");
                               }
@@ -415,7 +429,6 @@ const EmployeeRecordsComp = () => {
                                 const response = await fetch(`http://localhost:5000/api/documents/${rec._id}/reject`, { method: "POST" });
                                 if (!response.ok) throw new Error("Failed to reject record");
                                 setPendingRecords((prev) => prev.filter((r) => r._id !== rec._id));
-                                alert("Record rejected!");
                               } catch (error) {
                                 alert("Error rejecting record.");
                               }
@@ -441,6 +454,9 @@ const EmployeeRecordsComp = () => {
           visible={showNotifications}
           onClose={() => setShowNotifications(false)}
           userType="hr"
+          unreadNotifications={unreadNotifications}
+          readNotifications={readNotifications}
+          onMarkAsRead={handleMarkAsRead}
         />
       </main>
     </div>
