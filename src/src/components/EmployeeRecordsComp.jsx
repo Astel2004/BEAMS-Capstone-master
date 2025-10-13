@@ -561,10 +561,10 @@ const EmployeeRecordsComp = () => {
                           </button>
                           <button
                             className="reject-btn"
-                            style={{ marginLeft: "4px", background: "#f44336", color: "#fff", border: "none", padding: "4px 8px", borderRadius: "3px" }}
+                            style={{ marginLeft: "4px", background: "#3639f4ff", color: "#fff", border: "none", padding: "4px 8px", borderRadius: "3px" }}
                             onClick={() => handleRejectClick(rec._id)}
                           >
-                            Reject
+                            Submit
                           </button>
                         </td>
                       </tr>

@@ -29,7 +29,7 @@ const UsersComp = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/user/list");
+        const response = await fetch("http://localhost:5000/api/users/list");
         const data = await response.json();
         if (Array.isArray(data)) {
           setUsers(data);
@@ -77,7 +77,7 @@ const UsersComp = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/user/add-user', {
+      const response = await fetch('http://localhost:5000/api/users/add-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -98,7 +98,7 @@ const UsersComp = () => {
         setActiveTab('list');
 
         // Refresh user list
-        const usersRes = await fetch("http://localhost:5000/api/user/list");
+        const usersRes = await fetch("http://localhost:5000/api/users/list");
         const usersData = await usersRes.json();
         if (Array.isArray(usersData)) {
           setUsers(usersData);
@@ -258,43 +258,45 @@ const UsersComp = () => {
           {activeTab === "list" && (
             <div className="user-list-window">
               <h3>USER LIST</h3>
-              <table className="user-list-table">
-                <thead>
-                  <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Middle Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.isArray(users) && users.length === 0 ? (
+              <div className="user-list-table-container">
+                <table className="user-list-table">
+                  <thead>
                     <tr>
-                      <td colSpan="6" style={{ textAlign: 'center', color: '#888' }}>No users found.</td>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Middle Name</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Action</th>
                     </tr>
-                  ) : Array.isArray(users) ? (
-                    users.map((user, idx) => (
-                      <tr key={user._id || idx}>
-                        <td>{user.firstName || ""}</td>
-                        <td>{user.lastName || ""}</td>
-                        <td>{user.middleName || ""}</td>
-                        <td>{user.email}</td>
-                        <td>{user.role}</td>
-                        <td>
-                          <button>View</button>
-                          <button className="user-delete-btn" onClick={() => handleDeleteClick(user._id)}>Delete</button>
-                        </td>
+                  </thead>
+                  <tbody>
+                    {Array.isArray(users) && users.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" style={{ textAlign: 'center', color: '#888' }}>No users found.</td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="6" style={{ textAlign: 'center', color: 'red' }}>User list error</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    ) : Array.isArray(users) ? (
+                      users.map((user, idx) => (
+                        <tr key={user._id || idx}>
+                          <td>{user.firstName || ""}</td>
+                          <td>{user.lastName || ""}</td>
+                          <td>{user.middleName || ""}</td>
+                          <td>{user.email}</td>
+                          <td>{user.role}</td>
+                          <td>
+                            <button className="view-button">View</button>
+                            <button className="user-delete-btn" onClick={() => handleDeleteClick(user._id)}>Delete</button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="6" style={{ textAlign: 'center', color: 'red' }}>User list error</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
           {activeTab === "add" && (

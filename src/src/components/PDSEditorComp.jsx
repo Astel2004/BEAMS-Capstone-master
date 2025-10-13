@@ -5,6 +5,8 @@ import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import { saveAs } from "file-saver";
 import "../styles/PDSForm.css";
+import DocViewer, { DocViewerRenderers} from "react-doc-viewer";
+
 
 // Helper function for citizenship placeholders
 function getCitizenshipPlaceholders(citizenship, dualType, country) {
@@ -61,42 +63,22 @@ function EligibilitySection({ register }) {
           {Array.from({ length: 7 }).map((_, i) => (
             <tr key={i}>
               <td>
-                <input
-                  {...register(`elig_${i}_service`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input {...register(`elig_${i}_service`)} />
               </td>
               <td>
-                <input
-                  {...register(`elig_${i}_title`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input {...register(`elig_${i}_title`)} />
               </td>
               <td>
-                <input
-                  type="date"
-                  {...register(`elig_${i}_date`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input type="date" {...register(`elig_${i}_date`)} />
               </td>
               <td>
-                <input
-                  {...register(`elig_${i}_place`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input {...register(`elig_${i}_place`)} />
               </td>
               <td>
-                <input
-                  {...register(`elig_${i}_license`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input {...register(`elig_${i}_license`)} />
               </td>
               <td>
-                <input
-                  type="date"
-                  {...register(`elig_${i}_valid`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input type="date" {...register(`elig_${i}_valid`)} />
               </td>
             </tr>
           ))}
@@ -127,54 +109,28 @@ function WorkExperienceSection({ register }) {
           {Array.from({ length: 28 }).map((_, i) => (
             <tr key={i}>
               <td>
-                <input
-                  type="date"
-                  {...register(`work_${i}_from`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input type="date" {...register(`work_${i}_from`)} />
               </td>
               <td>
-                <input
-                  type="date"
-                  {...register(`work_${i}_to`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input type="date" {...register(`work_${i}_to`)} />
               </td>
               <td>
-                <input
-                  {...register(`work_${i}_title`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input {...register(`work_${i}_title`)} />
               </td>
               <td>
-                <input
-                  {...register(`work_${i}_agency`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input {...register(`work_${i}_agency`)} />
               </td>
               <td>
-                <input
-                  {...register(`work_${i}_salary`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input {...register(`work_${i}_salary`)} />
               </td>
               <td>
-                <input
-                  {...register(`work_${i}_grade`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input {...register(`work_${i}_grade`)} />
               </td>
               <td>
-                <input
-                  {...register(`work_${i}_status`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input {...register(`work_${i}_status`)} />
               </td>
               <td>
-                <input
-                  {...register(`work_${i}_govt`, { required: i === 0 ? "Required" : false })}
-                  placeholder={i === 0 ? "*" : ""}
-                />
+                <input {...register(`work_${i}_govt`)} />
               </td>
             </tr>
           ))}
@@ -191,6 +147,8 @@ const PDSForm = () => {
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [previewData, setPreviewData] = useState(null);
+  const [previewFile, setPreviewFile] = useState(null);
+  const [showDocPreview, setShowDocPreview] = useState(false);
   const [showSubmitPopup, setShowSubmitPopup] = useState(false);
   const [lastSavedFormData, setLastSavedFormData] = useState(null);
 
@@ -203,6 +161,128 @@ const PDSForm = () => {
     }
     return false;
   };
+
+
+
+const handlePreviewPDF = async () => {
+  try {
+    // Get current form values
+    const formData = getValues();
+    
+    // Basic validation
+    if (!formData.surname || !formData.firstName) {
+      alert("Please fill out at least the surname and first name before previewing.");
+      return;
+    }
+
+    // Show loading state
+    setLoading(true);
+    console.log("🚀 Generating PDF preview...");
+
+    // Send form data to backend for PDF generation
+    const response = await fetch("http://localhost:5000/api/pds/preview-pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ formData }),
+    });
+
+    console.log("📡 Response received, status:", response.status);
+
+    // Check if request was successful
+    if (!response.ok) {
+      let errorMessage = 'Failed to generate PDF preview';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+        console.error("❌ Backend error:", errorData);
+      } catch (e) {
+        console.error("❌ Could not parse error response");
+        errorMessage = `Server returned status ${response.status}`;
+      }
+      throw new Error(errorMessage);
+    }
+
+    console.log("📥 Getting PDF blob from response...");
+
+    // Get the PDF file as a blob from the response
+    const blob = await response.blob();
+    
+    console.log("✅ PDF blob received, size:", blob.size, "bytes");
+    console.log("📄 Blob type:", blob.type);
+    
+    // Verify blob is not empty
+    if (blob.size === 0) {
+      throw new Error("Received empty file from server");
+    }
+
+    // Create a temporary URL for the blob
+    const fileUrl = URL.createObjectURL(blob);
+    console.log("🔗 Blob URL created:", fileUrl);
+    
+    // Open PDF in new tab (PDFs display natively in browsers)
+    console.log("🪟 Opening PDF in new tab...");
+    const newWindow = window.open(fileUrl, '_blank');
+    
+    // Small delay to check if popup was blocked
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Check if popup was blocked
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      console.warn("⚠️ Popup was blocked by browser");
+      
+      // Fallback: Download the file instead
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = `PDS_Preview_${formData.surname || 'Document'}.pdf`;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(link);
+      }, 100);
+      
+      alert("Popup blocked! The PDF has been downloaded instead.\n\nOpen the downloaded file to view your PDS.");
+      console.log("📥 PDF downloaded as fallback");
+    } else {
+      console.log("✅ PDF opened successfully in new tab");
+    }
+    
+    // Hide loading state
+    setLoading(false);
+
+    // Clean up the blob URL after 2 minutes to free memory
+    setTimeout(() => {
+      URL.revokeObjectURL(fileUrl);
+      console.log("🧹 Blob URL cleaned up");
+    }, 120000);
+
+  } catch (error) {
+    // Hide loading state on error
+    setLoading(false);
+    
+    // Detailed error logging for debugging
+    console.error("❌ PDF Preview Error Details:");
+    console.error("  - Error name:", error.name);
+    console.error("  - Error message:", error.message);
+    console.error("  - Full error:", error);
+    
+    // User-friendly error message
+    let errorMsg = "Error generating PDF preview";
+    
+    if (error.message === 'Failed to fetch') {
+      errorMsg = `Cannot connect to backend server.\n\nTroubleshooting:\n• Check if backend is running on http://localhost:5000\n• Check browser console for details\n• Try refreshing the page`;
+    } else if (error.message.includes('empty file')) {
+      errorMsg = "Server generated an empty file.\n\nPlease check:\n• PDF template exists on backend\n• Backend console for errors";
+    } else {
+      errorMsg = `Error: ${error.message}\n\nCheck browser console for details.`;
+    }
+    
+    // Show error message to user
+    alert(errorMsg);
+  }
+};
 
   // ---- Save data in console (debug) ----
   const onSubmit = async (formData) => {
@@ -795,69 +875,53 @@ const PDSForm = () => {
                 </tr>
               </thead>
               <tbody>
-                {["ELEMENTARY", "SECONDARY", "VOCATIONAL", "COLLEGE", "GRADUATE"].map((lvl) => {
-                  const isRequired = ["ELEMENTARY", "SECONDARY", "COLLEGE"].includes(lvl);
-                  return (
-                    <tr key={lvl}>
-                      <td>
-                        {lvl}{isRequired && <span className="required-asterisk">*</span>}
-                      </td>
-                      <td>
-                        <input
-                          {...register(`${lvl}_school`, { required: isRequired ? "Required" : false })}
-                          placeholder={isRequired ? "*" : ""}
-                        />
-                        {errors[`${lvl}_school`] && <span className="error">{errors[`${lvl}_school`].message}</span>}
-                      </td>
-                      <td>
-                        <input
-                          {...register(`${lvl}_course`, { required: isRequired ? "Required" : false })}
-                          placeholder={isRequired ? "*" : ""}
-                        />
-                        {errors[`${lvl}_course`] && <span className="error">{errors[`${lvl}_course`].message}</span>}
-                      </td>
-                      <td>
-                        <input
-                          {...register(`${lvl}_from`, { required: isRequired ? "Required" : false })}
-                          placeholder={isRequired ? "*" : "From"}
-                          type="text"
-                        /> - 
-                        <input
-                          {...register(`${lvl}_to`, { required: isRequired ? "Required" : false })}
-                          placeholder={isRequired ? "*" : "To"}
-                          type="text"
-                        />
-                        {(errors[`${lvl}_from`] || errors[`${lvl}_to`]) && (
-                          <span className="error">
-                            {errors[`${lvl}_from`] && errors[`${lvl}_from`].message}
-                            {errors[`${lvl}_to`] && errors[`${lvl}_to`].message}
-                          </span>
-                        )}
-                      </td>
-                      <td>
-                        <input
-                          {...register(`${lvl}_highest`, { required: isRequired ? "Required" : false })}
-                          placeholder={isRequired ? "*" : ""}
-                        />
-                        {errors[`${lvl}_highest`] && <span className="error">{errors[`${lvl}_highest`].message}</span>}
-                      </td>
-                      <td>
-                        <input
-                          {...register(`${lvl}_gradYear`, { required: isRequired ? "Required" : false })}
-                          placeholder={isRequired ? "*" : ""}
-                        />
-                        {errors[`${lvl}_gradYear`] && <span className="error">{errors[`${lvl}_gradYear`].message}</span>}
-                      </td>
-                      <td>
-                        <input
-                          {...register(`${lvl}_honors`, { required: isRequired ? "Required" : false })}
-                          placeholder={isRequired ? "*" : ""}
-                        />
-                        {errors[`${lvl}_honors`] && <span className="error">{errors[`${lvl}_honors`].message}</span>}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {["ELEMENTARY", "SECONDARY", "VOCATIONAL", "COLLEGE", "GRADUATE"].map((lvl) => (
+                  <tr key={lvl}>
+                    <td>{lvl}</td>
+                    <td>
+                      <input
+                        {...register(`${lvl}_school`)}
+                        placeholder=""
+                      />
+                    </td>
+                    <td>
+                      <input
+                        {...register(`${lvl}_course`)}
+                        placeholder=""
+                      />
+                    </td>
+                    <td>
+                      <input
+                        {...register(`${lvl}_from`)}
+                        placeholder="From"
+                        type="text"
+                      /> - 
+                      <input
+                        {...register(`${lvl}_to`)}
+                        placeholder="To"
+                        type="text"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        {...register(`${lvl}_highest`)}
+                        placeholder=""
+                      />
+                    </td>
+                    <td>
+                      <input
+                        {...register(`${lvl}_gradYear`)}
+                        placeholder=""
+                      />
+                    </td>
+                    <td>
+                      <input
+                        {...register(`${lvl}_honors`)}
+                        placeholder=""
+                      />
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
             {/* IV. Civil Service Eligibility */}
@@ -885,35 +949,25 @@ const PDSForm = () => {
                   <tr key={i}>
                     <td>
                       <input
-                        {...register(`vol_${i}_org`, { required: i === 0 ? "Required" : false })}
-                        placeholder={i === 0 ? "*" : ""}
-                      />
+                        {...register(`vol_${i}_org`)} />
                     </td>
                     <td>
                       <input
                         type="date"
-                        {...register(`vol_${i}_from`, { required: i === 0 ? "Required" : false })}
-                        placeholder={i === 0 ? "*" : ""}
-                      />
+                        {...register(`vol_${i}_from`)} />
                     </td>
                     <td>
                       <input
                         type="date"
-                        {...register(`vol_${i}_to`, { required: i === 0 ? "Required" : false })}
-                        placeholder={i === 0 ? "*" : ""}
-                      />
+                        {...register(`vol_${i}_to`)} />
                     </td>
                     <td>
                       <input
-                        {...register(`vol_${i}_hours`, { required: i === 0 ? "Required" : false })}
-                        placeholder={i === 0 ? "*" : ""}
-                      />
+                        {...register(`vol_${i}_hours`)} />
                     </td>
                     <td>
                       <input
-                        {...register(`vol_${i}_pos`, { required: i === 0 ? "Required" : false })}
-                        placeholder={i === 0 ? "*" : ""}
-                      />
+                        {...register(`vol_${i}_pos`)} />
                     </td>
                   </tr>
                 ))}
@@ -937,41 +991,29 @@ const PDSForm = () => {
                   <tr key={i}>
                     <td>
                       <input
-                        {...register(`ld_${i}_title`, { required: i === 0 ? "Required" : false })}
-                        placeholder={i === 0 ? "*" : ""}
-                      />
+                        {...register(`ld_${i}_title`)} />
                     </td>
                     <td>
                       <input
                         type="date"
-                        {...register(`ld_${i}_from`, { required: i === 0 ? "Required" : false })}
-                        placeholder={i === 0 ? "*" : ""}
-                      />
+                        {...register(`ld_${i}_from`)} />
                     </td>
                     <td>
                       <input
                         type="date"
-                        {...register(`ld_${i}_to`, { required: i === 0 ? "Required" : false })}
-                        placeholder={i === 0 ? "*" : ""}
-                      />
+                        {...register(`ld_${i}_to`)} />
                     </td>
                     <td>
                       <input
-                        {...register(`ld_${i}_hours`, { required: i === 0 ? "Required" : false })}
-                        placeholder={i === 0 ? "*" : ""}
-                      />
+                        {...register(`ld_${i}_hours`)} />
                     </td>
                     <td>
                       <input
-                        {...register(`ld_${i}_type`, { required: i === 0 ? "Required" : false })}
-                        placeholder={i === 0 ? "*" : ""}
-                      />
+                        {...register(`ld_${i}_type`)} />
                     </td>
                     <td>
                       <input
-                        {...register(`ld_${i}_sponsor`, { required: i === 0 ? "Required" : false })}
-                        placeholder={i === 0 ? "*" : ""}
-                      />
+                        {...register(`ld_${i}_sponsor`)} />
                     </td>
                   </tr>
                 ))}
@@ -1021,50 +1063,50 @@ const PDSForm = () => {
    {/* Q34a */}
 <tr>
   <td>
-    <span className="required-asterisk">*</span>34a. Are you related by consanguinity or affinity within the third degree to the appointing/recommending authority, 
+    34a. Are you related by consanguinity or affinity within the third degree to the appointing/recommending authority, 
     or to the chief of bureau/office, or the person who has immediate supervision over you in the office, bureau or department where you will be appointed? 
     <b>a. within the third degree?</b>
   </td>
   <td>
-    <input type="radio" {...register("q34a", { required: "Required" })} value="Yes" /> Yes
+    <input type="radio" {...register("q34a")} value="Yes" /> Yes
   </td>
   <td>
-    <input type="radio" {...register("q34a", { required: "Required" })} value="No" /> No
+    <input type="radio" {...register("q34a")} value="No" /> No
   </td>
   <td>
-    <input {...register("q34a_details")} placeholder="If YES, give details" />
+    <input {...register("q34a_details")} />
   </td>
 </tr>
 
 {/* Q34b */}
 <tr>
   <td>
-    <span className="required-asterisk">*</span>34b. <b>b. Within the fourth degree (for Local Government Unit - Career Employees)?</b>
+    34b. <b>b. Within the fourth degree (for Local Government Unit - Career Employees)?</b>
   </td>
   <td>
-    <input type="radio" {...register("q34b", { required: "Required" })} value="Yes" /> Yes
+    <input type="radio" {...register("q34b")} value="Yes" /> Yes
   </td>
   <td>
-    <input type="radio" {...register("q34b", { required: "Required" })} value="No" /> No
+    <input type="radio" {...register("q34b")} value="No" /> No
   </td>
   <td>
-    <input {...register("q34b_details")} placeholder="If YES, give details" />
+    <input {...register("q34b_details")} />
   </td>
 </tr>
 
     {/* Q35a */}
     <tr>
       <td><span className="required-asterisk">*</span>35a. Have you ever been found guilty of any administrative offense?</td>
-      <td><input type="radio" {...register("q35a", { required: "Required" })} value="Yes" /></td>
-      <td><input type="radio" {...register("q35a", { required: "Required" })} value="No" /></td>
+      <td><input type="radio" {...register("q35a")} value="Yes" /></td>
+      <td><input type="radio" {...register("q35a")} value="No" /></td>
       <td><input {...register("q35a_details")} /></td>
     </tr>
 
     {/* Q35b */}
     <tr>
       <td><span className="required-asterisk">*</span>35b. Have you been criminally charged before any court?</td>
-      <td><input type="radio" {...register("q35b", { required: "Required" })} value="Yes" /></td>
-      <td><input type="radio" {...register("q35b", { required: "Required" })} value="No" /></td>
+      <td><input type="radio" {...register("q35b")} value="Yes" /></td>
+      <td><input type="radio" {...register("q35b")} value="No" /></td>
       <td>
         <input {...register("q35b_details")} placeholder="Details" />
         <input {...register("q35b_dateFiled")} placeholder="Date Filed" />
@@ -1075,8 +1117,8 @@ const PDSForm = () => {
     {/* Q36 */}
     <tr>
       <td><span className="required-asterisk">*</span>36. Have you ever been convicted of any crime or violation of any law, decree, ordinance, or regulation by any court or tribunal?</td>
-      <td><input type="radio" {...register("q36", { required: "Required" })} value="Yes" /></td>
-      <td><input type="radio" {...register("q36", { required: "Required" })} value="No" /></td>
+      <td><input type="radio" {...register("q36")} value="Yes" /></td>
+      <td><input type="radio" {...register("q36")} value="No" /></td>
       <td><input {...register("q36_details")} /></td>
     </tr>
 
@@ -1086,32 +1128,32 @@ const PDSForm = () => {
         <span className="required-asterisk">*</span>37. Have you ever been separated from the service in any of the following modes: resignation, retirement, dropped from the rolls, 
         dismissal, termination, end of term, finished contract, or phased out (abolition) in the public or private sector?
       </td>
-      <td><input type="radio" {...register("q37", { required: "Required" })} value="Yes" /></td>
-      <td><input type="radio" {...register("q37", { required: "Required" })} value="No" /></td>
+      <td><input type="radio" {...register("q37")} value="Yes" /></td>
+      <td><input type="radio" {...register("q37")} value="No" /></td>
       <td><input {...register("q37_details")} /></td>
     </tr>
 
     {/* Q38a */}
     <tr>
       <td><span className="required-asterisk">*</span>38a. Have you ever been a candidate in a national or local election held within the last year (except Barangay election)?</td>
-      <td><input type="radio" {...register("q38a", { required: "Required" })} value="Yes" /></td>
-      <td><input type="radio" {...register("q38a", { required: "Required" })} value="No" /></td>
+      <td><input type="radio" {...register("q38a")} value="Yes" /></td>
+      <td><input type="radio" {...register("q38a")} value="No" /></td>
       <td><input {...register("q38a_details")} /></td>
     </tr>
 
     {/* Q38b */}
     <tr>
       <td><span className="required-asterisk">*</span>38b. Have you resigned from the government service during the three (3)-month period before the last election to promote/actively campaign for a national or local candidate?</td>
-      <td><input type="radio" {...register("q38b", { required: "Required" })} value="Yes" /></td>
-      <td><input type="radio" {...register("q38b", { required: "Required" })} value="No" /></td>
+      <td><input type="radio" {...register("q38b")} value="Yes" /></td>
+      <td><input type="radio" {...register("q38b")} value="No" /></td>
       <td><input {...register("q38b_details")} /></td>
     </tr>
 
     {/* Q39 */}
     <tr>
       <td><span className="required-asterisk">*</span>39. Have you acquired the status of an immigrant or permanent resident of another country?</td>
-      <td><input type="radio" {...register("q39", { required: "Required" })} value="Yes" /></td>
-      <td><input type="radio" {...register("q39", { required: "Required" })} value="No" /></td>
+      <td><input type="radio" {...register("q39")} value="Yes" /></td>
+      <td><input type="radio" {...register("q39")} value="No" /></td>
       <td><input {...register("q39_details")} placeholder="If YES, give country" /></td>
     </tr>
 
@@ -1126,24 +1168,24 @@ const PDSForm = () => {
 {/* Q40a */}
 <tr>
   <td><span className="required-asterisk">*</span>a. Are you a member of any indigenous group?</td>
-  <td><input type="radio" {...register("q40a", { required: "Required" })} value="Yes" /></td>
-  <td><input type="radio" {...register("q40a", { required: "Required" })} value="No" /></td>
+  <td><input type="radio" {...register("q40a")} value="Yes" /></td>
+  <td><input type="radio" {...register("q40a")} value="No" /></td>
   <td><input {...register("q40a_details")} placeholder="If YES, please specify" /></td>
 </tr>
 
 {/* Q40b */}
 <tr>
   <td><span className="required-asterisk">*</span>b. Are you a person with disability?</td>
-  <td><input type="radio" {...register("q40b", { required: "Required" })} value="Yes" /></td>
-  <td><input type="radio" {...register("q40b", { required: "Required" })} value="No" /></td>
+  <td><input type="radio" {...register("q40b")} value="Yes" /></td>
+  <td><input type="radio" {...register("q40b")} value="No" /></td>
   <td><input {...register("q40b_details")} placeholder="If YES, specify ID No." /></td>
 </tr>
 
 {/* Q40c */}
 <tr>
   <td><span className="required-asterisk">*</span>c. Are you a solo parent?</td>
-  <td><input type="radio" {...register("q40c", { required: "Required" })} value="Yes" /></td>
-  <td><input type="radio" {...register("q40c", { required: "Required" })} value="No" /></td>
+  <td><input type="radio" {...register("q40c")} value="Yes" /></td>
+  <td><input type="radio" {...register("q40c")} value="No" /></td>
   <td><input {...register("q40c_details")} placeholder="If YES, specify ID No." /></td>
 </tr>
   </tbody>
@@ -1223,7 +1265,38 @@ const PDSForm = () => {
         >
           Download Empty PDS Template (DOCX)
         </button>
+        <button
+          className="preview"
+          onClick={handlePreviewPDF}
+          disabled={loading}
+          type="button"
+        >
+          Preview PDS (PDF)
+        </button>
       </div>
+
+      {showDocPreview && previewFile && (
+  <div className="modal-overlay">
+    <div className="modal-content" style={{ width: "80vw", height: "80vh" }}>
+      <button
+        className="modal-btn"
+        style={{ float: "right", marginBottom: "8px" }}
+        onClick={() => {
+          setShowDocPreview(false);
+          URL.revokeObjectURL(previewFile);
+          setPreviewFile(null);
+        }}
+      >
+        Close
+      </button>
+      <DocViewer
+        documents={[{ uri: previewFile, fileType: "docx" }]}
+        pluginRenderers={DocViewerRenderers}
+        style={{ height: "70vh" }}
+      />
+    </div>
+  </div>
+)}
 
       {/* Submit Popup (after save) */}
       {showSubmitPopup && (

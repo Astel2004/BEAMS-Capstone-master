@@ -18,7 +18,7 @@
     "cors": "^2.8.5",
     "docx-preview": "^0.3.7",
     "docx4js": "^3.3.0",
-    "docxtemplater": "^3.66.3",
+    "docxtemplater": "^3.66.6",
     "dotenv": "^16.5.0",
     "express": "^4.18.2",
     "file-saver": "^2.0.5",
@@ -30,6 +30,7 @@
     "mongoose": "^6.13.8",
     "multer": "^2.0.2",
     "pizzip": "^3.2.0",
+    "react-doc-viewer": "^0.1.14",
     "react-hook-form": "^7.62.0",
     "react-router-dom": "^7.5.1"
   },

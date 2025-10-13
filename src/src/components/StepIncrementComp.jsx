@@ -71,7 +71,7 @@ const StepIncrementComp = () => {
   useEffect(() => {
     const fetchUserAccounts = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/user/list");
+        const response = await fetch("http://localhost:5000/api/users/list");
         const data = await response.json();
         setUserAccounts(data);
       } catch (error) {
@@ -265,9 +265,9 @@ const StepIncrementComp = () => {
                 {Array.from({ length: 25 }, (_, i) => {
                   const year = 2006 + i;
                   let step = "";
-                  if (year === 2009) step = "Step 1";
-                  if (year === 2012) step = "Step 2";
-                  if (year === 2014) step = "Step 3";
+                  if (year === 2019) step = "Step 1";
+                  if (year === 2022) step = "Step 2";
+                  if (year === 2025) step = "Step 3";
                   return (
                     <p key={year} className={`year td-year-${year}`}>
                       {step}

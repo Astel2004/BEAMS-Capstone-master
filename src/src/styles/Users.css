@@ -7,7 +7,8 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   margin: 1rem;
-  overflow: hidden;
+  overflow: visible;
+  table-layout: fixed;
 }
 
 .user-list-table th,
@@ -20,11 +21,14 @@
 }
 
 .user-list-table th {
+  position: sticky;
+  top: 0;
   background: #1abc9c;
   color: #fff;
   font-weight: 600;
   letter-spacing: 0.5px;
   border: 1.5px solid #16a085;
+  z-index: 2;
 }
 
 .user-list-table tr:last-child td {
@@ -56,8 +60,8 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.07);
 }
 
-.user-list-table button:hover {
-  background: #005fa3;
+.user-delete-btn:hover {
+  background: #a30000;
   border-color: #16a085;
 }
 
@@ -265,4 +269,10 @@
 .modal-btn.no {
   background: #eee;
   color: #333;
+}
+
+.user-list-table-container {
+  max-height: 600px;      /* Adjust as needed */
+  overflow-y: auto;
+  width: 100%;
 }

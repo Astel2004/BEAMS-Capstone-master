@@ -82,15 +82,23 @@ router.post('/add-user', async (req, res) => {
     return res.status(400).json({ error: 'Invalid role selected.' });
   }
 
+  // Start a session for transaction
+  const session = await UserAccounts.startSession();
+  session.startTransaction();
+
   try {
     if (!firstName || !lastName || !email || !password || !role) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({ error: 'All fields are required.' });
     }
 
     const name = `${firstName} ${middleName || ""} ${lastName}`.trim();
 
-    const existingUser = await UserAccounts.findOne({ email });
+    const existingUser = await UserAccounts.findOne({ email }).session(session);
     if (existingUser) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(409).json({ error: 'User already exists with this email.' });
     }
 
@@ -107,22 +115,26 @@ router.post('/add-user', async (req, res) => {
       beamsId
     });
 
-    await newUser.save();
+    await newUser.save({ session });
 
     // --- CREATE CORRESPONDING EMPLOYEE RECORD ---
     const newEmployee = new Employees({
       surname: lastName,
       firstname: firstName,
-      middlename: middleName,
+      middlename: middleName || "-", // Provide a default value
       email: email,
-      position: role, // or set to "" if you want to leave blank
-      // Add other fields as needed
+      position: role,
     });
-    await newEmployee.save();
+    await newEmployee.save({ session });
     // --------------------------------------------
+
+    await session.commitTransaction();
+    session.endSession();
 
     res.status(201).json({ message: 'User added successfully!', beamsId });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     console.error('Add user error:', error);
     res.status(500).json({ error: 'An error occurred. Please try again.' });
   }
@@ -155,7 +167,7 @@ router.delete('/:id', async (req, res) => {
 // ===================== GET EMPLOYEES =====================
 router.get('/employees', async (req, res) => {
   try {
-    const employees = await UserAccounts.find({ role: "Employee" });
+    const employees = await Employees.find({});
     res.json(employees);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch employees.' });

@@ -14,6 +14,9 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+router.post('/preview', pdsController.generatePreview);  // <-- Add this FIRST
+router.post('/preview-pdf', pdsController.generatePreviewPDF);
+
 // Use upload.single('file') for file upload
 router.post('/', upload.single('file'), pdsController.createPDS);
 

@@ -28,7 +28,7 @@ mongoose
     process.exit(1);
   });
 
-app.use('/api/user', userRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/pds', pdsRoutes);   // ✅ Use PDS routes
 app.use('/api/saln', salnRoutes); // ✅ Use SALN routes

@@ -20,7 +20,7 @@ const MyProfileComp = ({
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/user/profile"); // Replace with your API endpoint
+        const response = await fetch("http://localhost:5000/api/users/profile"); // Replace with your API endpoint
         const data = await response.json();
         setProfile(data); // Update state with fetched data
         setFormData(data); // Initialize form data with profile data
@@ -45,7 +45,7 @@ const MyProfileComp = ({
 
   const handleSave = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/user/profile", {
+      const response = await fetch("http://localhost:5000/api/users/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
